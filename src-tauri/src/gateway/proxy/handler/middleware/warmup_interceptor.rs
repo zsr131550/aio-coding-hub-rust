@@ -66,7 +66,7 @@ fn respond_warmup_intercept<R: tauri::Runtime>(
 
     if ctx.observe_request {
         emit_request_start_event(
-            &ctx.state.app,
+            ctx.state.events.as_ref(),
             ctx.trace_id.clone(),
             ctx.cli_key.clone(),
             ctx.session_id.clone(),
@@ -109,6 +109,7 @@ fn respond_warmup_intercept<R: tauri::Runtime>(
         RequestEndArgs::from_context(RequestEndContextArgs {
             deps: RequestEndDeps::new(
                 &ctx.state.app,
+                &ctx.state.events,
                 &ctx.state.db,
                 &ctx.state.log_tx,
                 &ctx.state.plugin_pipeline,

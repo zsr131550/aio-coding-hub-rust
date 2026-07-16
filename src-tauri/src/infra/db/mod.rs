@@ -7,6 +7,7 @@ use crate::shared::error::db_err;
 use crate::shared::error::AppResult;
 use crate::shared::fs::read_file_with_max_len;
 use crate::shared::time::now_unix_seconds;
+use aio_core::AppPaths;
 use r2d2::Pool;
 use r2d2_sqlite::SqliteConnectionManager;
 use rusqlite::Connection;
@@ -14,7 +15,7 @@ use std::env;
 use std::path::PathBuf;
 use std::time::Duration;
 
-pub(crate) const DB_FILE_NAME: &str = "aio-coding-hub.db";
+pub(crate) const DB_FILE_NAME: &str = aio_core::DATABASE_FILE_NAME;
 pub(crate) const MIN_SUPPORTED_SCHEMA_VERSION: i64 = migrations::MIN_SUPPORTED_SCHEMA_VERSION;
 pub(crate) const LATEST_SCHEMA_VERSION: i64 = migrations::LATEST_SCHEMA_VERSION;
 pub(crate) const MAX_COMPAT_SCHEMA_VERSION: i64 = migrations::MAX_COMPAT_SCHEMA_VERSION;
@@ -24,7 +25,6 @@ const POOL_MIN_IDLE_DEFAULT: u32 = 1;
 const POOL_CONNECTION_TIMEOUT_DEFAULT: Duration = Duration::from_secs(5);
 const PRAGMA_SYNCHRONOUS_DEFAULT: &str = "NORMAL";
 const PRAGMA_MMAP_SIZE_DEFAULT: i64 = 268_435_456;
-const DB_OPTIMIZE_STAMP_FILE_NAME: &str = "db_optimize.stamp";
 const DB_OPTIMIZE_MIN_INTERVAL_SECS: i64 = 24 * 60 * 60;
 const DB_OPTIMIZE_STAMP_MAX_BYTES: usize = 64;
 
@@ -176,11 +176,21 @@ pub(crate) fn sql_placeholders(count: usize) -> String {
 }
 
 pub fn db_path<R: tauri::Runtime>(app: &tauri::AppHandle<R>) -> AppResult<PathBuf> {
-    Ok(app_paths::app_data_dir(app)?.join(DB_FILE_NAME))
+    let paths = app_paths::get(app)?;
+    Ok(db_path_from_paths(paths.as_ref()))
 }
 
 pub fn init<R: tauri::Runtime>(app: &tauri::AppHandle<R>) -> AppResult<Db> {
-    let path = db_path(app)?;
+    let paths = app_paths::get(app)?;
+    init_with_paths(paths.as_ref())
+}
+
+pub(crate) fn db_path_from_paths(paths: &AppPaths) -> PathBuf {
+    paths.database_file()
+}
+
+pub(crate) fn init_with_paths(paths: &AppPaths) -> AppResult<Db> {
+    let path = db_path_from_paths(paths);
     let path_hint = path.to_string_lossy();
 
     let config = DbRuntimeConfig::from_env();
@@ -226,7 +236,7 @@ pub fn init<R: tauri::Runtime>(app: &tauri::AppHandle<R>) -> AppResult<Db> {
     migrations::apply_migrations(&mut conn)
         .map_err(|e| format!("sqlite migration failed at {path_hint}: {e}"))?;
 
-    maybe_run_db_optimize(app, &conn);
+    maybe_run_db_optimize(paths, &conn);
 
     Ok(Db { pool })
 }
@@ -270,19 +280,13 @@ fn db_optimize_enabled() -> bool {
         .is_some_and(|v| v == "1" || v == "true" || v == "yes")
 }
 
-fn maybe_run_db_optimize<R: tauri::Runtime>(app: &tauri::AppHandle<R>, conn: &Connection) {
+fn maybe_run_db_optimize(paths: &AppPaths, conn: &Connection) {
     if !db_optimize_enabled() {
         return;
     }
 
     let now = now_unix_seconds();
-    let stamp_path = match app_paths::app_data_dir(app) {
-        Ok(dir) => dir.join(DB_OPTIMIZE_STAMP_FILE_NAME),
-        Err(err) => {
-            tracing::warn!("sqlite optimize skipped: failed to resolve app_data_dir: {err}");
-            return;
-        }
-    };
+    let stamp_path = paths.database_optimize_stamp();
 
     let last_run = read_db_optimize_stamp(&stamp_path);
 
@@ -457,7 +461,9 @@ mod tests {
     #[test]
     fn db_optimize_stamp_rejects_oversized_marker() {
         let temp = tempfile::tempdir().expect("tempdir");
-        let path = temp.path().join(DB_OPTIMIZE_STAMP_FILE_NAME);
+        let path = temp
+            .path()
+            .join(aio_core::DATABASE_OPTIMIZE_STAMP_FILE_NAME);
         std::fs::write(&path, vec![b'1'; DB_OPTIMIZE_STAMP_MAX_BYTES + 1]).expect("write stamp");
 
         assert_eq!(read_db_optimize_stamp(&path), 0);

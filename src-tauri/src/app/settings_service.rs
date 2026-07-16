@@ -1,7 +1,6 @@
 //! Usage: Settings-related Tauri commands.
 
-use crate::app_state::{ensure_db_ready, DbInitState};
-use crate::gateway::events::GATEWAY_STATUS_EVENT_NAME;
+use crate::app_state::{ensure_db_ready, ManagedCoreRuntimeState};
 use crate::gateway_control::{
     app_start_gateway_with_config, try_app_gateway_update_circuit_config,
 };
@@ -385,7 +384,7 @@ fn current_gateway_status(app: &tauri::AppHandle) -> crate::gateway::GatewayStat
 
 async fn start_gateway_with_settings_unlocked(
     app: &tauri::AppHandle,
-    db_state: &DbInitState,
+    db_state: &ManagedCoreRuntimeState,
     next_settings: &settings::AppSettings,
 ) -> Result<crate::gateway::control_service::GatewayStartResult, String> {
     let db = ensure_db_ready(app.clone(), db_state).await?;
@@ -404,10 +403,9 @@ async fn start_gateway_with_settings_unlocked(
     })
     .await?;
 
-    crate::app::heartbeat_watchdog::gated_emit(
+    crate::app::core_runtime::publish(
         app,
-        GATEWAY_STATUS_EVENT_NAME,
-        start_result.status.clone(),
+        aio_contract::AppEvent::GatewayStatusChanged(start_result.status.clone()),
     );
     Ok(start_result)
 }
@@ -427,7 +425,7 @@ async fn write_settings_snapshot(
 
 async fn restore_previous_runtime(
     app: &tauri::AppHandle,
-    db_state: &DbInitState,
+    db_state: &ManagedCoreRuntimeState,
     previous_settings: &settings::AppSettings,
     previous_gateway_status: &crate::gateway::GatewayStatus,
 ) -> crate::gateway::GatewayStatus {
@@ -453,7 +451,7 @@ async fn restore_previous_runtime(
 
 async fn rollback_settings_transaction(
     app: &tauri::AppHandle,
-    db_state: &DbInitState,
+    db_state: &ManagedCoreRuntimeState,
     previous_settings: &settings::AppSettings,
     previous_gateway_status: &crate::gateway::GatewayStatus,
 ) -> crate::gateway::GatewayStatus {
@@ -534,7 +532,7 @@ pub(crate) async fn settings_get(app: tauri::AppHandle) -> Result<SettingsView, 
 
 pub(crate) async fn settings_set_impl(
     app: tauri::AppHandle,
-    db_state: &DbInitState,
+    db_state: &ManagedCoreRuntimeState,
     update: SettingsUpdate,
 ) -> Result<SettingsMutationResult, String> {
     let SettingsUpdate {

@@ -1,6 +1,6 @@
 //! Usage: Request logs and trace detail related Tauri commands.
 
-use crate::app_state::{ensure_db_ready, DbInitState};
+use crate::app_state::{ensure_db_ready, ManagedCoreRuntimeState};
 use crate::commands::limit::normalize_limit;
 use crate::gateway_runtime_access::app_gateway_active_requests_snapshot;
 use crate::{blocking, request_attempt_logs, request_logs};
@@ -26,7 +26,7 @@ fn request_attempt_logs_limit(limit: Option<u32>) -> usize {
 #[specta::specta]
 pub(crate) async fn request_logs_list(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     cli_key: String,
     limit: Option<u32>,
 ) -> Result<Vec<request_logs::RequestLogSummary>, String> {
@@ -43,7 +43,7 @@ pub(crate) async fn request_logs_list(
 #[specta::specta]
 pub(crate) async fn request_logs_list_all(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     limit: Option<u32>,
 ) -> Result<Vec<request_logs::RequestLogSummary>, String> {
     let db = ensure_db_ready(app, db_state.inner()).await?;
@@ -59,7 +59,7 @@ pub(crate) async fn request_logs_list_all(
 #[specta::specta]
 pub(crate) async fn request_logs_list_after_id(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     cli_key: String,
     after_id: i64,
     limit: Option<u32>,
@@ -77,7 +77,7 @@ pub(crate) async fn request_logs_list_after_id(
 #[specta::specta]
 pub(crate) async fn request_logs_list_after_id_all(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     after_id: i64,
     limit: Option<u32>,
 ) -> Result<Vec<request_logs::RequestLogSummary>, String> {
@@ -94,7 +94,7 @@ pub(crate) async fn request_logs_list_after_id_all(
 #[specta::specta]
 pub(crate) async fn request_log_get(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     log_id: i64,
 ) -> Result<request_logs::RequestLogDetail, String> {
     let db = ensure_db_ready(app, db_state.inner()).await?;
@@ -109,7 +109,7 @@ pub(crate) async fn request_log_get(
 #[specta::specta]
 pub(crate) async fn request_log_get_by_trace_id(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     trace_id: String,
 ) -> Result<Option<request_logs::RequestLogDetail>, String> {
     let db = ensure_db_ready(app, db_state.inner()).await?;
@@ -124,7 +124,7 @@ pub(crate) async fn request_log_get_by_trace_id(
 #[specta::specta]
 pub(crate) async fn request_attempt_logs_by_trace_id(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     trace_id: String,
     limit: Option<u32>,
 ) -> Result<Vec<request_attempt_logs::RequestAttemptLog>, String> {

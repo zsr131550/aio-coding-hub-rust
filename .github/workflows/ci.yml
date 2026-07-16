@@ -224,6 +224,12 @@ jobs:
           git diff -- src-tauri/Cargo.lock
           exit 1
 
+      - name: Headless core boundary checker self-test
+        run: node scripts/check-headless-core-boundary.selftest.mjs
+
+      - name: Headless core dependency boundary
+        run: node scripts/check-headless-core-boundary.mjs
+
       - name: Rust clippy
         working-directory: src-tauri
         run: cargo clippy --all-targets --locked -- -D warnings

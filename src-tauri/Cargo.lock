@@ -39,6 +39,8 @@ dependencies = [
 name = "aio-coding-hub"
 version = "0.60.13"
 dependencies = [
+ "aio-contract",
+ "aio-core",
  "axum",
  "base64 0.22.1",
  "bytes",
@@ -86,6 +88,26 @@ dependencies = [
  "tracing-subscriber",
  "windows-sys 0.59.0",
  "zip",
+]
+
+[[package]]
+name = "aio-contract"
+version = "0.60.13"
+dependencies = [
+ "serde",
+ "serde_json",
+ "specta",
+]
+
+[[package]]
+name = "aio-core"
+version = "0.60.13"
+dependencies = [
+ "aio-contract",
+ "serde_json",
+ "tempfile",
+ "thiserror 2.0.18",
+ "tokio",
 ]
 
 [[package]]

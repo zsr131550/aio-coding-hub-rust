@@ -1,32 +1,29 @@
-//! Usage: Shared DB initialization gate used by `commands/*`.
+//! Usage: DB access adapter backed by the unified headless runtime state.
 
-use crate::shared::error::AppResult;
+pub(crate) use super::core_runtime::ManagedCoreRuntimeState;
+use crate::shared::error::{AppError, AppResult};
 use crate::{blocking, db};
-use tokio::sync::{Mutex as AsyncMutex, MutexGuard};
-
-#[derive(Default)]
-pub(crate) struct DbInitState(pub(crate) AsyncMutex<Option<AppResult<db::Db>>>);
 
 pub(crate) async fn ensure_db_ready<R: tauri::Runtime>(
     app: tauri::AppHandle<R>,
-    state: &DbInitState,
+    state: &ManagedCoreRuntimeState,
 ) -> AppResult<db::Db> {
-    let mut guard = state.0.lock().await;
-    if let Some(db) = guard.as_ref() {
-        return db.clone();
-    }
-
-    let db = blocking::run("db_init", move || db::init(&app)).await;
-    *guard = Some(db.clone());
-    db
+    ensure_db_ready_with(app, state.database()).await
 }
 
 pub(crate) async fn prepare_db_reset<'a>(
-    state: &'a DbInitState,
-) -> MutexGuard<'a, Option<AppResult<db::Db>>> {
-    let mut guard = state.0.lock().await;
+    state: &'a ManagedCoreRuntimeState,
+) -> aio_core::AsyncInitResetGuard<'a, db::Db, AppError> {
     // Hold the cache lock through file deletion so no concurrent command can
     // recreate the pool midway through a destructive reset.
-    let _ = guard.take();
-    guard
+    state.database().begin_reset().await
+}
+
+pub(crate) async fn ensure_db_ready_with<R: tauri::Runtime>(
+    app: tauri::AppHandle<R>,
+    state: &aio_core::AsyncInitState<db::Db, AppError>,
+) -> AppResult<db::Db> {
+    state
+        .get_or_try_init(|| async move { blocking::run("db_init", move || db::init(&app)).await })
+        .await
 }

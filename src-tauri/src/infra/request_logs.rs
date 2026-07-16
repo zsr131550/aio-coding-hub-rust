@@ -340,10 +340,10 @@ pub fn start_buffered_writer<R: tauri::Runtime>(
     db: db::Db,
 ) -> (
     mpsc::Sender<RequestLogInsert>,
-    tauri::async_runtime::JoinHandle<()>,
+    crate::task_runtime::JoinHandle<()>,
 ) {
     let (tx, rx) = mpsc::channel::<RequestLogInsert>(WRITE_BUFFER_CAPACITY);
-    let task = tauri::async_runtime::spawn_blocking(move || {
+    let task = crate::task_runtime::spawn_blocking(move || {
         writer_loop(app, db, rx);
     });
     (tx, task)
@@ -366,7 +366,7 @@ pub fn spawn_write_through<R: tauri::Runtime>(
         return false;
     };
 
-    tauri::async_runtime::spawn_blocking(move || {
+    crate::task_runtime::spawn_blocking(move || {
         let _permit = permit;
         let mut cache = InsertBatchCache::default();
         let items = [item];
@@ -454,7 +454,7 @@ pub(crate) fn spawn_retention_task(app: tauri::AppHandle, db: db::Db) {
         return;
     }
 
-    tauri::async_runtime::spawn(async move {
+    crate::task_runtime::spawn(async move {
         run_retention_once(&app, &db).await;
 
         let mut interval = tokio::time::interval(RETENTION_TASK_INTERVAL);

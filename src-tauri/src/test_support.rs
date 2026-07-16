@@ -84,6 +84,12 @@ pub fn app_data_dir<R: tauri::Runtime>(
     crate::infra::app_paths::app_data_dir(app)
 }
 
+pub fn app_paths<R: tauri::Runtime>(
+    app: &tauri::AppHandle<R>,
+) -> crate::shared::error::AppResult<std::sync::Arc<aio_core::AppPaths>> {
+    crate::infra::app_paths::get(app)
+}
+
 pub fn db_path<R: tauri::Runtime>(
     app: &tauri::AppHandle<R>,
 ) -> crate::shared::error::AppResult<PathBuf> {
@@ -99,12 +105,12 @@ pub fn init_db<R: tauri::Runtime>(
 pub fn app_data_reset<R: tauri::Runtime>(
     app: &tauri::AppHandle<R>,
 ) -> crate::shared::error::AppResult<bool> {
-    let state = crate::app::app_state::DbInitState::default();
+    let state = aio_core::AsyncInitState::<crate::db::Db, crate::shared::error::AppError>::new();
     let app_handle = app.clone();
 
-    tauri::async_runtime::block_on(async move {
-        let _ = crate::app::app_state::ensure_db_ready(app_handle.clone(), &state).await?;
-        let _db_reset_guard = crate::app::app_state::prepare_db_reset(&state).await;
+    crate::task_runtime::block_on(async move {
+        let _ = crate::app::app_state::ensure_db_ready_with(app_handle.clone(), &state).await?;
+        let _db_reset_guard = state.begin_reset().await;
         crate::infra::data_management::app_data_reset(&app_handle)
     })
 }
@@ -373,7 +379,7 @@ pub fn cli_proxy_set_enabled_via_command_json<R: tauri::Runtime>(
         );
     }
     let result =
-        tauri::async_runtime::block_on(crate::commands::cli_proxy::cli_proxy_set_disabled_impl(
+        crate::task_runtime::block_on(crate::commands::cli_proxy::cli_proxy_set_disabled_impl(
             app.clone(),
             None,
             cli_key.to_string(),
@@ -399,7 +405,7 @@ pub fn gateway_check_port_available_json<R: tauri::Runtime>(
     app: &tauri::AppHandle<R>,
     port: u16,
 ) -> crate::shared::error::AppResult<bool> {
-    tauri::async_runtime::block_on(crate::app::gateway_service::check_port_available(
+    crate::task_runtime::block_on(crate::app::gateway_service::check_port_available(
         app.clone(),
         port,
     ))

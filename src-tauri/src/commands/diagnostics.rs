@@ -1,6 +1,6 @@
 //! Usage: Read-only diagnostics for memory and data-size investigations.
 
-use crate::app_state::{ensure_db_ready, DbInitState};
+use crate::app_state::{ensure_db_ready, ManagedCoreRuntimeState};
 use crate::shared::time::now_unix_seconds;
 use crate::{app_paths, blocking, codex_paths, db};
 use rusqlite::OptionalExtension;
@@ -259,7 +259,7 @@ LIMIT ?1
 #[specta::specta]
 pub(crate) async fn app_memory_diagnostics_get(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
 ) -> Result<AppMemoryDiagnosticsSnapshot, String> {
     let db = ensure_db_ready(app.clone(), db_state.inner()).await?;
     blocking::run("app_memory_diagnostics_get", move || {

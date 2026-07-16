@@ -400,7 +400,7 @@ pub(crate) fn install(app: &tauri::AppHandle) {
     );
 
     let app = app.clone();
-    tauri::async_runtime::spawn(async move {
+    crate::task_runtime::spawn(async move {
         let mut interval = heartbeat_interval();
         // First tick is immediate; skip it to avoid double fire at startup.
         interval.tick().await;
@@ -467,7 +467,7 @@ pub(crate) fn on_main_window_shown(app: &tauri::AppHandle) {
     );
 
     let app = app.clone();
-    tauri::async_runtime::spawn(async move {
+    crate::task_runtime::spawn(async move {
         check_and_recover_if_needed(&app).await;
     });
 }
@@ -852,8 +852,8 @@ async fn escalate_to_app_restart(app: &tauri::AppHandle) {
     // Run cleanup + restart in a background thread to avoid blocking the watchdog loop.
     std::thread::spawn(move || {
         std::thread::sleep(Duration::from_millis(200));
-        tauri::async_runtime::block_on(crate::app::cleanup::cleanup_before_exit(&app));
-        app.request_restart();
+        crate::task_runtime::block_on(crate::app::cleanup::cleanup_before_exit(&app));
+        crate::app::lifecycle::request_restart(&app);
     });
 }
 

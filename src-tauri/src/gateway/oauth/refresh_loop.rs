@@ -25,8 +25,8 @@ enum RefreshLoopStep<T> {
 pub(crate) fn spawn(
     db: crate::db::Db,
     shutdown_rx: watch::Receiver<bool>,
-) -> tauri::async_runtime::JoinHandle<()> {
-    tauri::async_runtime::spawn(async move {
+) -> crate::task_runtime::JoinHandle<()> {
+    crate::task_runtime::spawn(async move {
         run_loop(db, shutdown_rx).await;
     })
 }

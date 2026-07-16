@@ -7,7 +7,6 @@ use std::process::Stdio;
 use std::time::Duration;
 use tokio::io::{AsyncRead, AsyncReadExt};
 use tokio::process::Command;
-use tokio::task::JoinHandle;
 
 const NPM_LATEST_TIMEOUT: Duration = Duration::from_secs(10);
 const NPM_INSTALL_TIMEOUT: Duration = Duration::from_secs(120);
@@ -360,7 +359,7 @@ fn build_cli_update_command(
     Ok(command)
 }
 
-type OutputReadTask = JoinHandle<std::io::Result<LimitedCommandOutput>>;
+type OutputReadTask = crate::task_runtime::JoinHandle<std::io::Result<LimitedCommandOutput>>;
 
 async fn collect_output_task(
     task: Option<OutputReadTask>,
@@ -434,14 +433,12 @@ pub async fn cli_update(app: &tauri::AppHandle, cli_key: String) -> CliUpdateRes
         }
     };
 
-    let stdout_task = child
-        .stdout
-        .take()
-        .map(|stdout| tokio::spawn(read_limited_output(stdout, NPM_INSTALL_OUTPUT_STREAM_LIMIT)));
-    let stderr_task = child
-        .stderr
-        .take()
-        .map(|stderr| tokio::spawn(read_limited_output(stderr, NPM_INSTALL_OUTPUT_STREAM_LIMIT)));
+    let stdout_task = child.stdout.take().map(|stdout| {
+        crate::task_runtime::spawn(read_limited_output(stdout, NPM_INSTALL_OUTPUT_STREAM_LIMIT))
+    });
+    let stderr_task = child.stderr.take().map(|stderr| {
+        crate::task_runtime::spawn(read_limited_output(stderr, NPM_INSTALL_OUTPUT_STREAM_LIMIT))
+    });
 
     let wait_result = tokio::time::timeout(NPM_INSTALL_TIMEOUT, child.wait()).await;
     match wait_result {

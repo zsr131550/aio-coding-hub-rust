@@ -6,6 +6,7 @@ mod claude_metadata_user_id_injection;
 pub(crate) mod cli_auth;
 mod codex_session_id;
 pub(crate) mod control_service;
+pub(crate) mod debug_log;
 pub(crate) mod events;
 pub(crate) mod http_client;
 pub(crate) mod listen;
@@ -28,13 +29,7 @@ mod warmup;
 use crate::settings;
 use serde::Serialize;
 
-#[derive(Debug, Clone, Serialize, specta::Type, Default, PartialEq, Eq)]
-pub struct GatewayStatus {
-    pub running: bool,
-    pub port: Option<u16>,
-    pub base_url: Option<String>,
-    pub listen_addr: Option<String>,
-}
+pub use aio_contract::GatewayStatus;
 
 #[derive(Debug, Clone, Serialize, specta::Type)]
 pub struct GatewayProviderCircuitStatus {

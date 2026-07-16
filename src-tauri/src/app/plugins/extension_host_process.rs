@@ -108,7 +108,7 @@ impl ExtensionHostChildProcess {
             )
         })?;
         if let Some(mut stderr) = child.stderr.take() {
-            tokio::spawn(async move {
+            crate::task_runtime::spawn(async move {
                 let mut sink = tokio::io::sink();
                 let _ = tokio::io::copy(&mut stderr, &mut sink).await;
             });

@@ -10,7 +10,8 @@ use super::request_context::RequestContext;
 use super::{is_claude_count_tokens_request, is_codex_model_discovery_request};
 
 use crate::gateway::active_requests::ActiveRequestStart;
-use crate::gateway::events::{emit_gateway_debug_log_lazy, emit_request_start_event};
+use crate::gateway::debug_log::emit_gateway_debug_log_lazy;
+use crate::gateway::events::emit_request_start_event;
 use crate::gateway::proxy::should_seed_in_progress_request_log;
 use crate::gateway::response_fixer;
 use crate::gateway::util::{
@@ -114,6 +115,7 @@ fn abort_guard_from_proxy_context<R: tauri::Runtime>(
 ) -> RequestAbortGuard<R> {
     RequestAbortGuard::new(
         ctx.state.app.clone(),
+        ctx.state.events.clone(),
         ctx.state.db.clone(),
         ctx.state.log_tx.clone(),
         ctx.state.plugin_pipeline.clone(),
@@ -291,7 +293,7 @@ where
     if ctx.observe_request {
         register_active_request_from_proxy_context(&ctx);
         emit_request_start_event(
-            &ctx.state.app,
+            ctx.state.events.as_ref(),
             ctx.trace_id.clone(),
             ctx.cli_key.clone(),
             ctx.session_id.clone(),
@@ -323,8 +325,14 @@ where
     });
 
     if let Some(args) = build_in_progress_request_log_args(&ctx) {
-        enqueue_request_log_placeholder(&ctx.state.app, &ctx.state.db, &ctx.state.log_tx, args)
-            .await;
+        enqueue_request_log_placeholder(
+            &ctx.state.app,
+            ctx.state.events.as_ref(),
+            &ctx.state.db,
+            &ctx.state.log_tx,
+            args,
+        )
+        .await;
     }
 
     super::forwarder::forward(RequestContext::from_handler_parts(
@@ -410,6 +418,7 @@ mod tests {
     ) -> GatewayAppState<tauri::test::MockRuntime> {
         GatewayAppState {
             app,
+            events: Arc::new(aio_core::NoopEventSink),
             db,
             log_tx,
             circuit: Arc::new(circuit_breaker::CircuitBreaker::new(

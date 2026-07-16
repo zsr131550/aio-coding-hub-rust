@@ -1,4 +1,4 @@
-use crate::app_state::{ensure_db_ready, DbInitState};
+use crate::app_state::{ensure_db_ready, ManagedCoreRuntimeState};
 use crate::gateway_control::app_gateway_clear_cli_route_runtime_state;
 use crate::{blocking, providers};
 
@@ -110,7 +110,7 @@ fn provider_runtime_reset_decision(
 
 pub(crate) async fn providers_list(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     cli_key: String,
 ) -> Result<Vec<providers::ProviderSummary>, String> {
     let db = ensure_db_ready(app.clone(), db_state.inner()).await?;
@@ -123,7 +123,7 @@ pub(crate) async fn providers_list(
 
 pub(crate) async fn provider_upsert(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     input: ProviderUpsertInput,
 ) -> Result<providers::ProviderSummary, String> {
     let ProviderUpsertInput {
@@ -247,7 +247,7 @@ pub(crate) async fn provider_upsert(
 
 pub(crate) async fn provider_duplicate(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     provider_id: i64,
 ) -> Result<providers::ProviderSummary, String> {
     let db = ensure_db_ready(app.clone(), db_state.inner()).await?;
@@ -325,7 +325,7 @@ pub(crate) async fn provider_duplicate(
 
 pub(crate) async fn provider_set_enabled(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     provider_id: i64,
     enabled: bool,
 ) -> Result<providers::ProviderSummary, String> {
@@ -352,7 +352,7 @@ pub(crate) async fn provider_set_enabled(
 
 pub(crate) async fn provider_delete(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     provider_id: i64,
     clear_usage_stats: bool,
 ) -> Result<bool, String> {
@@ -387,7 +387,7 @@ pub(crate) async fn provider_delete(
 
 pub(crate) async fn providers_reorder(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     cli_key: String,
     ordered_provider_ids: Vec<i64>,
 ) -> Result<Vec<providers::ProviderSummary>, String> {
@@ -412,7 +412,7 @@ pub(crate) async fn providers_reorder(
 
 pub(crate) async fn default_route_providers_list(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     cli_key: String,
 ) -> Result<Vec<providers::ProviderRouteRow>, String> {
     let db = ensure_db_ready(app.clone(), db_state.inner()).await?;
@@ -425,7 +425,7 @@ pub(crate) async fn default_route_providers_list(
 
 pub(crate) async fn default_route_providers_set_order(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     cli_key: String,
     ordered_provider_ids: Vec<i64>,
 ) -> Result<Vec<providers::ProviderRouteRow>, String> {

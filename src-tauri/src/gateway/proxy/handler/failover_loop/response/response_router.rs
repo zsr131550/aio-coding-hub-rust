@@ -326,7 +326,7 @@ fn emit_cx2cc_upstream_log<R: tauri::Runtime>(
         })
         .unwrap_or_else(|| "<unknown>".to_string());
     emit_gateway_log(
-        &input.state.app,
+        input.state.events.as_ref(),
         "info",
         "CX2CC_UPSTREAM_RESPONSE",
         format!(

@@ -91,8 +91,8 @@ pub(crate) fn app_restart(app: tauri::AppHandle) -> Result<bool, String> {
         std::thread::sleep(std::time::Duration::from_millis(200));
         app.state::<crate::app::resident::ResidentState>()
             .begin_restart();
-        tauri::async_runtime::block_on(crate::app::cleanup::cleanup_before_exit(&app));
-        app.request_restart();
+        crate::task_runtime::block_on(crate::app::cleanup::cleanup_before_exit(&app));
+        crate::app::lifecycle::request_restart(&app);
     });
     Ok(true)
 }
@@ -107,15 +107,20 @@ pub(crate) fn app_heartbeat_pong(app: tauri::AppHandle) -> Result<bool, String> 
 
 #[tauri::command]
 #[specta::specta]
-pub(crate) fn app_startup_status_get(app: tauri::AppHandle) -> AppStartupStatus {
-    crate::app::startup_state::startup_status_snapshot(&app)
+pub(crate) fn app_startup_status_get(
+    state: tauri::State<'_, crate::app::core_runtime::ManagedCoreRuntimeState>,
+) -> AppStartupStatus {
+    crate::app::startup_state::startup_status_snapshot(state.inner())
 }
 
 #[tauri::command]
 #[specta::specta]
-pub(crate) fn app_startup_retry(app: tauri::AppHandle) -> AppStartupStatus {
+pub(crate) fn app_startup_retry(
+    app: tauri::AppHandle,
+    state: tauri::State<'_, crate::app::core_runtime::ManagedCoreRuntimeState>,
+) -> AppStartupStatus {
     let _ = crate::app::startup_tasks::spawn(app.clone());
-    crate::app::startup_state::startup_status_snapshot(&app)
+    crate::app::startup_state::startup_status_snapshot(state.inner())
 }
 
 #[tauri::command]

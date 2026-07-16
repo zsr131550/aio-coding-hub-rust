@@ -1,13 +1,13 @@
 //! Usage: Claude provider model validation related Tauri commands.
 
-use crate::app_state::{ensure_db_ready, DbInitState};
+use crate::app_state::{ensure_db_ready, ManagedCoreRuntimeState};
 use crate::{blocking, claude_model_validation, claude_model_validation_history};
 
 #[tauri::command]
 #[specta::specta]
 pub(crate) async fn claude_provider_validate_model(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     provider_id: i64,
     base_url: String,
     request_json: String,
@@ -22,7 +22,7 @@ pub(crate) async fn claude_provider_validate_model(
 #[specta::specta]
 pub(crate) async fn claude_validation_history_list(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     provider_id: i64,
     limit: Option<u32>,
 ) -> Result<Vec<claude_model_validation_history::ClaudeModelValidationRunRow>, String> {
@@ -39,7 +39,7 @@ pub(crate) async fn claude_validation_history_list(
 #[specta::specta]
 pub(crate) async fn claude_validation_history_clear_provider(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     provider_id: i64,
 ) -> Result<bool, String> {
     let db = ensure_db_ready(app, db_state.inner()).await?;

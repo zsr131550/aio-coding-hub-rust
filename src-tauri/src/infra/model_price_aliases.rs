@@ -8,7 +8,6 @@ use crate::shared::fs::read_file_with_max_len;
 use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
 
-const MODEL_PRICE_DIR_NAME: &str = "model-prices";
 const ALIASES_FILE_NAME: &str = "price-aliases.json";
 const ALIASES_SCHEMA_VERSION_V1: i64 = 1;
 const MAX_MODEL_LEN: usize = 200;
@@ -55,7 +54,7 @@ fn validate_cli_key(cli_key: &str) -> Result<(), String> {
 fn model_prices_dir<R: tauri::Runtime>(
     app: &tauri::AppHandle<R>,
 ) -> crate::shared::error::AppResult<PathBuf> {
-    let dir = app_paths::app_data_dir(app)?.join(MODEL_PRICE_DIR_NAME);
+    let dir = app_paths::get(app)?.model_prices_dir();
     std::fs::create_dir_all(&dir).map_err(|e| format!("failed to create model-prices dir: {e}"))?;
     Ok(dir)
 }

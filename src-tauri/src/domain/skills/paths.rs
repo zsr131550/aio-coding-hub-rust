@@ -16,13 +16,13 @@ fn home_dir<R: tauri::Runtime>(
 pub(super) fn ssot_skills_root<R: tauri::Runtime>(
     app: &tauri::AppHandle<R>,
 ) -> crate::shared::error::AppResult<PathBuf> {
-    Ok(app_paths::app_data_dir(app)?.join("skills"))
+    Ok(app_paths::get(app)?.skills_root())
 }
 
 pub(super) fn repos_root<R: tauri::Runtime>(
     app: &tauri::AppHandle<R>,
 ) -> crate::shared::error::AppResult<PathBuf> {
-    Ok(app_paths::app_data_dir(app)?.join("skill-repos"))
+    Ok(app_paths::get(app)?.skill_repos_root())
 }
 
 pub(super) fn cli_skills_root<R: tauri::Runtime>(

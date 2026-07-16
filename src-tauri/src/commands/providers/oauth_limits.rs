@@ -1,4 +1,4 @@
-use crate::app_state::{ensure_db_ready, DbInitState};
+use crate::app_state::{ensure_db_ready, ManagedCoreRuntimeState};
 use crate::blocking;
 use crate::domain::provider_oauth_limits::OAuthLimitSnapshotInput;
 
@@ -21,7 +21,7 @@ pub(crate) struct ProviderOAuthLimitsResult {
 #[specta::specta]
 pub(crate) async fn provider_oauth_fetch_limits(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     provider_id: i64,
 ) -> Result<ProviderOAuthLimitsResult, String> {
     let db = ensure_db_ready(app, db_state.inner()).await?;

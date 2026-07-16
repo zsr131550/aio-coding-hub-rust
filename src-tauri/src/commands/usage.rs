@@ -1,6 +1,6 @@
 //! Usage: Usage statistics related Tauri commands.
 
-use crate::app_state::{ensure_db_ready, DbInitState};
+use crate::app_state::{ensure_db_ready, ManagedCoreRuntimeState};
 use crate::{blocking, cli_sessions, usage_stats};
 
 const USAGE_LEADERBOARD_CSV_EXPORT_MAX_BYTES: usize = 1024 * 1024;
@@ -71,7 +71,7 @@ fn write_usage_leaderboard_csv_export(file_path: String, csv: String) -> Result<
 #[specta::specta]
 pub(crate) async fn usage_summary(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     range: String,
     cli_key: Option<String>,
 ) -> Result<usage_stats::UsageSummary, String> {
@@ -87,7 +87,7 @@ pub(crate) async fn usage_summary(
 #[specta::specta]
 pub(crate) async fn usage_summary_v2(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     params: usage_stats::UsageQueryParams,
 ) -> Result<usage_stats::UsageSummary, String> {
     let db = ensure_db_ready(app.clone(), db_state.inner()).await?;
@@ -102,7 +102,7 @@ pub(crate) async fn usage_summary_v2(
 #[specta::specta]
 pub(crate) async fn usage_leaderboard_provider(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     range: String,
     cli_key: Option<String>,
     limit: Option<u32>,
@@ -120,7 +120,7 @@ pub(crate) async fn usage_leaderboard_provider(
 #[specta::specta]
 pub(crate) async fn usage_leaderboard_day(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     range: String,
     cli_key: Option<String>,
     limit: Option<u32>,
@@ -138,7 +138,7 @@ pub(crate) async fn usage_leaderboard_day(
 #[specta::specta]
 pub(crate) async fn usage_leaderboard_v2(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     scope: String,
     params: usage_stats::UsageQueryParams,
     limit: Option<u32>,
@@ -171,7 +171,7 @@ pub(crate) async fn usage_leaderboard_csv_export(
 #[specta::specta]
 pub(crate) async fn usage_hourly_series(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     days: u32,
 ) -> Result<Vec<usage_stats::UsageHourlyRow>, String> {
     let db = ensure_db_ready(app, db_state.inner()).await?;
@@ -236,7 +236,7 @@ mod tests {
 #[specta::specta]
 pub(crate) async fn usage_day_detail_v1(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     params: usage_stats::UsageDayDetailParams,
 ) -> Result<usage_stats::UsageDayDetailV1, String> {
     let db = ensure_db_ready(app.clone(), db_state.inner()).await?;
@@ -251,7 +251,7 @@ pub(crate) async fn usage_day_detail_v1(
 #[specta::specta]
 pub(crate) async fn usage_folder_options_v1(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     params: usage_stats::UsageQueryParams,
 ) -> Result<Vec<usage_stats::UsageFolderOptionV1>, String> {
     let db = ensure_db_ready(app.clone(), db_state.inner()).await?;
@@ -266,7 +266,7 @@ pub(crate) async fn usage_folder_options_v1(
 #[specta::specta]
 pub(crate) async fn usage_provider_cache_rate_trend_v1(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     params: usage_stats::UsageQueryParams,
     limit: Option<u32>,
 ) -> Result<Vec<usage_stats::UsageProviderCacheRateTrendRowV1>, String> {

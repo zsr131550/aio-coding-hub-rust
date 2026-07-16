@@ -714,7 +714,7 @@ where
             Err(err) => {
                 tracing::warn!("cx2cc: non-stream event-stream aggregation failed: {err}");
                 emit_gateway_log(
-                    &state.app,
+                    state.events.as_ref(),
                     "warn",
                     "CX2CC_RESPONSE_AGGREGATE_FAILED",
                     format!("[CX2CC] non-stream event-stream aggregation failed: {err}"),
@@ -764,7 +764,7 @@ where
             );
             if cx2cc_active {
                 emit_gateway_log(
-                    &state.app,
+                    state.events.as_ref(),
                     "info",
                     "CX2CC_SUCCESS_NON_STREAM",
                     format!(
@@ -784,7 +784,7 @@ where
                 "cx2cc: recovered headerless SSE payload on successful upstream response"
             );
             emit_gateway_log(
-                &state.app,
+                state.events.as_ref(),
                 "info",
                 "CX2CC_SSE_HEADER_MISSING",
                 format!(
@@ -800,7 +800,7 @@ where
     if cx2cc_active {
         match serde_json::from_slice::<serde_json::Value>(&body_bytes) {
             Ok(openai_body) => emit_gateway_log(
-                &state.app,
+                state.events.as_ref(),
                 "info",
                 "CX2CC_UPSTREAM_BODY_SUMMARY",
                 format!(
@@ -811,7 +811,7 @@ where
                 ),
             ),
             Err(err) => emit_gateway_log(
-                &state.app,
+                state.events.as_ref(),
                 "warn",
                 "CX2CC_UPSTREAM_BODY_PARSE_FAILED",
                 format!(
@@ -847,7 +847,7 @@ where
                     "cx2cc: non-stream response translated OpenAI → Anthropic"
                 );
                 emit_gateway_log(
-                    &state.app,
+                    state.events.as_ref(),
                     "info",
                     "CX2CC_TRANSLATED_BODY_SUMMARY",
                     format!(
@@ -870,7 +870,7 @@ where
         Err(err) => {
             tracing::warn!("cx2cc: response translation failed: {err}");
             emit_gateway_log(
-                &state.app,
+                state.events.as_ref(),
                 "warn",
                 "CX2CC_RESPONSE_TRANSLATE_FAILED",
                 format!("[CX2CC] response translation failed: {err}"),
@@ -1005,6 +1005,7 @@ where
             RequestEndArgs::from_context(RequestEndContextArgs {
                 deps: RequestEndDeps::new(
                     &state.app,
+                    &state.events,
                     &state.db,
                     &state.log_tx,
                     &state.plugin_pipeline,
@@ -1182,6 +1183,7 @@ where
         RequestEndArgs::from_context(RequestEndContextArgs {
             deps: RequestEndDeps::new(
                 &state.app,
+                &state.events,
                 &state.db,
                 &state.log_tx,
                 &state.plugin_pipeline,

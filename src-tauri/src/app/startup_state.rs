@@ -1,165 +1,85 @@
 //! Usage: Startup pipeline state shared between backend bootstrap and frontend status UI.
 
-use crate::shared::mutex_ext::MutexExt;
-use std::sync::Mutex;
-use tauri::Manager;
+use super::core_runtime::ManagedCoreRuntimeState;
 
-pub const APP_STARTUP_STATUS_EVENT_NAME: &str = "app:startup_status";
+pub use aio_contract::{AppStartupStage, AppStartupStatus, APP_STARTUP_STATUS_EVENT_NAME};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize, specta::Type)]
-#[serde(rename_all = "snake_case")]
-pub enum AppStartupStage {
-    Idle,
-    InitializingDb,
-    ReadingSettings,
-    StartingGateway,
-    SyncingCliProxy,
-    FinalizingWsl,
-    Ready,
-    Failed,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, specta::Type)]
-#[serde(rename_all = "camelCase")]
-pub struct AppStartupStatus {
-    pub running: bool,
-    pub current_stage: AppStartupStage,
-    pub failed_stage: Option<AppStartupStage>,
-    pub error_message: Option<String>,
-    pub can_retry: bool,
-}
-
-impl Default for AppStartupStatus {
-    fn default() -> Self {
-        Self {
-            running: false,
-            current_stage: AppStartupStage::Idle,
-            failed_stage: None,
-            error_message: None,
-            can_retry: false,
-        }
-    }
-}
-
-#[derive(Default)]
-pub(crate) struct StartupState {
-    inner: Mutex<AppStartupStatus>,
-}
-
-fn begin_run(status: &mut AppStartupStatus) -> bool {
-    if status.running {
-        return false;
-    }
-
-    status.running = true;
-    status.current_stage = AppStartupStage::InitializingDb;
-    status.failed_stage = None;
-    status.error_message = None;
-    status.can_retry = false;
-    true
-}
-
-fn set_stage(status: &mut AppStartupStatus, stage: AppStartupStage) {
-    status.running = true;
-    status.current_stage = stage;
-    status.failed_stage = None;
-    status.error_message = None;
-    status.can_retry = false;
-}
-
-fn set_failed(status: &mut AppStartupStatus, stage: AppStartupStage, message: String) {
-    status.running = false;
-    status.current_stage = AppStartupStage::Failed;
-    status.failed_stage = Some(stage);
-    status.error_message = Some(message);
-    status.can_retry = true;
-}
-
-fn set_ready(status: &mut AppStartupStatus) {
-    status.running = false;
-    status.current_stage = AppStartupStage::Ready;
-    status.failed_stage = None;
-    status.error_message = None;
-    status.can_retry = false;
-}
-
-fn emit_snapshot<R: tauri::Runtime>(app: &tauri::AppHandle<R>, snapshot: &AppStartupStatus) {
-    crate::app::heartbeat_watchdog::gated_emit(
-        app,
-        APP_STARTUP_STATUS_EVENT_NAME,
+fn emit_snapshot(events: &dyn aio_core::EventSink, snapshot: &AppStartupStatus) {
+    events.publish(aio_contract::AppEvent::StartupStatusChanged(
         snapshot.clone(),
-    );
+    ));
 }
 
-fn update_status<R, F>(app: &tauri::AppHandle<R>, update: F) -> AppStartupStatus
-where
-    R: tauri::Runtime,
-    F: FnOnce(&mut AppStartupStatus),
-{
-    let state = app.state::<StartupState>();
-    let mut guard = state.inner.lock_or_recover();
-    update(&mut guard);
-    let snapshot = guard.clone();
-    drop(guard);
-    emit_snapshot(app, &snapshot);
-    snapshot
+pub(crate) fn startup_status_snapshot(state: &ManagedCoreRuntimeState) -> AppStartupStatus {
+    state.context().startup().snapshot()
 }
 
-pub(crate) fn startup_status_snapshot<R: tauri::Runtime>(
-    app: &tauri::AppHandle<R>,
-) -> AppStartupStatus {
-    let state = app.state::<StartupState>();
-    let snapshot = state.inner.lock_or_recover().clone();
-    snapshot
-}
-
-pub(crate) fn try_begin_startup_run<R: tauri::Runtime>(app: &tauri::AppHandle<R>) -> bool {
-    let state = app.state::<StartupState>();
-    let mut guard = state.inner.lock_or_recover();
-    let started = begin_run(&mut guard);
-    let snapshot = guard.clone();
-    drop(guard);
-    if started {
-        emit_snapshot(app, &snapshot);
+pub(crate) fn try_begin_startup_run(state: &ManagedCoreRuntimeState) -> bool {
+    if let Some(snapshot) = state.context().startup().try_begin_run() {
+        emit_snapshot(state.context().events().as_ref(), &snapshot);
+        true
+    } else {
+        false
     }
-    started
 }
 
-pub(crate) fn set_startup_stage<R: tauri::Runtime>(
-    app: &tauri::AppHandle<R>,
+pub(crate) fn set_startup_stage(
+    state: &ManagedCoreRuntimeState,
     stage: AppStartupStage,
 ) -> AppStartupStatus {
-    update_status(app, |status| set_stage(status, stage))
+    let snapshot = state.context().startup().set_stage(stage);
+    emit_snapshot(state.context().events().as_ref(), &snapshot);
+    snapshot
 }
 
-pub(crate) fn fail_startup_run<R: tauri::Runtime>(
-    app: &tauri::AppHandle<R>,
+pub(crate) fn fail_startup_run(
+    state: &ManagedCoreRuntimeState,
     stage: AppStartupStage,
     message: impl Into<String>,
 ) -> AppStartupStatus {
-    let message = message.into();
-    update_status(app, |status| set_failed(status, stage, message))
+    let snapshot = state.context().startup().fail(stage, message);
+    emit_snapshot(state.context().events().as_ref(), &snapshot);
+    snapshot
 }
 
-pub(crate) fn finish_startup_run<R: tauri::Runtime>(app: &tauri::AppHandle<R>) -> AppStartupStatus {
-    update_status(app, set_ready)
+pub(crate) fn finish_startup_run(state: &ManagedCoreRuntimeState) -> AppStartupStatus {
+    let snapshot = state.context().startup().finish();
+    emit_snapshot(state.context().events().as_ref(), &snapshot);
+    snapshot
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use aio_core::RecordingEventSink;
+
+    #[test]
+    fn emit_snapshot_publishes_typed_startup_event() {
+        let events = RecordingEventSink::default();
+        let snapshot = AppStartupStatus {
+            running: false,
+            current_stage: AppStartupStage::Ready,
+            failed_stage: None,
+            error_message: None,
+            can_retry: false,
+        };
+
+        emit_snapshot(&events, &snapshot);
+
+        let published = events.events();
+        assert_eq!(published.len(), 1);
+        let aio_contract::AppEvent::StartupStatusChanged(actual) = &published[0] else {
+            panic!("expected typed startup status event");
+        };
+        assert_eq!(actual, &snapshot);
+    }
 
     #[test]
     fn begin_run_resets_failure_and_sets_initial_stage() {
-        let mut status = AppStartupStatus {
-            running: false,
-            current_stage: AppStartupStage::Failed,
-            failed_stage: Some(AppStartupStage::StartingGateway),
-            error_message: Some("boom".to_string()),
-            can_retry: true,
-        };
-
-        assert!(begin_run(&mut status));
+        let state = aio_core::StartupState::default();
+        let _ = state.try_begin_run().expect("first run starts");
+        let _ = state.fail(AppStartupStage::StartingGateway, "boom");
+        let status = state.try_begin_run().expect("retry starts");
         assert!(status.running);
         assert_eq!(status.current_stage, AppStartupStage::InitializingDb);
         assert_eq!(status.failed_stage, None);
@@ -169,25 +89,17 @@ mod tests {
 
     #[test]
     fn begin_run_rejects_parallel_start() {
-        let mut status = AppStartupStatus {
-            running: true,
-            ..AppStartupStatus::default()
-        };
-
-        assert!(!begin_run(&mut status));
-        assert!(status.running);
+        let state = aio_core::StartupState::default();
+        assert!(state.try_begin_run().is_some());
+        assert!(state.try_begin_run().is_none());
+        assert!(state.snapshot().running);
     }
 
     #[test]
     fn set_failed_marks_retryable_failure() {
-        let mut status = AppStartupStatus {
-            running: true,
-            current_stage: AppStartupStage::StartingGateway,
-            ..AppStartupStatus::default()
-        };
-
-        set_failed(
-            &mut status,
+        let state = aio_core::StartupState::default();
+        let _ = state.try_begin_run();
+        let status = state.fail(
             AppStartupStage::StartingGateway,
             "gateway failed".to_string(),
         );
@@ -201,15 +113,11 @@ mod tests {
 
     #[test]
     fn set_ready_clears_failure_details() {
-        let mut status = AppStartupStatus {
-            running: true,
-            current_stage: AppStartupStage::Failed,
-            failed_stage: Some(AppStartupStage::ReadingSettings),
-            error_message: Some("bad settings".to_string()),
-            can_retry: true,
-        };
-
-        set_ready(&mut status);
+        let state = aio_core::StartupState::default();
+        let _ = state.try_begin_run();
+        let _ = state.fail(AppStartupStage::ReadingSettings, "bad settings");
+        let _ = state.try_begin_run();
+        let status = state.finish();
 
         assert!(!status.running);
         assert_eq!(status.current_stage, AppStartupStage::Ready);

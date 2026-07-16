@@ -456,7 +456,7 @@ fn emit_started_event<R: tauri::Runtime>(
     }
     abort_guard.capture_in_flight_attempt(&started_attempt);
     if let Some(started_event) = started_event {
-        emit_attempt_event(&input.state.app, started_event);
+        emit_attempt_event(input.state.events.as_ref(), started_event);
     }
 }
 

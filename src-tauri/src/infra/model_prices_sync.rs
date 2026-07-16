@@ -41,7 +41,7 @@ struct ModelPriceRow {
 }
 
 fn model_prices_dir(app: &tauri::AppHandle) -> crate::shared::error::AppResult<PathBuf> {
-    let dir = app_paths::app_data_dir(app)?.join("model-prices");
+    let dir = app_paths::get(app)?.model_prices_dir();
     std::fs::create_dir_all(&dir).map_err(|e| format!("failed to create model-prices dir: {e}"))?;
     Ok(dir)
 }

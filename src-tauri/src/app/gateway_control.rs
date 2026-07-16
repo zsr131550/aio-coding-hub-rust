@@ -40,6 +40,7 @@ pub(crate) fn app_start_gateway(
         let start_result = gateway::control_service::GatewayControlService::start(
             running,
             app,
+            super::core_runtime::event_sink(app),
             db,
             &cfg,
             preferred_port,
@@ -70,6 +71,7 @@ pub(crate) fn app_start_gateway_with_config(
         gateway::control_service::GatewayControlService::start(
             running,
             app,
+            super::core_runtime::event_sink(app),
             db,
             cfg,
             preferred_port,

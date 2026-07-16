@@ -228,7 +228,7 @@ pub(super) fn emit_request_event_and_spawn_request_log<R: tauri::Runtime>(
     );
 
     log_args.emit_gateway_request_event(
-        &ctx.app,
+        ctx.events.as_ref(),
         effective_error_category,
         completion.ttfb_ms,
         attempts,
@@ -237,6 +237,7 @@ pub(super) fn emit_request_event_and_spawn_request_log<R: tauri::Runtime>(
 
     spawn_enqueue_request_log_with_backpressure(
         ctx.app.clone(),
+        ctx.events.clone(),
         ctx.db.clone(),
         ctx.log_tx.clone(),
         log_args,
@@ -279,6 +280,7 @@ mod tests {
     ) -> StreamFinalizeCtx<tauri::test::MockRuntime> {
         StreamFinalizeCtx {
             app,
+            events: Arc::new(aio_core::NoopEventSink),
             db,
             log_tx,
             plugin_pipeline: crate::gateway::plugins::pipeline::GatewayPluginPipeline::empty_shared(

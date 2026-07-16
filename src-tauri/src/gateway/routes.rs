@@ -811,6 +811,7 @@ mod tests {
     ) -> GatewayAppState<tauri::test::MockRuntime> {
         GatewayAppState {
             app,
+            events: Arc::new(aio_core::NoopEventSink),
             db,
             log_tx,
             circuit,

@@ -441,7 +441,7 @@ fn github_default_branch(
 ) -> crate::shared::error::AppResult<String> {
     let url = github_api_url(&["repos", owner, repo])?;
     let client = client.clone();
-    tauri::async_runtime::block_on(async move {
+    crate::task_runtime::block_on(async move {
         let resp = client
             .get(url)
             .header("Accept", "application/vnd.github+json")
@@ -495,7 +495,7 @@ fn github_download_zipball(
 ) -> crate::shared::error::AppResult<Vec<u8>> {
     let url = github_api_url(&["repos", owner, repo, "zipball", r#ref])?;
     let client = client.clone();
-    tauri::async_runtime::block_on(async move {
+    crate::task_runtime::block_on(async move {
         let resp = client
             .get(url)
             .header("Accept", "application/vnd.github+json")
@@ -532,7 +532,7 @@ pub(super) fn github_get_branch_commit(
 ) -> crate::shared::error::AppResult<String> {
     let client = build_github_client()?;
     let url = github_api_url(&["repos", owner, repo, "commits", branch])?;
-    tauri::async_runtime::block_on(async move {
+    crate::task_runtime::block_on(async move {
         let resp = client
             .get(url)
             .header("Accept", "application/vnd.github+json")

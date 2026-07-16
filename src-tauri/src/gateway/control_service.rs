@@ -12,7 +12,7 @@ use super::active_requests::ActiveRequestRegistry;
 use super::background_tasks::GatewayBackgroundTasks;
 use super::binder::{bind_exact, bind_first_available, resolve_gateway_binding};
 use super::codex_session_id::CodexSessionIdCache;
-use super::events::{GatewayLogEvent, GATEWAY_LOG_EVENT_NAME, GATEWAY_STATUS_EVENT_NAME};
+use super::events::{AppEvent, GatewayLogEvent};
 use super::proxy::{GatewayErrorCode, ProviderBaseUrlPingCache, RecentErrorCache};
 use super::routes::build_router;
 use super::runtime::{GatewayAppState, GatewayRuntime, GatewayRuntimeInit};
@@ -30,6 +30,7 @@ impl GatewayControlService {
     pub(crate) fn start(
         running: &mut Option<GatewayRuntime>,
         app: &tauri::AppHandle,
+        events: Arc<dyn aio_core::EventSink>,
         db: db::Db,
         cfg: &settings::AppSettings,
         preferred_port: Option<u16>,
@@ -65,7 +66,7 @@ impl GatewayControlService {
             .unwrap_or_else(|_| SocketAddr::from(([127, 0, 0, 1], port)));
 
         emit_port_fallback_log(
-            app,
+            events.as_ref(),
             binding.fixed_port,
             requested_port,
             port,
@@ -87,6 +88,7 @@ impl GatewayControlService {
 
         let state = GatewayAppState {
             app: app.clone(),
+            events: events.clone(),
             db: db.clone(),
             log_tx: background_tasks.log_tx(),
             circuit: circuit.clone(),
@@ -99,7 +101,7 @@ impl GatewayControlService {
         };
         let router = build_router(state);
         let (shutdown, shutdown_rx) = oneshot::channel::<()>();
-        let task = tauri::async_runtime::spawn(async move {
+        let task = crate::task_runtime::spawn(async move {
             let listener = match tokio::net::TcpListener::from_std(std_listener) {
                 Ok(listener) => listener,
                 Err(err) => {
@@ -136,7 +138,7 @@ impl GatewayControlService {
         });
         let status = runtime.status();
         *running = Some(runtime);
-        crate::app::heartbeat_watchdog::gated_emit(app, GATEWAY_STATUS_EVENT_NAME, &status);
+        events.publish(AppEvent::GatewayStatusChanged(status.clone()));
 
         Ok(GatewayStartResult {
             status,
@@ -318,7 +320,7 @@ fn provider_ids_for_cli(db: &db::Db, cli_key: &str) -> crate::shared::error::App
 }
 
 fn emit_port_fallback_log(
-    app: &tauri::AppHandle,
+    events: &dyn aio_core::EventSink,
     fixed_port: Option<u16>,
     requested_port: u16,
     bound_port: u16,
@@ -333,7 +335,7 @@ fn emit_port_fallback_log(
             bound_port,
             base_url,
         };
-        crate::app::heartbeat_watchdog::gated_emit(app, GATEWAY_LOG_EVENT_NAME, payload);
+        events.publish(AppEvent::GatewayLog(payload));
     }
 }
 

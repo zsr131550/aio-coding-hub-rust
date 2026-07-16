@@ -38,7 +38,7 @@ async fn auto_configure(
         let auto_cfg_db = db.clone();
         let gateway_listen_mode = settings.gateway_listen_mode;
 
-        tauri::async_runtime::spawn(async move {
+        crate::task_runtime::spawn(async move {
             if let Err(err) = crate::commands::wsl::wsl_auto_configure_on_startup(
                 &auto_cfg_app,
                 auto_cfg_db,

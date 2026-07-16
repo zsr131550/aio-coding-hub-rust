@@ -106,10 +106,10 @@ pub fn start_buffered_writer(
     db: db::Db,
 ) -> (
     mpsc::Sender<circuit_breaker::CircuitPersistedState>,
-    tauri::async_runtime::JoinHandle<()>,
+    crate::task_runtime::JoinHandle<()>,
 ) {
     let (tx, rx) = mpsc::channel::<circuit_breaker::CircuitPersistedState>(WRITE_BUFFER_CAPACITY);
-    let task = tauri::async_runtime::spawn_blocking(move || {
+    let task = crate::task_runtime::spawn_blocking(move || {
         writer_loop(db, rx);
     });
     (tx, task)

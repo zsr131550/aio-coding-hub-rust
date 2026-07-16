@@ -30,6 +30,8 @@ const CHECKS = {
   "plugin-api-contract": "pnpm check:plugin-api-contract",
   "egui-compat-contract": "pnpm check:egui-compat-contract",
   "egui-fixtures": "pnpm check:egui-fixtures",
+  "headless-core-boundary-self": "pnpm test:headless-core-boundary-self",
+  "headless-core-boundary": "pnpm check:headless-core-boundary",
   "egui-baseline-self": "pnpm test:egui-baseline-self",
   "plugin-sdk-typecheck": "pnpm --filter @aio-coding-hub/plugin-sdk typecheck",
   "plugin-sdk-test": "pnpm --filter @aio-coding-hub/plugin-sdk test",
@@ -45,7 +47,7 @@ const CHECKS = {
 };
 
 const PRECOMMIT_SRC = ["lint", "typecheck", "no-instant-now-sub"];
-const PRECOMMIT_TAURI = ["tauri-check"];
+const PRECOMMIT_TAURI = ["headless-core-boundary", "tauri-check"];
 const PREPUSH_STATIC = [
   "lint",
   "typecheck",
@@ -56,6 +58,8 @@ const PREPUSH_STATIC = [
   "plugin-api-contract",
   "egui-compat-contract",
   "egui-fixtures",
+  "headless-core-boundary-self",
+  "headless-core-boundary",
   "egui-baseline-self",
   "generated-bindings-self",
   "plugin-sdk-typecheck",
@@ -75,6 +79,8 @@ const STAGES = {
     "support-matrix",
     "homebrew-cask",
     "gateway-error-codes",
+    "headless-core-boundary-self",
+    "headless-core-boundary",
     "tauri-fmt",
     "tauri-check",
     "generated-bindings",

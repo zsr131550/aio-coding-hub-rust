@@ -111,6 +111,7 @@ pub(super) async fn handle_thinking_rectifiers_400<R: tauri::Runtime>(
                         RequestEndArgs::from_context(RequestEndContextArgs {
                             deps: RequestEndDeps::new(
                                 &state.app,
+                                &state.events,
                                 &state.db,
                                 &state.log_tx,
                                 &state.plugin_pipeline,
@@ -476,6 +477,7 @@ pub(super) async fn handle_thinking_rectifiers_400<R: tauri::Runtime>(
                     RequestEndArgs::from_context(RequestEndContextArgs {
                         deps: RequestEndDeps::new(
                             &state.app,
+                            &state.events,
                             &state.db,
                             &state.log_tx,
                             &state.plugin_pipeline,

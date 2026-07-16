@@ -32,7 +32,7 @@ pub(crate) fn persist_gateway_plugin_diagnostics(
     // logged inside the blocking body, join errors by blocking::run itself.
     let db = db.clone();
     let trace_id = trace_id.to_string();
-    tauri::async_runtime::spawn(async move {
+    crate::task_runtime::spawn(async move {
         let _ = crate::blocking::run("gateway_plugin_audit_persist", move || {
             persist_gateway_plugin_diagnostics_blocking(&db, &trace_id, events, reports);
             Ok::<_, crate::shared::error::AppError>(())

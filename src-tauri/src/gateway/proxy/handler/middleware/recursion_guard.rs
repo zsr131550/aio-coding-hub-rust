@@ -17,7 +17,7 @@ impl RecursionGuardMiddleware {
         }
 
         emit_gateway_log(
-            &ctx.state.app,
+            ctx.state.events.as_ref(),
             "warn",
             GatewayErrorCode::InternalError.as_str(),
             format!(

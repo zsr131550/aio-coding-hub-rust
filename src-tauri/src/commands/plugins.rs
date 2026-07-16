@@ -2,8 +2,8 @@
 
 use crate::app::plugin_service;
 use crate::app::plugins::contribution_registry::ActiveContributionSnapshot;
-use crate::app::plugins::extension_host_registry::ExtensionHostRuntimeState;
-use crate::app_state::{ensure_db_ready, DbInitState};
+use crate::app::plugins::extension_host_registry;
+use crate::app_state::{ensure_db_ready, ManagedCoreRuntimeState};
 use crate::domain::plugins::{
     PluginAuditLog, PluginDetail, PluginExtensionExecutionReport, PluginHookExecutionReport,
     PluginInstallPreview, PluginInstallSource, PluginReplayFixture, PluginUpdateDiff,
@@ -12,7 +12,6 @@ use crate::infra::plugins::market::PluginMarketListing;
 use crate::{blocking, plugins};
 use std::collections::HashMap;
 use std::path::PathBuf;
-use tauri::Manager;
 
 #[derive(Debug, Clone, serde::Deserialize, specta::Type)]
 #[serde(rename_all = "camelCase")]
@@ -128,11 +127,10 @@ pub(crate) struct PluginInstallRemoteInput {
 }
 
 fn official_resource_root<R: tauri::Runtime>(app: &tauri::AppHandle<R>) -> Result<PathBuf, String> {
-    let resource_dir = app
-        .path()
-        .resource_dir()
-        .map_err(|error| format!("failed to resolve official plugin resources: {error}"))?;
-    Ok(official_resource_root_from_resource_dir(&resource_dir))
+    let paths = crate::app_paths::get(app).map_err(|error| error.to_string())?;
+    Ok(official_resource_root_from_resource_dir(
+        paths.resource_dir(),
+    ))
 }
 
 fn official_resource_root_from_resource_dir(resource_dir: &std::path::Path) -> PathBuf {
@@ -170,7 +168,7 @@ fn local_plugin_preview_policy() -> plugin_service::LocalPackageInstallPolicy {
 #[specta::specta]
 pub(crate) async fn plugin_list(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
 ) -> Result<Vec<plugins::PluginSummary>, String> {
     let db = ensure_db_ready(app.clone(), db_state.inner()).await?;
     blocking::run("plugin_list", move || plugin_service::list_plugins(&db))
@@ -182,7 +180,7 @@ pub(crate) async fn plugin_list(
 #[specta::specta]
 pub(crate) async fn plugin_get(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     input: PluginGetInput,
 ) -> Result<PluginDetail, String> {
     let db = ensure_db_ready(app.clone(), db_state.inner()).await?;
@@ -197,7 +195,7 @@ pub(crate) async fn plugin_get(
 #[specta::specta]
 pub(crate) async fn plugin_active_contributions(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
 ) -> Result<ActiveContributionSnapshot, String> {
     let db = ensure_db_ready(app.clone(), db_state.inner()).await?;
     blocking::run("plugin_active_contributions", move || {
@@ -211,12 +209,11 @@ pub(crate) async fn plugin_active_contributions(
 #[specta::specta]
 pub(crate) async fn plugin_execute_command(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
-    registry_state: tauri::State<'_, ExtensionHostRuntimeState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     input: PluginExecuteCommandInput,
 ) -> Result<serde_json::Value, String> {
     let db = ensure_db_ready(app.clone(), db_state.inner()).await?;
-    let registry = registry_state.registry(app, db_state.inner()).await?;
+    let registry = extension_host_registry::registry(db_state.inner(), app).await?;
     plugin_service::execute_plugin_command(&db, registry.as_ref(), &input.command, input.args)
         .await
         .map_err(Into::into)
@@ -226,7 +223,7 @@ pub(crate) async fn plugin_execute_command(
 #[specta::specta]
 pub(crate) async fn plugin_preview_from_file(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     input: PluginPreviewFromFileInput,
 ) -> Result<PluginInstallPreview, String> {
     let db = ensure_db_ready(app.clone(), db_state.inner()).await?;
@@ -249,7 +246,7 @@ pub(crate) async fn plugin_preview_from_file(
 #[specta::specta]
 pub(crate) async fn plugin_preview_update_from_file(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     input: PluginPreviewUpdateFromFileInput,
 ) -> Result<PluginUpdateDiff, String> {
     let db = ensure_db_ready(app.clone(), db_state.inner()).await?;
@@ -272,7 +269,7 @@ pub(crate) async fn plugin_preview_update_from_file(
 #[specta::specta]
 pub(crate) async fn plugin_preview_remote_update(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     input: PluginInstallRemoteInput,
 ) -> Result<PluginUpdateDiff, String> {
     let db = ensure_db_ready(app.clone(), db_state.inner()).await?;
@@ -304,8 +301,7 @@ pub(crate) async fn plugin_preview_remote_update(
 #[specta::specta]
 pub(crate) async fn plugin_install_from_file(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
-    registry_state: tauri::State<'_, ExtensionHostRuntimeState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     input: PluginInstallFromFileInput,
 ) -> Result<PluginDetail, String> {
     let db = ensure_db_ready(app.clone(), db_state.inner()).await?;
@@ -325,7 +321,7 @@ pub(crate) async fn plugin_install_from_file(
     })
     .await
     .map_err(String::from)?;
-    dispose_plugin_extension_host_after_lifecycle_change(&registry_state, &detail).await;
+    dispose_plugin_extension_host_after_lifecycle_change(db_state.plugins(), &detail).await;
     Ok(detail)
 }
 
@@ -333,8 +329,7 @@ pub(crate) async fn plugin_install_from_file(
 #[specta::specta]
 pub(crate) async fn plugin_update_from_file(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
-    registry_state: tauri::State<'_, ExtensionHostRuntimeState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     input: PluginInstallFromFileInput,
 ) -> Result<PluginDetail, String> {
     let db = ensure_db_ready(app.clone(), db_state.inner()).await?;
@@ -355,7 +350,7 @@ pub(crate) async fn plugin_update_from_file(
     })
     .await
     .map_err(String::from)?;
-    dispose_plugin_extension_host_after_lifecycle_change(&registry_state, &detail).await;
+    dispose_plugin_extension_host_after_lifecycle_change(db_state.plugins(), &detail).await;
     Ok(detail)
 }
 
@@ -363,8 +358,7 @@ pub(crate) async fn plugin_update_from_file(
 #[specta::specta]
 pub(crate) async fn plugin_rollback(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
-    registry_state: tauri::State<'_, ExtensionHostRuntimeState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     input: PluginRollbackInput,
 ) -> Result<PluginDetail, String> {
     let db = ensure_db_ready(app.clone(), db_state.inner()).await?;
@@ -374,7 +368,7 @@ pub(crate) async fn plugin_rollback(
     })
     .await
     .map_err(String::from)?;
-    dispose_plugin_extension_host_after_lifecycle_change(&registry_state, &detail).await;
+    dispose_plugin_extension_host_after_lifecycle_change(db_state.plugins(), &detail).await;
     Ok(detail)
 }
 
@@ -405,7 +399,7 @@ fn market_index_trusted_public_key(
 #[specta::specta]
 pub(crate) async fn plugin_parse_market_index(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     input: PluginMarketIndexInput,
 ) -> Result<Vec<PluginMarketListing>, String> {
     let db = ensure_db_ready(app.clone(), db_state.inner()).await?;
@@ -452,8 +446,7 @@ pub(crate) async fn plugin_parse_market_index(
 #[specta::specta]
 pub(crate) async fn plugin_install_remote(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
-    registry_state: tauri::State<'_, ExtensionHostRuntimeState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     input: PluginInstallRemoteInput,
 ) -> Result<PluginDetail, String> {
     let db = ensure_db_ready(app.clone(), db_state.inner()).await?;
@@ -483,7 +476,7 @@ pub(crate) async fn plugin_install_remote(
     })
     .await
     .map_err(String::from)?;
-    dispose_plugin_extension_host_after_lifecycle_change(&registry_state, &detail).await;
+    dispose_plugin_extension_host_after_lifecycle_change(db_state.plugins(), &detail).await;
     Ok(detail)
 }
 
@@ -491,8 +484,7 @@ pub(crate) async fn plugin_install_remote(
 #[specta::specta]
 pub(crate) async fn plugin_update_remote(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
-    registry_state: tauri::State<'_, ExtensionHostRuntimeState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     input: PluginInstallRemoteInput,
 ) -> Result<PluginDetail, String> {
     let db = ensure_db_ready(app.clone(), db_state.inner()).await?;
@@ -522,7 +514,7 @@ pub(crate) async fn plugin_update_remote(
     })
     .await
     .map_err(String::from)?;
-    dispose_plugin_extension_host_after_lifecycle_change(&registry_state, &detail).await;
+    dispose_plugin_extension_host_after_lifecycle_change(db_state.plugins(), &detail).await;
     Ok(detail)
 }
 
@@ -530,8 +522,7 @@ pub(crate) async fn plugin_update_remote(
 #[specta::specta]
 pub(crate) async fn plugin_install_official(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
-    registry_state: tauri::State<'_, ExtensionHostRuntimeState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     input: PluginGetInput,
 ) -> Result<PluginDetail, String> {
     let db = ensure_db_ready(app.clone(), db_state.inner()).await?;
@@ -550,7 +541,7 @@ pub(crate) async fn plugin_install_official(
     })
     .await
     .map_err(String::from)?;
-    dispose_plugin_extension_host_after_lifecycle_change(&registry_state, &detail).await;
+    dispose_plugin_extension_host_after_lifecycle_change(db_state.plugins(), &detail).await;
     Ok(detail)
 }
 
@@ -558,8 +549,7 @@ pub(crate) async fn plugin_install_official(
 #[specta::specta]
 pub(crate) async fn plugin_quarantine_revoked(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
-    registry_state: tauri::State<'_, ExtensionHostRuntimeState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     input: PluginGetInput,
 ) -> Result<PluginDetail, String> {
     let db = ensure_db_ready(app.clone(), db_state.inner()).await?;
@@ -573,7 +563,7 @@ pub(crate) async fn plugin_quarantine_revoked(
     })
     .await
     .map_err(String::from)?;
-    dispose_plugin_extension_host_after_lifecycle_change(&registry_state, &detail).await;
+    dispose_plugin_extension_host_after_lifecycle_change(db_state.plugins(), &detail).await;
     Ok(detail)
 }
 
@@ -581,7 +571,7 @@ pub(crate) async fn plugin_quarantine_revoked(
 #[specta::specta]
 pub(crate) async fn plugin_enable(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     input: PluginGetInput,
 ) -> Result<PluginDetail, String> {
     let db = ensure_db_ready(app.clone(), db_state.inner()).await?;
@@ -624,20 +614,21 @@ fn refresh_running_gateway_plugins(
 }
 
 async fn dispose_plugin_extension_host_after_lifecycle_change(
-    registry_state: &ExtensionHostRuntimeState,
+    registry_state: &extension_host_registry::ExtensionHostInitState,
     detail: &PluginDetail,
 ) {
-    registry_state
-        .dispose_plugin_if_initialized(&detail.summary.plugin_id)
-        .await;
+    extension_host_registry::dispose_plugin_if_initialized(
+        registry_state,
+        &detail.summary.plugin_id,
+    )
+    .await;
 }
 
 #[tauri::command]
 #[specta::specta]
 pub(crate) async fn plugin_disable(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
-    registry_state: tauri::State<'_, ExtensionHostRuntimeState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     input: PluginGetInput,
 ) -> Result<PluginDetail, String> {
     let db = ensure_db_ready(app.clone(), db_state.inner()).await?;
@@ -647,7 +638,7 @@ pub(crate) async fn plugin_disable(
     })
     .await
     .map_err(String::from)?;
-    dispose_plugin_extension_host_after_lifecycle_change(&registry_state, &detail).await;
+    dispose_plugin_extension_host_after_lifecycle_change(db_state.plugins(), &detail).await;
     Ok(detail)
 }
 
@@ -655,8 +646,7 @@ pub(crate) async fn plugin_disable(
 #[specta::specta]
 pub(crate) async fn plugin_uninstall(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
-    registry_state: tauri::State<'_, ExtensionHostRuntimeState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     input: PluginGetInput,
 ) -> Result<PluginDetail, String> {
     let db = ensure_db_ready(app.clone(), db_state.inner()).await?;
@@ -666,7 +656,7 @@ pub(crate) async fn plugin_uninstall(
     })
     .await
     .map_err(String::from)?;
-    dispose_plugin_extension_host_after_lifecycle_change(&registry_state, &detail).await;
+    dispose_plugin_extension_host_after_lifecycle_change(db_state.plugins(), &detail).await;
     Ok(detail)
 }
 
@@ -674,7 +664,7 @@ pub(crate) async fn plugin_uninstall(
 #[specta::specta]
 pub(crate) async fn plugin_save_config(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     input: PluginSaveConfigInput,
 ) -> Result<PluginDetail, String> {
     let db = ensure_db_ready(app.clone(), db_state.inner()).await?;
@@ -690,7 +680,7 @@ pub(crate) async fn plugin_save_config(
 #[specta::specta]
 pub(crate) async fn plugin_grant_permissions(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     input: PluginGrantPermissionsInput,
 ) -> Result<PluginDetail, String> {
     let db = ensure_db_ready(app.clone(), db_state.inner()).await?;
@@ -706,7 +696,7 @@ pub(crate) async fn plugin_grant_permissions(
 #[specta::specta]
 pub(crate) async fn plugin_revoke_permission(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     input: PluginRevokePermissionInput,
 ) -> Result<PluginDetail, String> {
     let db = ensure_db_ready(app.clone(), db_state.inner()).await?;
@@ -722,7 +712,7 @@ pub(crate) async fn plugin_revoke_permission(
 #[specta::specta]
 pub(crate) async fn plugin_list_audit_logs(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     input: PluginListAuditLogsInput,
 ) -> Result<Vec<PluginAuditLog>, String> {
     let db = ensure_db_ready(app, db_state.inner()).await?;
@@ -741,7 +731,7 @@ pub(crate) async fn plugin_list_audit_logs(
 #[specta::specta]
 pub(crate) async fn plugin_list_runtime_reports(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     input: PluginListRuntimeReportsInput,
 ) -> Result<Vec<PluginHookExecutionReport>, String> {
     let db = ensure_db_ready(app, db_state.inner()).await?;
@@ -762,7 +752,7 @@ pub(crate) async fn plugin_list_runtime_reports(
 #[specta::specta]
 pub(crate) async fn plugin_list_extension_runtime_reports(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     input: PluginListExtensionRuntimeReportsInput,
 ) -> Result<Vec<PluginExtensionExecutionReport>, String> {
     let db = ensure_db_ready(app, db_state.inner()).await?;
@@ -784,7 +774,7 @@ pub(crate) async fn plugin_list_extension_runtime_reports(
 #[specta::specta]
 pub(crate) async fn plugin_export_replay_fixture(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     input: PluginExportReplayFixtureInput,
 ) -> Result<PluginReplayFixture, String> {
     let db = ensure_db_ready(app, db_state.inner()).await?;
@@ -1004,8 +994,12 @@ INSERT INTO plugin_market_sources(
         ] {
             let body = command_body(&source, function_name);
             assert!(
-                body.contains("registry_state: tauri::State<'_, ExtensionHostRuntimeState>"),
-                "{function_name} should receive ExtensionHostRuntimeState"
+                body.contains("db_state: tauri::State<'_, ManagedCoreRuntimeState>"),
+                "{function_name} should receive the unified runtime state"
+            );
+            assert!(
+                body.contains("db_state.plugins()"),
+                "{function_name} should obtain the extension host slot from the runtime state"
             );
             assert!(
                 body.contains("dispose_plugin_extension_host_after_lifecycle_change"),
@@ -1017,7 +1011,7 @@ INSERT INTO plugin_market_sources(
             .nth(1)
             .expect("dispose helper should exist");
         assert!(
-            helper.contains("dispose_plugin_if_initialized"),
+            helper.contains("extension_host_registry::dispose_plugin_if_initialized"),
             "dispose helper should no-op unless the extension host registry is initialized"
         );
     }

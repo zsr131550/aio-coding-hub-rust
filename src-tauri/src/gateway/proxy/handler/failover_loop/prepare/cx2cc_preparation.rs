@@ -68,7 +68,12 @@ pub(super) async fn prepare<R: tauri::Runtime>(args: Cx2ccPreparationInput<'_, R
                     source_provider_id = source_id,
                     "cx2cc: source provider not found: {err}"
                 );
-                emit_gateway_log(&args.input.state.app, "warn", "CX2CC_SOURCE_NOT_FOUND", msg);
+                emit_gateway_log(
+                    args.input.state.events.as_ref(),
+                    "warn",
+                    "CX2CC_SOURCE_NOT_FOUND",
+                    msg,
+                );
                 return Cx2ccOutcome::Skipped(SkipReason {
                     error_category: "config",
                     error_code: GatewayErrorCode::InternalError.as_str(),
@@ -97,7 +102,7 @@ pub(super) async fn prepare<R: tauri::Runtime>(args: Cx2ccPreparationInput<'_, R
                     "cx2cc: source provider credential resolution failed: {err}"
                 );
                 emit_gateway_log(
-                    &args.input.state.app,
+                    args.input.state.events.as_ref(),
                     "warn",
                     "CX2CC_CREDENTIAL_FAILED",
                     msg,
@@ -130,7 +135,12 @@ pub(super) async fn prepare<R: tauri::Runtime>(args: Cx2ccPreparationInput<'_, R
                     source_provider_id = source_id,
                     "cx2cc: source provider base_url resolution failed: {err}"
                 );
-                emit_gateway_log(&args.input.state.app, "warn", "CX2CC_BASE_URL_FAILED", msg);
+                emit_gateway_log(
+                    args.input.state.events.as_ref(),
+                    "warn",
+                    "CX2CC_BASE_URL_FAILED",
+                    msg,
+                );
                 return Cx2ccOutcome::Skipped(SkipReason {
                     error_category: "translation",
                     error_code: GatewayErrorCode::InternalError.as_str(),
@@ -213,7 +223,12 @@ pub(super) async fn prepare<R: tauri::Runtime>(args: Cx2ccPreparationInput<'_, R
                 provider_id = args.provider_id,
                 "cx2cc: request translation failed: {err}"
             );
-            emit_gateway_log(&args.input.state.app, "warn", "CX2CC_TRANSLATE_FAILED", msg);
+            emit_gateway_log(
+                args.input.state.events.as_ref(),
+                "warn",
+                "CX2CC_TRANSLATE_FAILED",
+                msg,
+            );
             return Cx2ccOutcome::Skipped(SkipReason {
                 error_category: "translation",
                 error_code: GatewayErrorCode::InternalError.as_str(),
@@ -271,7 +286,7 @@ pub(super) async fn prepare<R: tauri::Runtime>(args: Cx2ccPreparationInput<'_, R
         "cx2cc: request translated Anthropic -> OpenAI Responses API"
     );
     emit_gateway_log(
-        &args.input.state.app,
+        args.input.state.events.as_ref(),
         "info",
         "CX2CC_TRANSLATED",
         format!(
@@ -309,7 +324,7 @@ pub(super) async fn prepare<R: tauri::Runtime>(args: Cx2ccPreparationInput<'_, R
             .map(|m| m.keys().map(|k| k.as_str()).collect())
             .unwrap_or_default();
         emit_gateway_log(
-            &args.input.state.app,
+            args.input.state.events.as_ref(),
             "debug",
             "CX2CC_REQUEST_BODY",
             format!(

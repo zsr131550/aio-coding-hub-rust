@@ -1,7 +1,6 @@
 //! Usage: CLI proxy configuration related Tauri commands.
 
-use crate::app_state::{ensure_db_ready, DbInitState};
-use crate::gateway::events::GATEWAY_STATUS_EVENT_NAME;
+use crate::app_state::{ensure_db_ready, ManagedCoreRuntimeState};
 use crate::gateway_control::app_ensure_gateway_running;
 use crate::gateway_runtime_access::app_gateway_status;
 use crate::{blocking, cli_proxy, mcp, settings};
@@ -30,7 +29,7 @@ pub(crate) async fn cli_proxy_status_all(
 
 pub(crate) async fn cli_proxy_set_enabled_impl(
     app: tauri::AppHandle,
-    db_state: &DbInitState,
+    db_state: &ManagedCoreRuntimeState,
     cli_key: String,
     enabled: bool,
 ) -> Result<cli_proxy::CliProxyResult, String> {
@@ -49,10 +48,9 @@ pub(crate) async fn cli_proxy_set_enabled_impl(
                 let was_running = app_gateway_status(&app).running;
                 let status = app_ensure_gateway_running(&app, db, Some(settings.preferred_port))?;
                 if !was_running {
-                    crate::app::heartbeat_watchdog::gated_emit(
+                    crate::app::core_runtime::publish(
                         &app,
-                        GATEWAY_STATUS_EVENT_NAME,
-                        status.clone(),
+                        aio_contract::AppEvent::GatewayStatusChanged(status.clone()),
                     );
                 }
 
@@ -124,7 +122,7 @@ pub(crate) async fn cli_proxy_set_enabled_impl(
 
 pub(crate) async fn cli_proxy_set_disabled_impl<R: tauri::Runtime>(
     app: tauri::AppHandle<R>,
-    db_state: Option<&DbInitState>,
+    db_state: Option<&ManagedCoreRuntimeState>,
     cli_key: String,
 ) -> Result<cli_proxy::CliProxyResult, String> {
     tracing::info!(cli_key = %cli_key, enabled = false, "cli proxy enabled state changing");

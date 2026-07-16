@@ -42,7 +42,7 @@ pub(super) fn mcp_sync_root_dir<R: tauri::Runtime>(
     app: &tauri::AppHandle<R>,
     cli_key: &str,
 ) -> crate::shared::error::AppResult<PathBuf> {
-    Ok(app_paths::app_data_dir(app)?.join("mcp-sync").join(cli_key))
+    Ok(app_paths::get(app)?.mcp_sync_root(cli_key))
 }
 
 pub(super) fn mcp_sync_files_dir(root: &Path) -> PathBuf {

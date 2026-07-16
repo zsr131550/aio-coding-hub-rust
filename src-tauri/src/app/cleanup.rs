@@ -1,10 +1,9 @@
 //! Usage: Best-effort cleanup hooks for app lifecycle events (exit/restart).
 
-use super::app_state::{ensure_db_ready, DbInitState};
+use super::app_state::{ensure_db_ready, ManagedCoreRuntimeState};
 use super::gateway_control::app_take_running_gateway;
 use crate::blocking;
 use crate::cli_proxy;
-use crate::gateway::events::GATEWAY_STATUS_EVENT_NAME;
 #[cfg(windows)]
 use crate::infra::wsl;
 use crate::request_logs::{reconcile_unresolved_pending, RequestLogReconcileReason};
@@ -101,13 +100,13 @@ pub(crate) async fn cleanup_before_exit(app: &tauri::AppHandle) {
 }
 
 async fn dispose_extension_hosts_best_effort(app: &tauri::AppHandle) {
-    let Some(state) =
-        app.try_state::<crate::app::plugins::extension_host_registry::ExtensionHostRuntimeState>()
-    else {
+    let Some(state) = app.try_state::<ManagedCoreRuntimeState>() else {
         return;
     };
 
-    match tokio::time::timeout(EXTENSION_HOST_DISPOSE_TIMEOUT, state.dispose_all()).await {
+    let dispose =
+        crate::app::plugins::extension_host_registry::dispose_all_if_initialized(state.plugins());
+    match tokio::time::timeout(EXTENSION_HOST_DISPOSE_TIMEOUT, dispose).await {
         Ok(()) => tracing::info!("extension host instances disposed during exit cleanup"),
         Err(_) => tracing::warn!(
             "exit cleanup: extension host disposal timed out ({}s)",
@@ -220,7 +219,10 @@ pub(crate) async fn stop_gateway_best_effort_unlocked<R: tauri::Runtime>(
         base_url: None,
         listen_addr: None,
     };
-    crate::app::heartbeat_watchdog::gated_emit(app, GATEWAY_STATUS_EVENT_NAME, stopped_status);
+    super::core_runtime::publish(
+        app,
+        aio_contract::AppEvent::GatewayStatusChanged(stopped_status),
+    );
 
     stop_gateway_tasks_best_effort(
         &mut task,
@@ -237,7 +239,7 @@ pub(crate) async fn stop_gateway_best_effort_unlocked<R: tauri::Runtime>(
 async fn reconcile_gateway_stop_pending_logs_best_effort<R: tauri::Runtime>(
     app: &tauri::AppHandle<R>,
 ) {
-    let Some(db_state) = app.try_state::<DbInitState>() else {
+    let Some(db_state) = app.try_state::<ManagedCoreRuntimeState>() else {
         tracing::warn!(
             "exit cleanup: DB state unavailable while reconciling pending request logs; startup recovery will retry"
         );
@@ -276,10 +278,10 @@ async fn reconcile_gateway_stop_pending_logs_best_effort<R: tauri::Runtime>(
 }
 
 async fn stop_gateway_tasks_best_effort(
-    server_task: &mut tauri::async_runtime::JoinHandle<()>,
-    log_task: &mut tauri::async_runtime::JoinHandle<()>,
-    circuit_task: &mut tauri::async_runtime::JoinHandle<()>,
-    oauth_refresh_task: &mut tauri::async_runtime::JoinHandle<()>,
+    server_task: &mut crate::task_runtime::JoinHandle<()>,
+    log_task: &mut crate::task_runtime::JoinHandle<()>,
+    circuit_task: &mut crate::task_runtime::JoinHandle<()>,
+    oauth_refresh_task: &mut crate::task_runtime::JoinHandle<()>,
     timeouts: GatewayStopTimeouts,
 ) {
     if !join_task_with_timeout(server_task, timeouts.server_stop).await {
@@ -308,13 +310,13 @@ async fn stop_gateway_tasks_best_effort(
 }
 
 async fn join_task_with_timeout(
-    task: &mut tauri::async_runtime::JoinHandle<()>,
+    task: &mut crate::task_runtime::JoinHandle<()>,
     timeout: Duration,
 ) -> bool {
     tokio::time::timeout(timeout, task).await.is_ok()
 }
 
-async fn abort_task_and_wait(task: &mut tauri::async_runtime::JoinHandle<()>, grace: Duration) {
+async fn abort_task_and_wait(task: &mut crate::task_runtime::JoinHandle<()>, grace: Duration) {
     task.abort();
     let _ = join_task_with_timeout(task, grace).await;
 }
@@ -329,16 +331,16 @@ mod tests {
     async fn gateway_stop_drains_writers_after_server_abort_drops_route_senders() {
         let (held_tx, mut rx) = mpsc::channel::<()>(1);
         let (drained_tx, drained_rx) = oneshot::channel::<()>();
-        let mut server_task = tauri::async_runtime::spawn(async move {
+        let mut server_task = crate::task_runtime::spawn(async move {
             let _held_tx = held_tx;
             std::future::pending::<()>().await;
         });
-        let mut log_task = tauri::async_runtime::spawn(async move {
+        let mut log_task = crate::task_runtime::spawn(async move {
             while rx.recv().await.is_some() {}
             let _ = drained_tx.send(());
         });
-        let mut circuit_task = tauri::async_runtime::spawn(async {});
-        let mut oauth_refresh_task = tauri::async_runtime::spawn(async {});
+        let mut circuit_task = crate::task_runtime::spawn(async {});
+        let mut oauth_refresh_task = crate::task_runtime::spawn(async {});
 
         stop_gateway_tasks_best_effort(
             &mut server_task,

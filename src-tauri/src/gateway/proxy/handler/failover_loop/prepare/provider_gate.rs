@@ -38,7 +38,7 @@ pub(super) fn gate_provider<R: tauri::Runtime>(
 
     let now_unix = now_unix_seconds() as i64;
     provider_router::gate_provider(provider_router::GateProviderArgs {
-        app: Some(&ctx.state.app),
+        events: Some(ctx.state.events.as_ref()),
         circuit: ctx.state.circuit.as_ref(),
         trace_id: ctx.trace_id.as_str(),
         cli_key: ctx.cli_key.as_str(),

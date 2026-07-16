@@ -1,4 +1,4 @@
-use crate::app_state::{ensure_db_ready, DbInitState};
+use crate::app_state::{ensure_db_ready, ManagedCoreRuntimeState};
 use crate::{blocking, providers};
 use base64::Engine as _;
 use serde::Deserialize;
@@ -229,7 +229,7 @@ async fn codex_exchange_device_code_for_tokens(
 #[specta::specta]
 pub(crate) async fn provider_oauth_start_flow(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     cli_key: String,
     provider_id: i64,
 ) -> Result<ProviderOAuthStartFlowResult, String> {
@@ -339,7 +339,6 @@ pub(crate) async fn provider_oauth_start_flow(
     let provider_type = adapter.provider_type();
 
     // 10. Save to provider
-    let app_handle = app.clone();
     blocking::run("provider_oauth_start_flow_save", move || {
         crate::gateway::oauth::complete_current_flow(&flow_id, || {
             crate::providers::update_oauth_tokens(
@@ -364,7 +363,7 @@ pub(crate) async fn provider_oauth_start_flow(
     .map_err(Into::<String>::into)?;
 
     crate::gateway::events::emit_gateway_log(
-        &app_handle,
+        db_state.context().events().as_ref(),
         "info",
         "OAUTH_LOGIN_OK",
         format!("OAuth 登录成功：provider_id={provider_id} type={provider_type}"),
@@ -382,7 +381,7 @@ pub(crate) async fn provider_oauth_start_flow(
 #[specta::specta]
 pub(crate) async fn provider_oauth_start_device_flow(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     provider_id: i64,
 ) -> Result<ProviderOAuthDeviceCodeStartResult, String> {
     let db = ensure_db_ready(app, db_state.inner()).await?;
@@ -453,7 +452,7 @@ pub(crate) async fn provider_oauth_start_device_flow(
 #[specta::specta]
 pub(crate) async fn provider_oauth_poll_device_flow(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     input: ProviderOAuthDeviceCodePollInput,
 ) -> Result<ProviderOAuthDeviceCodePollResult, String> {
     ensure_current_oauth_flow(&input.flow_id)?;
@@ -569,7 +568,7 @@ pub(crate) async fn provider_oauth_poll_device_flow(
     .map_err(Into::<String>::into)?;
 
     crate::gateway::events::emit_gateway_log(
-        &app,
+        db_state.context().events().as_ref(),
         "info",
         "OAUTH_DEVICE_LOGIN_OK",
         format!("OAuth 设备码登录成功：provider_id={provider_id} type={provider_type}"),
@@ -601,7 +600,7 @@ pub(crate) async fn provider_oauth_cancel_device_flow(
 #[specta::specta]
 pub(crate) async fn provider_oauth_refresh(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     provider_id: i64,
 ) -> Result<ProviderOAuthRefreshResult, String> {
     let db = ensure_db_ready(app, db_state.inner()).await?;
@@ -695,7 +694,7 @@ pub(crate) async fn provider_oauth_refresh(
 #[specta::specta]
 pub(crate) async fn provider_oauth_disconnect(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     provider_id: i64,
 ) -> Result<ProviderOAuthDisconnectResult, String> {
     let db = ensure_db_ready(app, db_state.inner()).await?;
@@ -713,7 +712,7 @@ pub(crate) async fn provider_oauth_disconnect(
 #[specta::specta]
 pub(crate) async fn provider_oauth_status(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     provider_id: i64,
 ) -> Result<ProviderOAuthStatusResult, String> {
     let db = ensure_db_ready(app, db_state.inner()).await?;

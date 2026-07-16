@@ -1,6 +1,6 @@
 //! Usage: MCP server management related Tauri commands.
 
-use crate::app_state::{ensure_db_ready, DbInitState};
+use crate::app_state::{ensure_db_ready, ManagedCoreRuntimeState};
 use crate::{blocking, mcp};
 use std::collections::BTreeMap;
 
@@ -114,7 +114,7 @@ impl From<mcp::McpServerSummary> for McpServerSummaryView {
 #[specta::specta]
 pub(crate) async fn mcp_servers_list(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     input: McpServersListInput,
 ) -> Result<Vec<McpServerSummaryView>, String> {
     let db = ensure_db_ready(app, db_state.inner()).await?;
@@ -130,7 +130,7 @@ pub(crate) async fn mcp_servers_list(
 #[specta::specta]
 pub(crate) async fn mcp_server_upsert(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     input: McpServerUpsertInput,
 ) -> Result<McpServerSummaryView, String> {
     #[cfg(windows)]
@@ -180,7 +180,7 @@ pub(crate) async fn mcp_server_upsert(
 #[specta::specta]
 pub(crate) async fn mcp_server_set_enabled(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     input: McpServerEnabledInput,
 ) -> Result<McpServerSummaryView, String> {
     #[cfg(windows)]
@@ -209,7 +209,7 @@ pub(crate) async fn mcp_server_set_enabled(
 #[specta::specta]
 pub(crate) async fn mcp_server_delete(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     input: McpServerDeleteInput,
 ) -> Result<bool, String> {
     #[cfg(windows)]
@@ -241,7 +241,7 @@ pub(crate) fn mcp_parse_json(input: McpParseJsonInput) -> Result<mcp::McpParseRe
 #[specta::specta]
 pub(crate) async fn mcp_import_servers(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     input: McpImportServersInput,
 ) -> Result<mcp::McpImportReport, String> {
     #[cfg(windows)]
@@ -263,7 +263,7 @@ pub(crate) async fn mcp_import_servers(
 #[specta::specta]
 pub(crate) async fn mcp_import_from_workspace_cli(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     input: McpImportFromWorkspaceCliInput,
 ) -> Result<mcp::McpImportReport, String> {
     #[cfg(windows)]

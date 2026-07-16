@@ -1,10 +1,16 @@
 //! Usage: Synchronous Tauri setup wiring extracted from `lib.rs`.
 
 use super::resident;
+use aio_core::InstanceGuard;
+use std::sync::Arc;
 use tauri_plugin_dialog::DialogExt;
 
 pub(crate) fn setup(app: &mut tauri::App<tauri::Wry>) -> Result<(), Box<dyn std::error::Error>> {
     crate::benchmark::milestone("tauri_setup_started", serde_json::json!({}));
+    let paths = crate::app_paths::install(app.handle())?;
+    let instance = Arc::new(InstanceGuard::try_acquire(paths.as_ref())?);
+    let _runtime_state =
+        crate::app::core_runtime::install(app.handle(), Arc::clone(&paths), instance)?;
     crate::app::logging::init(app.handle());
     guard_restart_storm(app);
     crate::app::heartbeat_watchdog::install(app.handle());
@@ -89,3 +95,32 @@ fn log_dev_diagnostics(app: &tauri::App<tauri::Wry>) {
 
 #[cfg(not(debug_assertions))]
 fn log_dev_diagnostics(_app: &tauri::App<tauri::Wry>) {}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn setup_acquires_data_ownership_before_logging_or_startup() {
+        let source = std::fs::read_to_string(file!()).expect("read bootstrap source");
+        let paths = source
+            .find("app_paths::install")
+            .expect("bootstrap must install AppPaths");
+        let instance = source
+            .find("InstanceGuard::try_acquire")
+            .expect("bootstrap must acquire InstanceGuard");
+        let runtime_state = source
+            .find("core_runtime::install")
+            .expect("bootstrap must install one core runtime state root");
+        let logging = source
+            .find("logging::init")
+            .expect("bootstrap must initialize logging");
+        let startup = source
+            .find("startup_tasks::spawn")
+            .expect("bootstrap must start application tasks");
+
+        assert!(paths < instance);
+        assert!(instance < runtime_state);
+        assert!(runtime_state < logging);
+        assert!(instance < logging);
+        assert!(instance < startup);
+    }
+}

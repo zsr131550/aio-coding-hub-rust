@@ -1,6 +1,6 @@
 //! Usage: Windows WSL related Tauri commands.
 
-use crate::app_state::{ensure_db_ready, DbInitState};
+use crate::app_state::{ensure_db_ready, ManagedCoreRuntimeState};
 #[cfg(windows)]
 use crate::db;
 use crate::gateway_control::app_ensure_gateway_running;
@@ -148,7 +148,7 @@ pub(crate) async fn wsl_config_status_get(
 #[specta::specta]
 pub(crate) async fn wsl_configure_clients(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
 ) -> Result<wsl::WslConfigureReport, String> {
     if !cfg!(windows) {
         return Ok(wsl::WslConfigureReport {
@@ -256,7 +256,7 @@ pub(crate) async fn wsl_configure_clients(
 /// detects WSL, resolves host, gathers sync data, and configures CLI clients.
 #[cfg(windows)]
 pub(crate) async fn wsl_auto_sync_core(app: &tauri::AppHandle) -> Result<(), String> {
-    use crate::app_state::{ensure_db_ready, DbInitState};
+    use crate::app_state::{ensure_db_ready, ManagedCoreRuntimeState};
     use crate::gateway_runtime_access::app_gateway_status;
 
     // 1. Read settings and check preconditions
@@ -303,7 +303,7 @@ pub(crate) async fn wsl_auto_sync_core(app: &tauri::AppHandle) -> Result<(), Str
     let distros = detection.distros;
 
     // 5. Gather MCP, Prompt, and Skills sync data
-    let db_state = app.state::<DbInitState>();
+    let db_state = app.state::<ManagedCoreRuntimeState>();
     let db = ensure_db_ready(app.clone(), db_state.inner()).await?;
 
     let (mcp_data, prompt_data, skills_data) = blocking::run("wsl_core_gather_sync_data", {
@@ -444,7 +444,7 @@ pub(crate) mod wsl_sync_trigger {
     /// If the background task hasn't been spawned yet, it will be spawned on first call.
     pub(crate) fn trigger(app: tauri::AppHandle) {
         if !TASK_SPAWNED.swap(true, Ordering::SeqCst) {
-            tauri::async_runtime::spawn(debounce_loop(app));
+            crate::task_runtime::spawn(debounce_loop(app));
         }
         trigger_notify().notify_one();
     }

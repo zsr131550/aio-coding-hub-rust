@@ -1,7 +1,7 @@
 //! Usage: Thin IPC wrappers for settings commands.
 
 use crate::app::settings_service;
-use crate::app_state::DbInitState;
+use crate::app_state::ManagedCoreRuntimeState;
 
 pub(crate) use crate::app::settings_service::{
     CircuitBreakerNoticeUpdate, CodexSessionIdCompletionUpdate, GatewayRectifierSettingsUpdate,
@@ -19,7 +19,7 @@ pub(crate) async fn settings_get(app: tauri::AppHandle) -> Result<SettingsView, 
 #[specta::specta]
 pub(crate) async fn settings_set(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     update: SettingsUpdate,
 ) -> Result<SettingsMutationResult, String> {
     settings_service::settings_set_impl(app, db_state.inner(), update).await

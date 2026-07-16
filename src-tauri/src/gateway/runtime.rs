@@ -14,6 +14,7 @@ use super::{GatewayProviderCircuitStatus, GatewayStatus};
 
 pub(in crate::gateway) struct GatewayAppState<R: tauri::Runtime = tauri::Wry> {
     pub(super) app: tauri::AppHandle<R>,
+    pub(super) events: Arc<dyn aio_core::EventSink>,
     pub(super) db: db::Db,
     pub(super) log_tx: tokio::sync::mpsc::Sender<request_logs::RequestLogInsert>,
     pub(super) circuit: Arc<circuit_breaker::CircuitBreaker>,
@@ -29,6 +30,7 @@ impl<R: tauri::Runtime> Clone for GatewayAppState<R> {
     fn clone(&self) -> Self {
         Self {
             app: self.app.clone(),
+            events: self.events.clone(),
             db: self.db.clone(),
             log_tx: self.log_tx.clone(),
             circuit: self.circuit.clone(),
@@ -92,11 +94,11 @@ impl GatewayAppState {
 
 pub(crate) type GatewayRuntimeHandles = (
     oneshot::Sender<()>,
-    tauri::async_runtime::JoinHandle<()>,
-    tauri::async_runtime::JoinHandle<()>,
-    tauri::async_runtime::JoinHandle<()>,
+    crate::task_runtime::JoinHandle<()>,
+    crate::task_runtime::JoinHandle<()>,
+    crate::task_runtime::JoinHandle<()>,
     tokio::sync::watch::Sender<bool>,
-    tauri::async_runtime::JoinHandle<()>,
+    crate::task_runtime::JoinHandle<()>,
 );
 
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
@@ -115,7 +117,7 @@ pub(super) struct GatewayRuntimeInit {
     pub(super) plugin_pipeline: Arc<GatewayPluginPipeline>,
     pub(super) active_requests: Arc<ActiveRequestRegistry>,
     pub(super) shutdown: oneshot::Sender<()>,
-    pub(super) task: tauri::async_runtime::JoinHandle<()>,
+    pub(super) task: crate::task_runtime::JoinHandle<()>,
     pub(super) background_tasks: GatewayBackgroundTasks,
 }
 
@@ -129,7 +131,7 @@ pub(crate) struct GatewayRuntime {
     plugin_pipeline: Arc<GatewayPluginPipeline>,
     active_requests: Arc<ActiveRequestRegistry>,
     shutdown: oneshot::Sender<()>,
-    task: tauri::async_runtime::JoinHandle<()>,
+    task: crate::task_runtime::JoinHandle<()>,
     background_tasks: GatewayBackgroundTasks,
 }
 
@@ -276,7 +278,7 @@ impl GatewayRuntime {
             plugin_pipeline: GatewayPluginPipeline::empty_shared(),
             active_requests: Arc::new(ActiveRequestRegistry::default()),
             shutdown,
-            task: tauri::async_runtime::JoinHandle::Tokio(rt.spawn(async {})),
+            task: crate::task_runtime::JoinHandle::from_tokio(rt.spawn(async {})),
             background_tasks: GatewayBackgroundTasks::for_tests(rt),
         }
     }

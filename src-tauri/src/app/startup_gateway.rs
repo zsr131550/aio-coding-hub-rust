@@ -35,10 +35,9 @@ pub(crate) async fn start(
         }
     };
 
-    crate::app::heartbeat_watchdog::gated_emit(
+    crate::app::core_runtime::publish(
         app_handle,
-        crate::gateway::events::GATEWAY_STATUS_EVENT_NAME,
-        status.clone(),
+        aio_contract::AppEvent::GatewayStatusChanged(status.clone()),
     );
 
     Ok(status)

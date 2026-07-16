@@ -1,11 +1,11 @@
 //! Usage: Thin IPC wrappers for CLI proxy commands.
 
 use crate::app::cli_proxy_service;
-use crate::app_state::DbInitState;
+use crate::app_state::ManagedCoreRuntimeState;
 
 pub(crate) async fn cli_proxy_set_disabled_impl<R: tauri::Runtime>(
     app: tauri::AppHandle<R>,
-    db_state: Option<&DbInitState>,
+    db_state: Option<&ManagedCoreRuntimeState>,
     cli_key: String,
 ) -> Result<crate::cli_proxy::CliProxyResult, String> {
     cli_proxy_service::cli_proxy_set_disabled_impl(app, db_state, cli_key).await
@@ -23,7 +23,7 @@ pub(crate) async fn cli_proxy_status_all(
 #[specta::specta]
 pub(crate) async fn cli_proxy_set_enabled(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     cli_key: String,
     enabled: bool,
 ) -> Result<crate::cli_proxy::CliProxyResult, String> {

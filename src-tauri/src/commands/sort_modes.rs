@@ -1,6 +1,6 @@
 //! Usage: Provider sort modes related Tauri commands.
 
-use crate::app_state::{ensure_db_ready, DbInitState};
+use crate::app_state::{ensure_db_ready, ManagedCoreRuntimeState};
 use crate::gateway_control::app_gateway_clear_cli_route_runtime_state;
 use crate::{blocking, sort_modes};
 
@@ -8,7 +8,7 @@ use crate::{blocking, sort_modes};
 #[specta::specta]
 pub(crate) async fn sort_modes_list(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
 ) -> Result<Vec<sort_modes::SortModeSummary>, String> {
     let db = ensure_db_ready(app.clone(), db_state.inner()).await?;
     blocking::run("sort_modes_list", move || sort_modes::list_modes(&db))
@@ -20,7 +20,7 @@ pub(crate) async fn sort_modes_list(
 #[specta::specta]
 pub(crate) async fn sort_mode_create(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     name: String,
 ) -> Result<sort_modes::SortModeSummary, String> {
     let db = ensure_db_ready(app.clone(), db_state.inner()).await?;
@@ -35,7 +35,7 @@ pub(crate) async fn sort_mode_create(
 #[specta::specta]
 pub(crate) async fn sort_mode_rename(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     mode_id: i64,
     name: String,
 ) -> Result<sort_modes::SortModeSummary, String> {
@@ -51,7 +51,7 @@ pub(crate) async fn sort_mode_rename(
 #[specta::specta]
 pub(crate) async fn sort_mode_delete(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     mode_id: i64,
 ) -> Result<bool, String> {
     let db = ensure_db_ready(app.clone(), db_state.inner()).await?;
@@ -71,7 +71,7 @@ pub(crate) async fn sort_mode_delete(
 #[specta::specta]
 pub(crate) async fn sort_mode_active_list(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
 ) -> Result<Vec<sort_modes::SortModeActiveRow>, String> {
     let db = ensure_db_ready(app.clone(), db_state.inner()).await?;
     blocking::run("sort_mode_active_list", move || {
@@ -85,7 +85,7 @@ pub(crate) async fn sort_mode_active_list(
 #[specta::specta]
 pub(crate) async fn sort_mode_active_set(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     cli_key: String,
     mode_id: Option<i64>,
 ) -> Result<sort_modes::SortModeActiveRow, String> {
@@ -105,7 +105,7 @@ pub(crate) async fn sort_mode_active_set(
 #[specta::specta]
 pub(crate) async fn sort_mode_providers_list(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     mode_id: i64,
     cli_key: String,
 ) -> Result<Vec<sort_modes::SortModeProviderRow>, String> {
@@ -121,7 +121,7 @@ pub(crate) async fn sort_mode_providers_list(
 #[specta::specta]
 pub(crate) async fn sort_mode_providers_set_order(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     mode_id: i64,
     cli_key: String,
     ordered_provider_ids: Vec<i64>,
@@ -145,7 +145,7 @@ pub(crate) async fn sort_mode_providers_set_order(
 #[specta::specta]
 pub(crate) async fn sort_mode_provider_set_enabled(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     mode_id: i64,
     cli_key: String,
     provider_id: i64,

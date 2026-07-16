@@ -8,6 +8,7 @@ use super::types::{AppSettings, CodexHomeMode, GatewayListenMode, WslHostAddress
 use crate::app_paths;
 use crate::shared::error::AppResult;
 use crate::shared::fs::read_file_with_max_len;
+use aio_core::AppPaths;
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{OnceLock, RwLock};
@@ -36,8 +37,8 @@ fn cache_settings(path: &Path, settings: &AppSettings) {
     }
 }
 
-fn settings_path<R: tauri::Runtime>(app: &tauri::AppHandle<R>) -> AppResult<PathBuf> {
-    Ok(app_paths::app_data_dir(app)?.join(super::SETTINGS_FILE_NAME))
+fn settings_path(paths: &AppPaths) -> PathBuf {
+    paths.settings_file()
 }
 
 fn legacy_settings_path<R: tauri::Runtime>(app: &tauri::AppHandle<R>) -> AppResult<PathBuf> {
@@ -162,7 +163,8 @@ pub(crate) fn canonical_settings_json(settings: &AppSettings) -> AppResult<serde
 
 pub fn read<R: tauri::Runtime>(app: &tauri::AppHandle<R>) -> AppResult<AppSettings> {
     let cache = SETTINGS_CACHE.get_or_init(|| RwLock::new(None));
-    let path = settings_path(app)?;
+    let paths = app_paths::get(app)?;
+    let path = settings_path(&paths);
 
     if let Ok(guard) = cache.read() {
         if let Some(cached) = guard.as_ref() {
@@ -503,7 +505,8 @@ pub fn write<R: tauri::Runtime>(
 
     validate_bounds(&settings)?;
 
-    let path = settings_path(app)?;
+    let paths = app_paths::get(app)?;
+    let path = settings_path(&paths);
     let tmp_path = path.with_file_name("settings.json.tmp");
     let backup_path = path.with_file_name("settings.json.bak");
 

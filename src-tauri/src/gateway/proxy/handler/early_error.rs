@@ -209,6 +209,7 @@ fn early_error_request_end_args<'a, R: tauri::Runtime>(
     RequestEndArgs::from_context(RequestEndContextArgs {
         deps: RequestEndDeps::new(
             &ctx.state.app,
+            &ctx.state.events,
             &ctx.state.db,
             &ctx.state.log_tx,
             &ctx.state.plugin_pipeline,

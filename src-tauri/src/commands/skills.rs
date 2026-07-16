@@ -1,6 +1,6 @@
 //! Usage: Skills management related Tauri commands.
 
-use crate::app_state::{ensure_db_ready, DbInitState};
+use crate::app_state::{ensure_db_ready, ManagedCoreRuntimeState};
 use crate::shared::cli_key::CliKey;
 use crate::shared::ipc_confirm::{RiskyIpcConfirm, RISKY_SKILL_LOCAL_DELETE};
 use crate::{blocking, skills};
@@ -9,7 +9,7 @@ use crate::{blocking, skills};
 #[specta::specta]
 pub(crate) async fn skill_repos_list(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
 ) -> Result<Vec<skills::SkillRepoSummary>, String> {
     let db = ensure_db_ready(app, db_state.inner()).await?;
     blocking::run("skill_repos_list", move || skills::repos_list(&db))
@@ -21,7 +21,7 @@ pub(crate) async fn skill_repos_list(
 #[specta::specta]
 pub(crate) async fn skill_repo_upsert(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     repo_id: Option<i64>,
     git_url: String,
     branch: String,
@@ -39,7 +39,7 @@ pub(crate) async fn skill_repo_upsert(
 #[specta::specta]
 pub(crate) async fn skill_repo_delete(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     repo_id: i64,
 ) -> Result<bool, String> {
     let db = ensure_db_ready(app, db_state.inner()).await?;
@@ -58,7 +58,7 @@ pub(crate) async fn skill_repo_delete(
 #[specta::specta]
 pub(crate) async fn skills_installed_list(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     workspace_id: i64,
 ) -> Result<Vec<skills::InstalledSkillSummary>, String> {
     let db = ensure_db_ready(app, db_state.inner()).await?;
@@ -73,7 +73,7 @@ pub(crate) async fn skills_installed_list(
 #[specta::specta]
 pub(crate) async fn skills_discover_available(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     refresh: bool,
 ) -> Result<Vec<skills::AvailableSkillSummary>, String> {
     let db = ensure_db_ready(app.clone(), db_state.inner()).await?;
@@ -88,7 +88,7 @@ pub(crate) async fn skills_discover_available(
 #[specta::specta]
 pub(crate) async fn skill_repo_discover_available(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     repo_id: i64,
     refresh: bool,
 ) -> Result<Vec<skills::AvailableSkillSummary>, String> {
@@ -105,7 +105,7 @@ pub(crate) async fn skill_repo_discover_available(
 #[allow(clippy::too_many_arguments)]
 pub(crate) async fn skill_install(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     workspace_id: i64,
     git_url: String,
     branch: String,
@@ -132,7 +132,7 @@ pub(crate) async fn skill_install(
 #[specta::specta]
 pub(crate) async fn skill_install_to_local(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     workspace_id: i64,
     git_url: String,
     branch: String,
@@ -150,7 +150,7 @@ pub(crate) async fn skill_install_to_local(
 #[specta::specta]
 pub(crate) async fn skill_set_enabled(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     workspace_id: i64,
     skill_id: i64,
     enabled: bool,
@@ -167,7 +167,7 @@ pub(crate) async fn skill_set_enabled(
 #[specta::specta]
 pub(crate) async fn skill_uninstall(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     skill_id: i64,
 ) -> Result<bool, String> {
     let db = ensure_db_ready(app.clone(), db_state.inner()).await?;
@@ -186,7 +186,7 @@ pub(crate) async fn skill_uninstall(
 #[specta::specta]
 pub(crate) async fn skill_return_to_local(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     workspace_id: i64,
     skill_id: i64,
 ) -> Result<bool, String> {
@@ -206,7 +206,7 @@ pub(crate) async fn skill_return_to_local(
 #[specta::specta]
 pub(crate) async fn skills_local_list(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     workspace_id: i64,
 ) -> Result<Vec<skills::LocalSkillSummary>, String> {
     let db = ensure_db_ready(app.clone(), db_state.inner()).await?;
@@ -221,7 +221,7 @@ pub(crate) async fn skills_local_list(
 #[specta::specta]
 pub(crate) async fn skill_local_delete(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     workspace_id: i64,
     dir_name: String,
     confirm: Option<RiskyIpcConfirm>,
@@ -246,7 +246,7 @@ pub(crate) async fn skill_local_delete(
 #[specta::specta]
 pub(crate) async fn skill_import_local(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     workspace_id: i64,
     dir_name: String,
 ) -> Result<skills::InstalledSkillSummary, String> {
@@ -262,7 +262,7 @@ pub(crate) async fn skill_import_local(
 #[specta::specta]
 pub(crate) async fn skills_import_local_batch(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     workspace_id: i64,
     dir_names: Vec<String>,
 ) -> Result<skills::SkillImportLocalBatchReport, String> {
@@ -299,7 +299,7 @@ fn normalize_skills_cli_key(cli_key: &str) -> Result<String, String> {
 #[specta::specta]
 pub(crate) async fn skill_check_updates(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     workspace_id: i64,
 ) -> Result<Vec<skills::SkillUpdateInfo>, String> {
     let db = ensure_db_ready(app.clone(), db_state.inner()).await?;
@@ -333,7 +333,7 @@ mod tests {
 #[specta::specta]
 pub(crate) async fn skill_update(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     workspace_id: i64,
     skill_id: i64,
 ) -> Result<skills::InstalledSkillSummary, String> {

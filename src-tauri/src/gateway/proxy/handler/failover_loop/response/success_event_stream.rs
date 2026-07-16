@@ -75,7 +75,7 @@ where
         );
         if cx2cc_active {
             emit_gateway_log(
-                &common.state.app,
+                common.state.events.as_ref(),
                 "info",
                 "CX2CC_SUCCESS_EVENT_STREAM",
                 format!(

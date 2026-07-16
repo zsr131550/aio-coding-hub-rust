@@ -236,6 +236,7 @@ pub(super) fn build_stream_finalize_ctx<R: tauri::Runtime>(
 
     StreamFinalizeCtx {
         app: ctx.state.app.clone(),
+        events: ctx.state.events.clone(),
         db: ctx.state.db.clone(),
         log_tx: ctx.state.log_tx.clone(),
         plugin_pipeline: ctx.state.plugin_pipeline.clone(),

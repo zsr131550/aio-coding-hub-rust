@@ -9,7 +9,7 @@ use std::pin::Pin;
 use std::task::{Context, Poll};
 use std::time::Duration;
 
-use super::super::events::{emit_gateway_debug_log, emit_gateway_debug_log_lazy};
+use super::super::debug_log::{emit_gateway_debug_log, emit_gateway_debug_log_lazy};
 use super::super::proxy::{
     is_fake_200_non_stream_body, upstream_client_error_rules, GatewayErrorCode,
 };
@@ -126,7 +126,7 @@ fn spawn_touch_activity<R: tauri::Runtime>(
     let db = ctx.db.clone();
     let trace_id = ctx.trace_id.clone();
     let cli_key = ctx.cli_key.clone();
-    tauri::async_runtime::spawn_blocking(move || {
+    crate::task_runtime::spawn_blocking(move || {
         if let Err(err) =
             crate::request_logs::touch_activity(&db, &trace_id, &cli_key, last_activity_ms, details)
         {
@@ -473,7 +473,7 @@ where
     let mut tee = UsageSseTeeStream::new(upstream, ctx, idle_timeout, initial_first_byte_ms)
         .with_defer_terminal_error();
 
-    tokio::spawn(async move {
+    crate::task_runtime::spawn(async move {
         let mut forwarded_chunks: i64 = 0;
         let mut forwarded_bytes: i64 = 0;
         let mut drained_chunks: i64 = 0;
@@ -900,6 +900,7 @@ mod tests {
     ) -> StreamFinalizeCtx<tauri::test::MockRuntime> {
         StreamFinalizeCtx {
             app,
+            events: Arc::new(aio_core::NoopEventSink),
             db,
             log_tx,
             plugin_pipeline: crate::gateway::plugins::pipeline::GatewayPluginPipeline::empty_shared(

@@ -4,27 +4,11 @@
 //! - 前端：`invoke("notice_send", { level, title?, body })` 触发通知
 //! - Rust 后台：调用 `notice::emit(app, payload)` 触发通知事件（由前端统一监听并发送系统通知）
 
-pub const NOTICE_EVENT_NAME: &str = "notice:notify";
+pub use aio_contract::{NoticeEventPayload, NoticeLevel, NOTICE_EVENT_NAME};
 pub const NOTICE_TITLE_MAX_CHARS: usize = 128;
 pub const NOTICE_BODY_MAX_CHARS: usize = 4096;
 
 const NOTICE_PREFIX: &str = "AIO Coding Hub";
-
-#[derive(Debug, Clone, Copy, serde::Deserialize, serde::Serialize, specta::Type)]
-#[serde(rename_all = "lowercase")]
-pub enum NoticeLevel {
-    Info,
-    Success,
-    Warning,
-    Error,
-}
-
-#[derive(Debug, Clone, serde::Serialize)]
-pub struct NoticeEventPayload {
-    pub level: NoticeLevel,
-    pub title: String,
-    pub body: String,
-}
 
 fn default_title(level: NoticeLevel) -> &'static str {
     match level {
@@ -96,17 +80,38 @@ pub fn build(
     })
 }
 
-pub fn emit<R: tauri::Runtime>(
-    app: &tauri::AppHandle<R>,
+pub fn emit(
+    events: &dyn aio_core::EventSink,
     payload: NoticeEventPayload,
 ) -> crate::shared::error::AppResult<()> {
-    crate::app::heartbeat_watchdog::gated_emit(app, NOTICE_EVENT_NAME, payload);
+    events.publish(aio_contract::AppEvent::NoticeRequested(payload));
     Ok(())
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use aio_core::RecordingEventSink;
+
+    #[test]
+    fn emit_publishes_typed_notice_event() {
+        let events = RecordingEventSink::default();
+        let payload = NoticeEventPayload {
+            level: NoticeLevel::Info,
+            title: "Title".to_string(),
+            body: "Body".to_string(),
+        };
+
+        emit(&events, payload).expect("publish notice");
+
+        let published = events.events();
+        assert_eq!(published.len(), 1);
+        let aio_contract::AppEvent::NoticeRequested(actual) = &published[0] else {
+            panic!("expected typed notice event");
+        };
+        assert_eq!(actual.title, "Title");
+        assert_eq!(actual.body, "Body");
+    }
 
     #[test]
     fn build_trims_title_and_body() {

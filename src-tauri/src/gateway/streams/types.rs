@@ -63,6 +63,7 @@ impl StreamActivityTracker {
 
 pub(in crate::gateway) struct StreamFinalizeCtx<R: tauri::Runtime = tauri::Wry> {
     pub(in crate::gateway) app: tauri::AppHandle<R>,
+    pub(in crate::gateway) events: Arc<dyn aio_core::EventSink>,
     pub(in crate::gateway) db: db::Db,
     pub(in crate::gateway) log_tx: tokio::sync::mpsc::Sender<request_logs::RequestLogInsert>,
     pub(in crate::gateway) plugin_pipeline: Arc<GatewayPluginPipeline>,

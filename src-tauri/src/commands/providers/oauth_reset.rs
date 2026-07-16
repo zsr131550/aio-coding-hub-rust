@@ -1,4 +1,4 @@
-use crate::app_state::{ensure_db_ready, DbInitState};
+use crate::app_state::{ensure_db_ready, ManagedCoreRuntimeState};
 use crate::blocking;
 use crate::commands::providers::oauth_limits::ProviderOAuthLimitsResult;
 use crate::domain::provider_oauth_limits::OAuthLimitSnapshotInput;
@@ -257,7 +257,7 @@ async fn consume_codex_reset_credit_and_refresh(
 #[specta::specta]
 pub(crate) async fn provider_oauth_reset_codex_quota(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     provider_id: i64,
     confirm: Option<RiskyIpcConfirm>,
 ) -> Result<ProviderOAuthResetCodexQuotaResult, String> {

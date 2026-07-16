@@ -17,6 +17,7 @@ const REQUEST_END_LOG_REASON_MAX_CHARS: usize = 2048;
 
 pub(super) struct RequestEndDeps<'a, R: tauri::Runtime = tauri::Wry> {
     pub(super) app: &'a tauri::AppHandle<R>,
+    pub(super) events: &'a Arc<dyn aio_core::EventSink>,
     pub(super) db: &'a db::Db,
     pub(super) log_tx: &'a tokio::sync::mpsc::Sender<request_logs::RequestLogInsert>,
     pub(super) plugin_pipeline: &'a Arc<GatewayPluginPipeline>,
@@ -26,6 +27,7 @@ pub(super) struct RequestEndDeps<'a, R: tauri::Runtime = tauri::Wry> {
 impl<'a, R: tauri::Runtime> RequestEndDeps<'a, R> {
     pub(super) fn new(
         app: &'a tauri::AppHandle<R>,
+        events: &'a Arc<dyn aio_core::EventSink>,
         db: &'a db::Db,
         log_tx: &'a tokio::sync::mpsc::Sender<request_logs::RequestLogInsert>,
         plugin_pipeline: &'a Arc<GatewayPluginPipeline>,
@@ -33,6 +35,7 @@ impl<'a, R: tauri::Runtime> RequestEndDeps<'a, R> {
     ) -> Self {
         Self {
             app,
+            events,
             db,
             log_tx,
             plugin_pipeline,
@@ -744,9 +747,9 @@ impl RequestLogEnqueueArgs {
         })
     }
 
-    pub(in crate::gateway) fn emit_gateway_request_event<R: tauri::Runtime>(
+    pub(in crate::gateway) fn emit_gateway_request_event(
         &self,
-        app: &tauri::AppHandle<R>,
+        events: &dyn aio_core::EventSink,
         error_category: Option<&'static str>,
         event_ttfb_ms: Option<u128>,
         attempts: Vec<FailoverAttempt>,
@@ -755,7 +758,7 @@ impl RequestLogEnqueueArgs {
         let claude_model_mapping =
             select_claude_model_mapping(self.special_settings_json.as_deref(), &attempts);
         emit_request_event(
-            app,
+            events,
             self.trace_id.clone(),
             self.cli_key.clone(),
             self.session_id.clone(),
@@ -854,7 +857,7 @@ pub(super) async fn emit_request_event_and_enqueue_request_log<R: tauri::Runtime
     );
 
     log_args.emit_gateway_request_event(
-        deps.app,
+        deps.events.as_ref(),
         error_category,
         event_ttfb_ms,
         attempts,
@@ -863,6 +866,7 @@ pub(super) async fn emit_request_event_and_enqueue_request_log<R: tauri::Runtime
 
     enqueue_request_log_with_backpressure_and_plugins(
         deps.app,
+        deps.events.as_ref(),
         deps.db,
         deps.log_tx,
         Some(deps.plugin_pipeline.clone()),
@@ -905,7 +909,7 @@ pub(super) fn emit_request_event_and_spawn_request_log<R: tauri::Runtime>(
     );
 
     log_args.emit_gateway_request_event(
-        deps.app,
+        deps.events.as_ref(),
         error_category,
         event_ttfb_ms,
         attempts,
@@ -914,6 +918,7 @@ pub(super) fn emit_request_event_and_spawn_request_log<R: tauri::Runtime>(
 
     spawn_enqueue_request_log_with_backpressure(
         deps.app.clone(),
+        deps.events.clone(),
         deps.db.clone(),
         deps.log_tx.clone(),
         log_args,
@@ -1018,6 +1023,7 @@ mod tests {
         let db_dir = tempfile::tempdir().expect("db dir");
         let db = crate::db::init_for_tests(&db_dir.path().join("request-end.db")).expect("init db");
         let (log_tx, _log_rx) = tokio::sync::mpsc::channel(1);
+        let events: Arc<dyn aio_core::EventSink> = Arc::new(aio_core::NoopEventSink);
         let active_requests = Arc::new(ActiveRequestRegistry::default());
         active_requests.register(active_request_start("trace-active-end"));
 
@@ -1025,6 +1031,7 @@ mod tests {
             RequestEndArgs::from_context(RequestEndContextArgs {
                 deps: RequestEndDeps::new(
                     &app_handle,
+                    &events,
                     &db,
                     &log_tx,
                     &GatewayPluginPipeline::empty_shared(),

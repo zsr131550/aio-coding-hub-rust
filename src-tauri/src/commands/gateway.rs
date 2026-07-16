@@ -1,7 +1,7 @@
 //! Usage: Gateway lifecycle / status / session / circuit commands.
 
 use crate::app::gateway_service::{self, GatewayActiveSessionSummary};
-use crate::app_state::{ensure_db_ready, DbInitState};
+use crate::app_state::{ensure_db_ready, ManagedCoreRuntimeState};
 use crate::gateway_runtime_access::app_gateway_status;
 use crate::shared::cli_key::CliKey;
 use crate::{gateway, settings};
@@ -56,7 +56,7 @@ pub(crate) async fn gateway_check_port_available(
 #[specta::specta]
 pub(crate) async fn gateway_sessions_list(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     limit: Option<u32>,
 ) -> Result<Vec<GatewayActiveSessionSummary>, String> {
     let db = ensure_db_ready(app.clone(), db_state.inner()).await?;
@@ -69,7 +69,7 @@ pub(crate) async fn gateway_sessions_list(
 #[specta::specta]
 pub(crate) async fn gateway_circuit_status(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     cli_key: String,
 ) -> Result<Vec<gateway::GatewayProviderCircuitStatus>, String> {
     let cli_key = normalize_gateway_cli_key(&cli_key)?;
@@ -83,7 +83,7 @@ pub(crate) async fn gateway_circuit_status(
 #[specta::specta]
 pub(crate) async fn gateway_circuit_reset_provider(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     provider_id: i64,
 ) -> Result<bool, String> {
     let db = ensure_db_ready(app.clone(), db_state.inner()).await?;
@@ -96,7 +96,7 @@ pub(crate) async fn gateway_circuit_reset_provider(
 #[specta::specta]
 pub(crate) async fn gateway_circuit_reset_cli(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     cli_key: String,
 ) -> Result<usize, String> {
     let cli_key = normalize_gateway_cli_key(&cli_key)?;
@@ -116,7 +116,7 @@ fn normalize_gateway_cli_key(cli_key: &str) -> Result<String, String> {
 #[specta::specta]
 pub(crate) async fn gateway_start(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     preferred_port: Option<u16>,
 ) -> Result<gateway::GatewayStatus, String> {
     let db = ensure_db_ready(app.clone(), db_state.inner()).await?;

@@ -1,6 +1,6 @@
 # egui migration evidence
 
-This directory is the versioned C0 evidence boundary for the native egui migration. It describes the current Tauri/React shell before any `eframe`, `egui`, `winit`, or core extraction work begins.
+This directory is the versioned compatibility boundary for the native egui migration. C0 records the Tauri/React baseline; C1 adds the headless Rust foundations consumed by the legacy shell and the future native shell.
 
 ## Artifacts
 
@@ -15,6 +15,7 @@ This directory is the versioned C0 evidence boundary for the native egui migrati
 
 ```powershell
 pnpm check:egui-compat-contract
+pnpm check:headless-core-boundary
 pnpm check:egui-fixtures
 pnpm test:egui-baseline-self
 pnpm test:egui-baseline-matrix-self
@@ -29,6 +30,70 @@ pnpm egui:fixtures:write
 ```
 
 Review the resulting diff. Do not edit generated JSON or fixture hashes by hand.
+
+## C1 headless Rust boundary
+
+`src-tauri` remains the stable Cargo/build root and lock-file owner. Its workspace contains:
+
+- `aio-coding-hub`: the existing Tauri shell, command adapters, gateway services, and platform integrations.
+- `aio-contract`: serialized event DTOs, frozen legacy event names, delivery metadata, and `AppEvent`.
+- `aio-core`: `AppPaths`, `InstanceGuard`, the process-owned task runtime, state containers, `AppContext`, and `EventSink`.
+
+`aio-contract` is limited to Serde/Specta-style contract dependencies. `aio-core` may use
+`aio-contract`, Tokio, and platform-neutral support crates, but it may not resolve or import
+Tauri, Tauri plugins, `egui`, `eframe`, `winit`, Wry, or WebView crates. The structured
+`check:headless-core-boundary` command validates direct dependency allowlists, the resolved Cargo
+dependency closure, crate locations, and Rust source identifiers. Its temporary-workspace
+self-test proves that prohibited dependency aliases and imports are rejected.
+
+Path resolution happens once in Tauri setup and produces one immutable `AppPaths`. The
+per-data-directory `.instance.lock` is acquired before logging, settings, or SQLite initialization,
+so benchmark/test homes remain isolated and a rejected second owner cannot migrate the database.
+The process entry point owns one multi-thread Tokio runtime; application tasks use the `TaskRuntime`
+boundary. The legacy shell uses `App::run_return`: normal exit waits for coordinated cleanup,
+while restart returns its dedicated exit code directly. Both paths release the event loop and shut
+down the owned runtime before the process terminates or restarts.
+
+Tauri manages one `Arc<AppRuntimeState<...>>`. Its `AppContext` owns paths, the instance guard,
+task runtime, event sink, and startup state; the same root owns lazy DB initialization, the gateway
+slot, and lazy Extension Host registry initialization. Commands obtain narrow handles from this
+root instead of registering independent core states.
+
+### Event adapter
+
+Core and gateway producers publish typed `AppEvent` values. `TauriEventSink` is the sole legacy
+adapter for the nine frozen non-heartbeat events:
+
+| `AppEvent` variant | Legacy route | Delivery note |
+| --- | --- | --- |
+| `GatewayStatusChanged` | `gateway:status` | Latest snapshot |
+| `GatewayRequestStarted` | `gateway:request_start` | Visibility-gated detail |
+| `GatewayAttempted` | `gateway:attempt` | Visibility-gated detail |
+| `GatewayRequestCompleted` | `gateway:request` | Persisted separately; UI detail remains visibility-gated |
+| `GatewayRequestSignal` | `gateway:request_signal` | Lightweight phase signal |
+| `GatewayLog` | `gateway:log` | Best effort |
+| `GatewayCircuitChanged` | `gateway:circuit` | Provider transition |
+| `StartupStatusChanged` | `app:startup_status` | Latest snapshot |
+| `NoticeRequested` | `notice:notify` | Best effort |
+
+The adapter serializes the untagged variant payload directly, preserves the existing WebView
+heartbeat gate, and applies the old hidden/minimized-window policy only to request detail variants.
+`PlatformActivationRequested` is an internal control event published before the unchanged
+single-instance show/focus action and has no legacy frontend route. `app:heartbeat` and WSL prompts
+remain shell-owned and are intentionally absent from both headless crates.
+
+### Rollback and remaining work
+
+The legacy contract re-exports and Tauri adapters are retained so each C1 boundary can be reverted
+independently: paths/locking, task runtime, unified state, and typed event producers do not require
+a data-format or IPC rollback. Reverting event routing means reconnecting a producer to the legacy
+adapter; it does not require changing event DTOs or fixtures.
+
+C2 still needs native platform abstractions for window/tray lifecycle, dialogs, clipboard, opener,
+notifications, autostart, updater, and single-instance transport. C3 adds the `eframe`/`egui` shell,
+view models, rendering, input/IME/accessibility work, and parity measurement against the unchanged
+C0 fixtures and seven-scenario baseline protocol. The default executable remains Tauri until those
+phases pass their own gates.
 
 `check:egui-fixtures` scans every committed artifact, including readable bytes
 inside SQLite files, for non-empty credential fields, token/private-key

@@ -2,9 +2,8 @@ import { describe, expect, it } from "vitest";
 import { appEventNames } from "../../constants/appEvents";
 import { HOME_USAGE_PERIOD_VALUES } from "../../constants/homeUsagePeriods";
 import bindingsSource from "../bindings.ts?raw";
+import eventContractSource from "../../../src-tauri/crates/aio-contract/src/events.rs?raw";
 import heartbeatSource from "../../../src-tauri/src/app/heartbeat_watchdog.rs?raw";
-import noticeSource from "../../../src-tauri/src/app/notice.rs?raw";
-import startupStateSource from "../../../src-tauri/src/app/startup_state.rs?raw";
 
 function extractStringUnionLiterals(source: string, typeName: string) {
   const match = source.match(new RegExp(`export type ${typeName} = (.+)$`, "m"));
@@ -159,12 +158,14 @@ describe("generated/bindings.ts contract", () => {
     expect(bindingsSource).not.toContain("desktopUpdaterDownloadAndInstall");
   });
 
-  it("keeps Rust app event emitters aligned with shared frontend constants", () => {
+  it("keeps Rust app event contracts aligned with shared frontend constants", () => {
     expect(extractRustStringConst(heartbeatSource, "HEARTBEAT_EVENT_NAME")).toBe(
       appEventNames.heartbeat
     );
-    expect(extractRustStringConst(noticeSource, "NOTICE_EVENT_NAME")).toBe(appEventNames.notice);
-    expect(extractRustStringConst(startupStateSource, "APP_STARTUP_STATUS_EVENT_NAME")).toBe(
+    expect(extractRustStringConst(eventContractSource, "NOTICE_EVENT_NAME")).toBe(
+      appEventNames.notice
+    );
+    expect(extractRustStringConst(eventContractSource, "APP_STARTUP_STATUS_EVENT_NAME")).toBe(
       appEventNames.startupStatus
     );
   });

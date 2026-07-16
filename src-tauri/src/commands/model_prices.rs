@@ -1,13 +1,13 @@
 //! Usage: Model pricing related Tauri commands.
 
-use crate::app_state::{ensure_db_ready, DbInitState};
+use crate::app_state::{ensure_db_ready, ManagedCoreRuntimeState};
 use crate::{blocking, cost_stats, model_price_aliases, model_prices, model_prices_sync};
 
 #[tauri::command]
 #[specta::specta]
 pub(crate) async fn model_prices_list(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     cli_key: String,
 ) -> Result<Vec<model_prices::ModelPriceSummary>, String> {
     let db = ensure_db_ready(app, db_state.inner()).await?;
@@ -22,7 +22,7 @@ pub(crate) async fn model_prices_list(
 #[specta::specta]
 pub(crate) async fn model_price_upsert(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     cli_key: String,
     model: String,
     price_json: String,
@@ -39,7 +39,7 @@ pub(crate) async fn model_price_upsert(
 #[specta::specta]
 pub(crate) async fn model_prices_sync_basellm(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     force: Option<bool>,
 ) -> Result<model_prices_sync::ModelPricesSyncReport, String> {
     let db = ensure_db_ready(app.clone(), db_state.inner()).await?;

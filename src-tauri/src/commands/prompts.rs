@@ -1,13 +1,13 @@
 //! Usage: Prompt templates related Tauri commands.
 
-use crate::app_state::{ensure_db_ready, DbInitState};
+use crate::app_state::{ensure_db_ready, ManagedCoreRuntimeState};
 use crate::{blocking, prompts};
 
 #[tauri::command]
 #[specta::specta]
 pub(crate) async fn prompts_list(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     workspace_id: i64,
 ) -> Result<Vec<prompts::PromptSummary>, String> {
     let db = ensure_db_ready(app, db_state.inner()).await?;
@@ -22,7 +22,7 @@ pub(crate) async fn prompts_list(
 #[specta::specta]
 pub(crate) async fn prompts_list_summary(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     workspace_id: i64,
 ) -> Result<Vec<prompts::PromptListSummary>, String> {
     let db = ensure_db_ready(app, db_state.inner()).await?;
@@ -37,7 +37,7 @@ pub(crate) async fn prompts_list_summary(
 #[specta::specta]
 pub(crate) async fn prompts_default_sync_from_files(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
 ) -> Result<prompts::DefaultPromptSyncReport, String> {
     #[cfg(windows)]
     let app_for_wsl = app.clone();
@@ -58,7 +58,7 @@ pub(crate) async fn prompts_default_sync_from_files(
 #[specta::specta]
 pub(crate) async fn prompt_upsert(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     prompt_id: Option<i64>,
     workspace_id: i64,
     name: String,
@@ -84,7 +84,7 @@ pub(crate) async fn prompt_upsert(
 #[specta::specta]
 pub(crate) async fn prompt_set_enabled(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     prompt_id: i64,
     enabled: bool,
 ) -> Result<prompts::PromptSummary, String> {
@@ -107,7 +107,7 @@ pub(crate) async fn prompt_set_enabled(
 #[specta::specta]
 pub(crate) async fn prompt_delete(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     prompt_id: i64,
 ) -> Result<bool, String> {
     #[cfg(windows)]

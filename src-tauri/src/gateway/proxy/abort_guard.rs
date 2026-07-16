@@ -15,6 +15,7 @@ use super::request_end::{
 
 pub(super) struct RequestAbortGuard<R: tauri::Runtime = tauri::Wry> {
     app: tauri::AppHandle<R>,
+    events: Arc<dyn aio_core::EventSink>,
     db: db::Db,
     log_tx: tokio::sync::mpsc::Sender<request_logs::RequestLogInsert>,
     plugin_pipeline: Arc<GatewayPluginPipeline>,
@@ -39,6 +40,7 @@ impl<R: tauri::Runtime> RequestAbortGuard<R> {
     #[allow(clippy::too_many_arguments)]
     pub(super) fn new(
         app: tauri::AppHandle<R>,
+        events: Arc<dyn aio_core::EventSink>,
         db: db::Db,
         log_tx: tokio::sync::mpsc::Sender<request_logs::RequestLogInsert>,
         plugin_pipeline: Arc<GatewayPluginPipeline>,
@@ -58,6 +60,7 @@ impl<R: tauri::Runtime> RequestAbortGuard<R> {
     ) -> Self {
         Self {
             app,
+            events,
             db,
             log_tx,
             plugin_pipeline,
@@ -89,6 +92,7 @@ impl<R: tauri::Runtime> RequestAbortGuard<R> {
     pub(super) fn take(&mut self) -> Self {
         let taken = Self {
             app: self.app.clone(),
+            events: self.events.clone(),
             db: self.db.clone(),
             log_tx: self.log_tx.clone(),
             plugin_pipeline: self.plugin_pipeline.clone(),
@@ -132,6 +136,7 @@ impl<R: tauri::Runtime> Drop for RequestAbortGuard<R> {
             RequestEndArgs::from_context(RequestEndContextArgs {
                 deps: RequestEndDeps::new(
                     &self.app,
+                    &self.events,
                     &self.db,
                     &self.log_tx,
                     &self.plugin_pipeline,

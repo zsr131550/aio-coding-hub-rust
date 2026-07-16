@@ -1,4 +1,4 @@
-//! Usage: Run blocking work on Tauri async runtime with a stable label.
+//! Usage: Run blocking work on the process-owned runtime with a stable label.
 
 use crate::shared::error::{AppError, AppResult};
 use std::sync::{Arc, OnceLock};
@@ -37,10 +37,36 @@ where
     T: Send + 'static,
     E: Into<AppError> + Send + 'static,
 {
-    run_with_limiter(label, blocking_limiter(), f).await
+    run_on(crate::task_runtime::current(), label, f).await
 }
 
+pub async fn run_on<T, E>(
+    runtime: Arc<aio_core::TokioTaskRuntime>,
+    label: &'static str,
+    f: impl FnOnce() -> Result<T, E> + Send + 'static,
+) -> AppResult<T>
+where
+    T: Send + 'static,
+    E: Into<AppError> + Send + 'static,
+{
+    run_with_limiter_on(runtime, label, blocking_limiter(), f).await
+}
+
+#[cfg(test)]
 async fn run_with_limiter<T, E>(
+    label: &'static str,
+    limiter: Arc<Semaphore>,
+    f: impl FnOnce() -> Result<T, E> + Send + 'static,
+) -> AppResult<T>
+where
+    T: Send + 'static,
+    E: Into<AppError> + Send + 'static,
+{
+    run_with_limiter_on(crate::task_runtime::current(), label, limiter, f).await
+}
+
+async fn run_with_limiter_on<T, E>(
+    runtime: Arc<aio_core::TokioTaskRuntime>,
     label: &'static str,
     limiter: Arc<Semaphore>,
     f: impl FnOnce() -> Result<T, E> + Send + 'static,
@@ -56,7 +82,7 @@ where
         )
     })?;
 
-    let task = tauri::async_runtime::spawn_blocking(move || {
+    let task = runtime.spawn_blocking(move || {
         let _permit = permit;
         f()
     });
@@ -66,24 +92,19 @@ where
         Err(err) => {
             // Avoid forwarding JoinError display text to UI, because panic payloads may contain
             // user content (e.g., slicing errors include a snippet of the offending string).
-            if let tauri::Error::JoinError(join_err) = err {
-                if join_err.is_panic() {
-                    tracing::error!(label, "blocking task panicked");
-                    return Err(AppError::new(
-                        "TASK_JOIN",
-                        format!("{label}: task panicked"),
-                    ));
-                }
-
-                tracing::warn!(label, "blocking task cancelled");
+            if err.is_panic() {
+                tracing::error!(label, "blocking task panicked");
                 return Err(AppError::new(
                     "TASK_JOIN",
-                    format!("{label}: task cancelled"),
+                    format!("{label}: task panicked"),
                 ));
             }
 
-            tracing::error!(label, "blocking task failed");
-            Err(AppError::new("TASK_JOIN", format!("{label}: task failed")))
+            tracing::warn!(label, "blocking task cancelled");
+            Err(AppError::new(
+                "TASK_JOIN",
+                format!("{label}: task cancelled"),
+            ))
         }
     }
 }
@@ -109,6 +130,27 @@ mod tests {
             blocking_concurrency_limit_for_parallelism(99),
             BLOCKING_MAX_CONCURRENT
         );
+    }
+
+    #[test]
+    fn run_on_uses_the_explicit_runtime() {
+        let owner = aio_core::RuntimeOwner::new("explicit-blocking-runtime")
+            .expect("create explicit runtime");
+        let runtime = owner.task_runtime();
+
+        let thread_name = owner
+            .block_on(run_on(runtime, "explicit_runtime", || {
+                Ok::<_, AppError>(
+                    std::thread::current()
+                        .name()
+                        .unwrap_or_default()
+                        .to_string(),
+                )
+            }))
+            .expect("blocking task succeeds");
+
+        assert!(thread_name.starts_with("explicit-blocking-runtime"));
+        owner.shutdown_timeout(Duration::from_secs(1));
     }
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 2)]

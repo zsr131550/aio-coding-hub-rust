@@ -1,13 +1,13 @@
 //! Usage: Workspace (profile) related Tauri commands.
 
-use crate::app_state::{ensure_db_ready, DbInitState};
+use crate::app_state::{ensure_db_ready, ManagedCoreRuntimeState};
 use crate::{blocking, workspace_switch, workspaces};
 
 #[tauri::command]
 #[specta::specta]
 pub(crate) async fn workspaces_list(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     cli_key: String,
 ) -> Result<workspaces::WorkspacesListResult, String> {
     let db = ensure_db_ready(app, db_state.inner()).await?;
@@ -22,7 +22,7 @@ pub(crate) async fn workspaces_list(
 #[specta::specta]
 pub(crate) async fn workspace_create(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     cli_key: String,
     name: String,
     clone_from_active: Option<bool>,
@@ -39,7 +39,7 @@ pub(crate) async fn workspace_create(
 #[specta::specta]
 pub(crate) async fn workspace_rename(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     workspace_id: i64,
     name: String,
 ) -> Result<workspaces::WorkspaceSummary, String> {
@@ -55,7 +55,7 @@ pub(crate) async fn workspace_rename(
 #[specta::specta]
 pub(crate) async fn workspace_delete(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     workspace_id: i64,
 ) -> Result<bool, String> {
     let db = ensure_db_ready(app, db_state.inner()).await?;
@@ -70,7 +70,7 @@ pub(crate) async fn workspace_delete(
 #[specta::specta]
 pub(crate) async fn workspace_preview(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     workspace_id: i64,
 ) -> Result<workspace_switch::WorkspacePreview, String> {
     let db = ensure_db_ready(app, db_state.inner()).await?;
@@ -85,7 +85,7 @@ pub(crate) async fn workspace_preview(
 #[specta::specta]
 pub(crate) async fn workspace_apply(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     workspace_id: i64,
 ) -> Result<workspace_switch::WorkspaceApplyReport, String> {
     let db = ensure_db_ready(app.clone(), db_state.inner()).await?;

@@ -12,10 +12,12 @@ import { MAX_ATTEMPTS_PER_TRACE } from "../../services/gateway/traceLimits";
 import { SETTINGS_VALIDATION_LIMITS } from "../../services/settings/settingsValidation";
 import { getSettingsState, resetMswState } from "../../test/msw/state";
 import bindingsSource from "../../generated/bindings.ts?raw";
+import eventContractSource from "../../../src-tauri/crates/aio-contract/src/events.rs?raw";
 import heartbeatSource from "../../../src-tauri/src/app/heartbeat_watchdog.rs?raw";
 import noticeSource from "../../../src-tauri/src/app/notice.rs?raw";
 import settingsServiceSource from "../../../src-tauri/src/app/settings_service.rs?raw";
 import startupStateSource from "../../../src-tauri/src/app/startup_state.rs?raw";
+import tauriEventSinkSource from "../../../src-tauri/src/app/tauri_event_sink.rs?raw";
 import promptsSource from "../../../src-tauri/src/domain/prompts.rs?raw";
 import providersValidationSource from "../../../src-tauri/src/domain/providers/validation.rs?raw";
 import workspacesSource from "../../../src-tauri/src/domain/workspaces.rs?raw";
@@ -71,34 +73,46 @@ describe("cross-layer contracts", () => {
     expect(extractRustStringConst(heartbeatSource, "HEARTBEAT_EVENT_NAME")).toBe(
       appEventNames.heartbeat
     );
-    expect(extractRustStringConst(noticeSource, "NOTICE_EVENT_NAME")).toBe(appEventNames.notice);
-    expect(extractRustStringConst(startupStateSource, "APP_STARTUP_STATUS_EVENT_NAME")).toBe(
+    expect(extractRustStringConst(eventContractSource, "NOTICE_EVENT_NAME")).toBe(
+      appEventNames.notice
+    );
+    expect(extractRustStringConst(eventContractSource, "APP_STARTUP_STATUS_EVENT_NAME")).toBe(
       appEventNames.startupStatus
     );
   });
 
   it("keeps gateway event names aligned with Rust emitters", () => {
-    expect(extractRustStringConst(gatewayEventsSource, "GATEWAY_STATUS_EVENT_NAME")).toBe(
+    expect(extractRustStringConst(eventContractSource, "GATEWAY_STATUS_EVENT_NAME")).toBe(
       gatewayEventNames.status
     );
-    expect(extractRustStringConst(gatewayEventsSource, "GATEWAY_REQUEST_START_EVENT_NAME")).toBe(
+    expect(extractRustStringConst(eventContractSource, "GATEWAY_REQUEST_START_EVENT_NAME")).toBe(
       gatewayEventNames.requestStart
     );
-    expect(extractRustStringConst(gatewayEventsSource, "GATEWAY_ATTEMPT_EVENT_NAME")).toBe(
+    expect(extractRustStringConst(eventContractSource, "GATEWAY_ATTEMPT_EVENT_NAME")).toBe(
       gatewayEventNames.attempt
     );
-    expect(extractRustStringConst(gatewayEventsSource, "GATEWAY_REQUEST_EVENT_NAME")).toBe(
+    expect(extractRustStringConst(eventContractSource, "GATEWAY_REQUEST_EVENT_NAME")).toBe(
       gatewayEventNames.request
     );
-    expect(extractRustStringConst(gatewayEventsSource, "GATEWAY_REQUEST_SIGNAL_EVENT_NAME")).toBe(
+    expect(extractRustStringConst(eventContractSource, "GATEWAY_REQUEST_SIGNAL_EVENT_NAME")).toBe(
       gatewayEventNames.requestSignal
     );
-    expect(extractRustStringConst(gatewayEventsSource, "GATEWAY_LOG_EVENT_NAME")).toBe(
+    expect(extractRustStringConst(eventContractSource, "GATEWAY_LOG_EVENT_NAME")).toBe(
       gatewayEventNames.log
     );
-    expect(extractRustStringConst(gatewayEventsSource, "GATEWAY_CIRCUIT_EVENT_NAME")).toBe(
+    expect(extractRustStringConst(eventContractSource, "GATEWAY_CIRCUIT_EVENT_NAME")).toBe(
       gatewayEventNames.circuit
     );
+  });
+
+  it("keeps legacy event routes owned by the typed Tauri adapter", () => {
+    expect(tauriEventSinkSource).toContain("let name = event.metadata().legacy_name?");
+    expect(tauriEventSinkSource).toContain(
+      "crate::app::heartbeat_watchdog::gated_emit(&self.app, name, payload)"
+    );
+    expect(gatewayEventsSource).not.toContain("gated_emit(");
+    expect(noticeSource).not.toContain("gated_emit(");
+    expect(startupStateSource).not.toContain("gated_emit(");
   });
 
   it("keeps gateway error codes aligned with Rust definitions", () => {
@@ -149,7 +163,7 @@ describe("cross-layer contracts", () => {
     // assertions in failover_loop/tests.rs, absence handling in attemptsJson).
     const exemptFields = ["circuit_recover_at_unix", "circuit_trigger_error_code"];
     const skippedFields = Array.from(
-      gatewayEventsSource.matchAll(
+      eventContractSource.matchAll(
         /#\[serde\(skip_serializing_if[^\]]*\)\]\s*(?:pub(?:\([^)]*\))?\s+)?(\w+):/g
       ),
       (match) => match[1]
@@ -289,10 +303,15 @@ describe("cross-layer contracts", () => {
   });
 
   it("keeps request detail events gated behind the summary signal path", () => {
-    expect(gatewayEventsSource).toContain("emit_request_signal(");
-    expect(gatewayEventsSource).toContain("if !should_emit_gateway_detail_event(app) {");
     expect(gatewayEventsSource).toMatch(
-      /emit_request_signal\([\s\S]+?if !should_emit_gateway_detail_event\(app\) \{\s+return;\s+\}/
+      /pub\(super\) fn emit_request_event[\s\S]+?emit_request_signal\([\s\S]+?sink\.publish\(AppEvent::GatewayRequestCompleted/
+    );
+    expect(gatewayEventsSource).not.toContain("should_emit_gateway_detail_event");
+    expect(tauriEventSinkSource).toContain(
+      "detail_visibility_gated(&event) && !should_emit_gateway_detail_event(&self.app)"
+    );
+    expect(tauriEventSinkSource).toMatch(
+      /AppEvent::GatewayRequestStarted\(_\)[\s\S]+?AppEvent::GatewayAttempted\(_\)[\s\S]+?AppEvent::GatewayRequestCompleted\(_\)/
     );
   });
 

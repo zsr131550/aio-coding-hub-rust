@@ -26,3 +26,23 @@ fn app_paths_and_db_init_are_isolated_under_home() {
         "unexpected sqlite user_version={user_version}"
     );
 }
+
+#[test]
+fn second_instance_rejection_happens_before_db_open() {
+    let app = support::TestApp::new();
+    let handle = app.handle();
+    let paths = aio_coding_hub_lib::test_support::app_paths(&handle).expect("managed app paths");
+    let _first = aio_core::InstanceGuard::try_acquire(paths.as_ref()).expect("first owner");
+    let db_path = paths.database_file();
+
+    let second = aio_core::InstanceGuard::try_acquire(paths.as_ref());
+    if second.is_ok() {
+        rusqlite::Connection::open(&db_path).expect("open database after ownership");
+    }
+
+    assert!(matches!(
+        second,
+        Err(aio_core::InstanceLockError::AlreadyRunning { .. })
+    ));
+    assert!(!db_path.exists(), "rejected owner must not create SQLite");
+}

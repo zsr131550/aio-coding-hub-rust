@@ -1,31 +1,38 @@
 //! Usage: Async startup task pipeline extracted from bootstrap setup.
 
-use super::app_state::{ensure_db_ready, DbInitState};
+use super::app_state::{ensure_db_ready, ManagedCoreRuntimeState};
 use super::startup_state::{
     fail_startup_run, finish_startup_run, set_startup_stage, try_begin_startup_run, AppStartupStage,
 };
 use tauri::Manager;
 
 pub(crate) fn spawn(app_handle: tauri::AppHandle) -> bool {
-    if !try_begin_startup_run(&app_handle) {
+    let core_state = app_handle
+        .state::<ManagedCoreRuntimeState>()
+        .inner()
+        .clone();
+    if !try_begin_startup_run(&core_state) {
         return false;
     }
     crate::benchmark::milestone("startup_run_started", serde_json::json!({}));
 
-    tauri::async_runtime::spawn(async move {
+    crate::task_runtime::spawn(async move {
         run(app_handle).await;
     });
     true
 }
 
 async fn run(app_handle: tauri::AppHandle) {
-    let db_state = app_handle.state::<DbInitState>();
-    let db = match ensure_db_ready(app_handle.clone(), db_state.inner()).await {
+    let core_state = app_handle
+        .state::<ManagedCoreRuntimeState>()
+        .inner()
+        .clone();
+    let db = match ensure_db_ready(app_handle.clone(), &core_state).await {
         Ok(db) => db,
         Err(err) => {
             tracing::error!("database initialization failed: {}", err);
             fail_startup_run(
-                &app_handle,
+                &core_state,
                 AppStartupStage::InitializingDb,
                 format!("数据库初始化失败：{err}"),
             );
@@ -50,7 +57,7 @@ async fn run(app_handle: tauri::AppHandle) {
         Err(err) => {
             tracing::error!("startup request-log reconciliation failed: {}", err);
             fail_startup_run(
-                &app_handle,
+                &core_state,
                 AppStartupStage::InitializingDb,
                 format!("请求日志恢复失败：{err}"),
             );
@@ -60,11 +67,11 @@ async fn run(app_handle: tauri::AppHandle) {
 
     crate::request_logs::spawn_retention_task(app_handle.clone(), db.clone());
 
-    set_startup_stage(&app_handle, AppStartupStage::ReadingSettings);
+    set_startup_stage(&core_state, AppStartupStage::ReadingSettings);
     let settings = match crate::app::startup_settings::read(&app_handle).await {
         Ok(settings) => settings,
         Err(err) => {
-            fail_startup_run(&app_handle, AppStartupStage::ReadingSettings, err);
+            fail_startup_run(&core_state, AppStartupStage::ReadingSettings, err);
             return;
         }
     };
@@ -73,12 +80,12 @@ async fn run(app_handle: tauri::AppHandle) {
     crate::app::startup_settings::apply_window_state(&app_handle, &settings);
     crate::benchmark::record_window_visibility(&app_handle, settings.start_minimized);
 
-    set_startup_stage(&app_handle, AppStartupStage::StartingGateway);
+    set_startup_stage(&core_state, AppStartupStage::StartingGateway);
     let status = match crate::app::startup_gateway::start(&app_handle, db.clone(), &settings).await
     {
         Ok(status) => status,
         Err(err) => {
-            fail_startup_run(&app_handle, AppStartupStage::StartingGateway, err);
+            fail_startup_run(&core_state, AppStartupStage::StartingGateway, err);
             return;
         }
     };
@@ -91,12 +98,12 @@ async fn run(app_handle: tauri::AppHandle) {
     );
     crate::benchmark::record_gateway_ready(&status).await;
 
-    set_startup_stage(&app_handle, AppStartupStage::SyncingCliProxy);
+    set_startup_stage(&core_state, AppStartupStage::SyncingCliProxy);
     crate::app::startup_gateway::sync_cli_proxy_after_autostart(&app_handle, &status).await;
 
-    set_startup_stage(&app_handle, AppStartupStage::FinalizingWsl);
+    set_startup_stage(&core_state, AppStartupStage::FinalizingWsl);
     crate::app::startup_wsl::finalize(&app_handle, db, status.port, settings).await;
-    finish_startup_run(&app_handle);
+    finish_startup_run(&core_state);
     crate::benchmark::milestone("startup_ready", serde_json::json!({}));
     crate::benchmark::schedule_native_idle_completion(app_handle);
 }

@@ -30,6 +30,8 @@
     "check:plugin-system-docs": "node scripts/check-plugin-system-docs.mjs",
     "check:plugin-system-completion": "node scripts/check-plugin-system-completion.mjs",
     "check:egui-compat-contract": "node scripts/egui-compat-contract.mjs",
+    "check:headless-core-boundary": "node scripts/check-headless-core-boundary.mjs",
+    "test:headless-core-boundary-self": "node scripts/check-headless-core-boundary.selftest.mjs",
     "egui:compat-contract:write": "node scripts/egui-compat-contract.mjs --write",
     "test:egui-compat-contract-self": "node scripts/egui-compat-contract.selftest.mjs",
     "check:egui-fixtures": "node scripts/egui-fixtures.mjs",

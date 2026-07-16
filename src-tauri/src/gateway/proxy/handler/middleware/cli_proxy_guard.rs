@@ -29,7 +29,7 @@ impl CliProxyGuardMiddleware {
         if !enabled_snapshot.cache_hit {
             if let Some(err) = enabled_snapshot.error.as_deref() {
                 emit_gateway_log(
-                    &ctx.state.app,
+                    ctx.state.events.as_ref(),
                     "warn",
                     GatewayErrorCode::CliProxyGuardError.as_str(),
                     format!(

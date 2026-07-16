@@ -1,5 +1,4 @@
-use crate::app_state::{ensure_db_ready, DbInitState};
-use crate::gateway::events::GATEWAY_STATUS_EVENT_NAME;
+use crate::app_state::{ensure_db_ready, ManagedCoreRuntimeState};
 use crate::gateway_control::app_ensure_gateway_running;
 use crate::shared::ipc_confirm::{RiskyIpcConfirm, RISKY_PROVIDER_API_KEY_CLIPBOARD};
 use crate::{base_url_probe, blocking, providers};
@@ -20,7 +19,7 @@ const CLAUDE_LAUNCHER_ARTIFACT_TTL_SECS: u64 = 60 * 60;
 #[specta::specta]
 pub(crate) async fn provider_claude_terminal_launch_command(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     provider_id: i64,
 ) -> Result<String, String> {
     let db = ensure_db_ready(app.clone(), db_state.inner()).await?;
@@ -51,7 +50,10 @@ fn ensure_gateway_base_origin(
 ) -> crate::shared::error::AppResult<String> {
     let status = app_ensure_gateway_running(app, db.clone(), None)?;
 
-    crate::app::heartbeat_watchdog::gated_emit(app, GATEWAY_STATUS_EVENT_NAME, status.clone());
+    crate::app::core_runtime::publish(
+        app,
+        aio_contract::AppEvent::GatewayStatusChanged(status.clone()),
+    );
 
     status
         .base_url
@@ -275,7 +277,7 @@ fn windows_double_quote(value: &str) -> String {
 #[specta::specta]
 pub(crate) async fn provider_copy_api_key_to_clipboard(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     provider_id: i64,
     confirm: Option<RiskyIpcConfirm>,
 ) -> Result<bool, String> {

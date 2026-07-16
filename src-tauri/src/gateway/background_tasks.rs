@@ -4,19 +4,19 @@ use crate::{circuit_breaker, db, provider_circuit_breakers, request_logs};
 use tokio::sync::{mpsc, watch};
 
 pub(super) type GatewayBackgroundTaskHandles = (
-    tauri::async_runtime::JoinHandle<()>,
-    tauri::async_runtime::JoinHandle<()>,
+    crate::task_runtime::JoinHandle<()>,
+    crate::task_runtime::JoinHandle<()>,
     watch::Sender<bool>,
-    tauri::async_runtime::JoinHandle<()>,
+    crate::task_runtime::JoinHandle<()>,
 );
 
 pub(super) struct GatewayBackgroundTasks {
     log_tx: mpsc::Sender<request_logs::RequestLogInsert>,
     circuit_persist_tx: mpsc::Sender<circuit_breaker::CircuitPersistedState>,
-    log_task: tauri::async_runtime::JoinHandle<()>,
-    circuit_task: tauri::async_runtime::JoinHandle<()>,
+    log_task: crate::task_runtime::JoinHandle<()>,
+    circuit_task: crate::task_runtime::JoinHandle<()>,
     oauth_refresh_shutdown: watch::Sender<bool>,
-    oauth_refresh_task: tauri::async_runtime::JoinHandle<()>,
+    oauth_refresh_task: crate::task_runtime::JoinHandle<()>,
 }
 
 impl GatewayBackgroundTasks {
@@ -66,10 +66,10 @@ impl GatewayBackgroundTasks {
         Self {
             log_tx,
             circuit_persist_tx,
-            log_task: tauri::async_runtime::JoinHandle::Tokio(rt.spawn(async {})),
-            circuit_task: tauri::async_runtime::JoinHandle::Tokio(rt.spawn(async {})),
+            log_task: crate::task_runtime::JoinHandle::from_tokio(rt.spawn(async {})),
+            circuit_task: crate::task_runtime::JoinHandle::from_tokio(rt.spawn(async {})),
             oauth_refresh_shutdown,
-            oauth_refresh_task: tauri::async_runtime::JoinHandle::Tokio(rt.spawn(async {})),
+            oauth_refresh_task: crate::task_runtime::JoinHandle::from_tokio(rt.spawn(async {})),
         }
     }
 }

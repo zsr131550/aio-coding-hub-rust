@@ -3,6 +3,7 @@
 use crate::gateway::plugins::context::GatewayLogHookInput;
 use crate::gateway::plugins::pipeline::GatewayPluginPipeline;
 use crate::{db, request_logs};
+use aio_core::EventSink;
 use serde_json::Value;
 use std::sync::atomic::{AtomicU32, AtomicU64, Ordering};
 use std::sync::{Arc, OnceLock};
@@ -304,6 +305,7 @@ async fn apply_log_before_persist_hook(
 
 pub(super) async fn enqueue_request_log_with_backpressure_and_plugins<R: tauri::Runtime>(
     app: &tauri::AppHandle<R>,
+    events: &dyn EventSink,
     db: &db::Db,
     log_tx: &tokio::sync::mpsc::Sender<request_logs::RequestLogInsert>,
     plugin_pipeline: Option<Arc<GatewayPluginPipeline>>,
@@ -326,7 +328,7 @@ pub(super) async fn enqueue_request_log_with_backpressure_and_plugins<R: tauri::
         }
         Ok(Err(_)) => {
             emit_gateway_log(
-                app,
+                events,
                 "warn",
                 GatewayErrorCode::RequestLogChannelClosed.as_str(),
                 format!(
@@ -340,7 +342,7 @@ pub(super) async fn enqueue_request_log_with_backpressure_and_plugins<R: tauri::
             match log_tx.try_send(insert) {
                 Ok(()) => {
                     emit_gateway_log(
-                        app,
+                        events,
                         "warn",
                         GatewayErrorCode::RequestLogEnqueueTimeout.as_str(),
                         format!(
@@ -358,7 +360,7 @@ pub(super) async fn enqueue_request_log_with_backpressure_and_plugins<R: tauri::
                         let count = next_request_log_write_through_count(now_unix_seconds());
                         if count <= REQUEST_LOG_WRITE_THROUGH_MAX_PER_SEC {
                             emit_gateway_log(
-                                app,
+                                events,
                                 "warn",
                                 GatewayErrorCode::RequestLogWriteThroughOnBackpressure.as_str(),
                                 format!(
@@ -372,7 +374,7 @@ pub(super) async fn enqueue_request_log_with_backpressure_and_plugins<R: tauri::
                             request_logs::spawn_write_through(app.clone(), db.clone(), insert);
                         } else if count == REQUEST_LOG_WRITE_THROUGH_MAX_PER_SEC + 1 {
                             emit_gateway_log(
-                                app,
+                                events,
                                 "error",
                                 GatewayErrorCode::RequestLogWriteThroughRateLimited.as_str(),
                                 format!(
@@ -390,7 +392,7 @@ pub(super) async fn enqueue_request_log_with_backpressure_and_plugins<R: tauri::
             }
 
             emit_gateway_log(
-                app,
+                events,
                 "error",
                 GatewayErrorCode::RequestLogDropped.as_str(),
                 format!(
@@ -406,6 +408,7 @@ pub(super) async fn enqueue_request_log_with_backpressure_and_plugins<R: tauri::
 
 pub(super) async fn enqueue_request_log_placeholder<R: tauri::Runtime>(
     app: &tauri::AppHandle<R>,
+    events: &dyn EventSink,
     db: &db::Db,
     log_tx: &tokio::sync::mpsc::Sender<request_logs::RequestLogInsert>,
     args: super::RequestLogEnqueueArgs,
@@ -423,7 +426,7 @@ pub(super) async fn enqueue_request_log_placeholder<R: tauri::Runtime>(
         }
         Ok(Err(_)) => {
             emit_gateway_log(
-                app,
+                events,
                 "warn",
                 GatewayErrorCode::RequestLogChannelClosed.as_str(),
                 format!(
@@ -436,7 +439,7 @@ pub(super) async fn enqueue_request_log_placeholder<R: tauri::Runtime>(
         Err(_) => match log_tx.try_send(insert) {
             Ok(()) => {
                 emit_gateway_log(
-                    app,
+                    events,
                     "warn",
                     GatewayErrorCode::RequestLogEnqueueTimeout.as_str(),
                     format!(
@@ -449,7 +452,7 @@ pub(super) async fn enqueue_request_log_placeholder<R: tauri::Runtime>(
             }
             Err(tokio::sync::mpsc::error::TrySendError::Closed(insert)) => {
                 emit_gateway_log(
-                    app,
+                    events,
                     "warn",
                     GatewayErrorCode::RequestLogChannelClosed.as_str(),
                     format!(
@@ -461,7 +464,7 @@ pub(super) async fn enqueue_request_log_placeholder<R: tauri::Runtime>(
             }
             Err(tokio::sync::mpsc::error::TrySendError::Full(insert)) => {
                 emit_gateway_log(
-                    app,
+                    events,
                     "warn",
                     GatewayErrorCode::RequestLogWriteThroughOnBackpressure.as_str(),
                     format!(
@@ -479,6 +482,7 @@ pub(super) async fn enqueue_request_log_placeholder<R: tauri::Runtime>(
 
 pub(in crate::gateway) fn spawn_enqueue_request_log_with_backpressure<R: tauri::Runtime>(
     app: tauri::AppHandle<R>,
+    events: Arc<dyn EventSink>,
     db: db::Db,
     log_tx: tokio::sync::mpsc::Sender<request_logs::RequestLogInsert>,
     args: super::RequestLogEnqueueArgs,
@@ -487,14 +491,15 @@ pub(in crate::gateway) fn spawn_enqueue_request_log_with_backpressure<R: tauri::
     let Some(permit) =
         try_acquire_request_log_enqueue_task_permit(request_log_enqueue_task_limiter())
     else {
-        enqueue_request_log_when_spawn_saturated(&app, &db, &log_tx, args);
+        enqueue_request_log_when_spawn_saturated(&app, events.as_ref(), &db, &log_tx, args);
         return;
     };
 
-    tauri::async_runtime::spawn(async move {
+    crate::task_runtime::spawn(async move {
         let _permit = permit;
         enqueue_request_log_with_backpressure_and_plugins(
             &app,
+            events.as_ref(),
             &db,
             &log_tx,
             plugin_pipeline,
@@ -506,6 +511,7 @@ pub(in crate::gateway) fn spawn_enqueue_request_log_with_backpressure<R: tauri::
 
 fn enqueue_request_log_when_spawn_saturated<R: tauri::Runtime>(
     app: &tauri::AppHandle<R>,
+    events: &dyn EventSink,
     db: &db::Db,
     log_tx: &tokio::sync::mpsc::Sender<request_logs::RequestLogInsert>,
     args: super::RequestLogEnqueueArgs,
@@ -523,7 +529,7 @@ fn enqueue_request_log_when_spawn_saturated<R: tauri::Runtime>(
         Ok(()) => {}
         Err(tokio::sync::mpsc::error::TrySendError::Closed(insert)) => {
             emit_gateway_log(
-                app,
+                events,
                 "warn",
                 GatewayErrorCode::RequestLogChannelClosed.as_str(),
                 format!(
@@ -537,7 +543,7 @@ fn enqueue_request_log_when_spawn_saturated<R: tauri::Runtime>(
             let count = next_request_log_write_through_count(now_unix_seconds());
             if count <= REQUEST_LOG_WRITE_THROUGH_MAX_PER_SEC {
                 emit_gateway_log(
-                    app,
+                    events,
                     "warn",
                     GatewayErrorCode::RequestLogWriteThroughOnBackpressure.as_str(),
                     format!(
@@ -548,7 +554,7 @@ fn enqueue_request_log_when_spawn_saturated<R: tauri::Runtime>(
                 request_logs::spawn_write_through(app.clone(), db.clone(), insert);
             } else if count == REQUEST_LOG_WRITE_THROUGH_MAX_PER_SEC + 1 {
                 emit_gateway_log(
-                    app,
+                    events,
                     "error",
                     GatewayErrorCode::RequestLogWriteThroughRateLimited.as_str(),
                     format!(
@@ -560,7 +566,7 @@ fn enqueue_request_log_when_spawn_saturated<R: tauri::Runtime>(
         }
         Err(tokio::sync::mpsc::error::TrySendError::Full(_)) => {
             emit_gateway_log(
-                app,
+                events,
                 "error",
                 GatewayErrorCode::RequestLogDropped.as_str(),
                 format!(
@@ -795,7 +801,8 @@ WHERE trace_id = ?1
         args.created_at_ms = 1_770_000_000_000;
         args.created_at = 1_770_000_000;
 
-        enqueue_request_log_placeholder(&app_handle, &db, &log_tx, args).await;
+        enqueue_request_log_placeholder(&app_handle, &aio_core::NoopEventSink, &db, &log_tx, args)
+            .await;
 
         let row = wait_for_placeholder_lifecycle_row(&db, "placeholder-closed")
             .await
@@ -822,7 +829,8 @@ WHERE trace_id = ?1
         args.created_at_ms = 1_770_000_000_000;
         args.created_at = 1_770_000_000;
 
-        enqueue_request_log_placeholder(&app_handle, &db, &log_tx, args).await;
+        enqueue_request_log_placeholder(&app_handle, &aio_core::NoopEventSink, &db, &log_tx, args)
+            .await;
 
         let row = wait_for_placeholder_lifecycle_row(&db, "placeholder-full")
             .await

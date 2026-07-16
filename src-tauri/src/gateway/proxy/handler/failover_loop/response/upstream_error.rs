@@ -361,7 +361,7 @@ pub(super) async fn handle_non_success_response<R: tauri::Runtime>(
                     let preview = String::from_utf8_lossy(&body_for_scan);
                     let truncated: String = preview.chars().take(500).collect();
                     emit_gateway_log(
-                        &state.app,
+                        state.events.as_ref(),
                         "warn",
                         "CX2CC_UPSTREAM_ERROR",
                         format!(
@@ -648,6 +648,7 @@ pub(super) async fn handle_non_success_response<R: tauri::Runtime>(
                     RequestEndArgs::from_context(RequestEndContextArgs {
                         deps: RequestEndDeps::new(
                             &state.app,
+                            &state.events,
                             &state.db,
                             &state.log_tx,
                             &state.plugin_pipeline,
@@ -694,6 +695,7 @@ pub(super) async fn handle_non_success_response<R: tauri::Runtime>(
                 RequestEndArgs::from_context(RequestEndContextArgs {
                     deps: RequestEndDeps::new(
                         &state.app,
+                        &state.events,
                         &state.db,
                         &state.log_tx,
                         &state.plugin_pipeline,

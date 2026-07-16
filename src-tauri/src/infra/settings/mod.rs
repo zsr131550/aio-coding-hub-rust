@@ -5,7 +5,7 @@ mod migration;
 mod persistence;
 mod types;
 
-pub(crate) const SETTINGS_FILE_NAME: &str = "settings.json";
+pub(crate) const SETTINGS_FILE_NAME: &str = aio_core::SETTINGS_FILE_NAME;
 
 // Re-export public API (preserves identical surface for all consumers).
 pub use defaults::{

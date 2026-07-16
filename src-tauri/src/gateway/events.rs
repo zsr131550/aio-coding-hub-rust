@@ -1,18 +1,13 @@
-use crate::{circuit_breaker, settings, usage};
-use serde::Serialize;
-use tauri::Manager;
+use crate::{circuit_breaker, usage};
+use aio_core::EventSink;
 
-pub(crate) const GATEWAY_STATUS_EVENT_NAME: &str = "gateway:status";
-pub(crate) const GATEWAY_REQUEST_START_EVENT_NAME: &str = "gateway:request_start";
-pub(crate) const GATEWAY_ATTEMPT_EVENT_NAME: &str = "gateway:attempt";
-pub(crate) const GATEWAY_REQUEST_EVENT_NAME: &str = "gateway:request";
-pub(crate) const GATEWAY_REQUEST_SIGNAL_EVENT_NAME: &str = "gateway:request_signal";
-pub(crate) const GATEWAY_LOG_EVENT_NAME: &str = "gateway:log";
-pub(crate) const GATEWAY_CIRCUIT_EVENT_NAME: &str = "gateway:circuit";
-
-use crate::app::heartbeat_watchdog::gated_emit;
-
-const MAIN_WINDOW_LABEL: &str = "main";
+pub(crate) use aio_contract::{
+    AppEvent, ClaudeModelMapping, FailoverAttempt, GatewayAttemptEvent, GatewayCircuitEvent,
+    GatewayLogEvent, GatewayRequestEvent, GatewayRequestSignalEvent, GatewayRequestStartEvent,
+    GATEWAY_ATTEMPT_EVENT_NAME, GATEWAY_CIRCUIT_EVENT_NAME, GATEWAY_LOG_EVENT_NAME,
+    GATEWAY_REQUEST_EVENT_NAME, GATEWAY_REQUEST_SIGNAL_EVENT_NAME,
+    GATEWAY_REQUEST_START_EVENT_NAME, GATEWAY_STATUS_EVENT_NAME,
+};
 const REQUEST_EVENT_MAX_ATTEMPTS: usize = 100;
 const EVENT_METHOD_MAX_CHARS: usize = 32;
 const EVENT_STATE_MAX_CHARS: usize = 64;
@@ -69,168 +64,8 @@ pub(in crate::gateway) mod decision_chain {
     }
 }
 
-#[derive(Debug, Serialize, Clone, specta::Type)]
-pub(super) struct FailoverAttempt {
-    pub(super) provider_id: i64,
-    pub(super) provider_name: String,
-    pub(super) base_url: String,
-    pub(super) outcome: String,
-    pub(super) status: Option<u16>,
-    pub(super) provider_index: Option<u32>,
-    pub(super) retry_index: Option<u32>,
-    pub(super) session_reuse: Option<bool>,
-    pub(super) error_category: Option<&'static str>,
-    pub(super) error_code: Option<&'static str>,
-    pub(super) decision: Option<&'static str>,
-    pub(super) reason: Option<String>,
-    pub(super) selection_method: Option<&'static str>,
-    pub(super) reason_code: Option<&'static str>,
-    pub(super) attempt_started_ms: Option<u128>,
-    pub(super) attempt_duration_ms: Option<u128>,
-    pub(super) circuit_state_before: Option<&'static str>,
-    pub(super) circuit_state_after: Option<&'static str>,
-    pub(super) circuit_failure_count: Option<u32>,
-    pub(super) circuit_failure_threshold: Option<u32>,
-    // Circuit attribution for circuit-gate skip attempts (recovery point and
-    // the error code that triggered the breaker). Serialized only when set so
-    // success attempts and non-circuit paths gain zero bytes in attempts_json.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub(super) circuit_recover_at_unix: Option<i64>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub(super) circuit_trigger_error_code: Option<&'static str>,
-    // Whether the attempted provider has bridged (cx2cc) input semantics; None
-    // for synthetic attempts without a concrete provider. Feeds the request
-    // event's effective_input_tokens.
-    pub(super) provider_bridged: Option<bool>,
-    // Effective first-byte timeout (seconds); Some only for failures recorded
-    // under an active first-byte timeout window (GW_UPSTREAM_TIMEOUT plus the
-    // first-chunk stream-error branches). Structured contract for the frontend
-    // (never parsed out of `outcome`); serializes as explicit null per the
-    // gateway event contract.
-    pub(super) timeout_secs: Option<u32>,
-}
-
-#[derive(Debug, Serialize, Clone, PartialEq, Eq, specta::Type)]
-#[serde(rename_all = "camelCase")]
-pub(super) struct ClaudeModelMapping {
-    pub(super) requested_model: String,
-    pub(super) effective_model: String,
-    pub(super) mapping_kind: String,
-    pub(super) provider_id: i64,
-    pub(super) provider_name: String,
-    pub(super) applied: bool,
-}
-
-#[derive(Debug, Serialize, Clone, specta::Type)]
-pub(crate) struct GatewayRequestEvent {
-    trace_id: String,
-    cli_key: String,
-    session_id: Option<String>,
-    method: String,
-    path: String,
-    query: Option<String>,
-    requested_model: Option<String>,
-    status: Option<u16>,
-    error_category: Option<&'static str>,
-    error_code: Option<&'static str>,
-    duration_ms: u128,
-    ttfb_ms: Option<u128>,
-    attempts: Vec<FailoverAttempt>,
-    input_tokens: Option<i64>,
-    output_tokens: Option<i64>,
-    total_tokens: Option<i64>,
-    cache_read_input_tokens: Option<i64>,
-    cache_creation_input_tokens: Option<i64>,
-    cache_creation_5m_input_tokens: Option<i64>,
-    cache_creation_1h_input_tokens: Option<i64>,
-    // Backend-computed via domain::usage_stats::effective_input_tokens so the
-    // frontend never re-derives the formula (single source of truth).
-    effective_input_tokens: Option<i64>,
-    claude_model_mapping: Option<ClaudeModelMapping>,
-}
-
-#[derive(Debug, Serialize, Clone, specta::Type)]
-pub(crate) struct GatewayRequestStartEvent {
-    trace_id: String,
-    cli_key: String,
-    session_id: Option<String>,
-    method: String,
-    path: String,
-    query: Option<String>,
-    requested_model: Option<String>,
-    ts: i64,
-}
-
-#[derive(Debug, Serialize, Clone, specta::Type)]
-pub(crate) struct GatewayRequestSignalEvent {
-    trace_id: String,
-    cli_key: String,
-    session_id: Option<String>,
-    requested_model: Option<String>,
-    phase: &'static str,
-    ts: i64,
-}
-
-#[derive(Debug, Serialize, Clone, PartialEq, Eq, specta::Type)]
-pub(crate) struct GatewayAttemptEvent {
-    pub(super) trace_id: String,
-    pub(super) cli_key: String,
-    pub(super) session_id: Option<String>,
-    pub(super) method: String,
-    pub(super) path: String,
-    pub(super) query: Option<String>,
-    pub(super) requested_model: Option<String>,
-    pub(super) attempt_index: u32,
-    pub(super) provider_id: i64,
-    pub(super) session_reuse: Option<bool>,
-    pub(super) provider_name: String,
-    pub(super) base_url: String,
-    pub(super) outcome: String,
-    pub(super) status: Option<u16>,
-    pub(super) attempt_started_ms: u128,
-    pub(super) attempt_duration_ms: u128,
-    pub(super) circuit_state_before: Option<&'static str>,
-    pub(super) circuit_state_after: Option<&'static str>,
-    pub(super) circuit_failure_count: Option<u32>,
-    pub(super) circuit_failure_threshold: Option<u32>,
-    pub(super) claude_model_mapping: Option<ClaudeModelMapping>,
-}
-
-#[derive(Debug, Serialize, Clone, specta::Type)]
-pub(crate) struct GatewayCircuitEvent {
-    pub(super) trace_id: String,
-    pub(super) cli_key: String,
-    pub(super) provider_id: i64,
-    pub(super) provider_name: String,
-    pub(super) base_url: String,
-    pub(super) prev_state: &'static str,
-    pub(super) next_state: &'static str,
-    pub(super) failure_count: u32,
-    pub(super) failure_threshold: u32,
-    pub(super) open_until: Option<i64>,
-    pub(super) cooldown_until: Option<i64>,
-    pub(super) reason: &'static str,
-    pub(super) ts: i64,
-    // Trigger-failure attribution (error code that tripped the breaker and the
-    // effective first-byte timeout in seconds). The frontend builds the
-    // circuit-breaker notice body from these; None outside failure-recording
-    // transitions. Serialized as explicit null per the gateway event contract.
-    pub(super) trigger_error_code: Option<String>,
-    pub(super) first_byte_timeout_secs: Option<u32>,
-}
-
-#[derive(Debug, Serialize, Clone, specta::Type)]
-pub(crate) struct GatewayLogEvent {
-    pub(super) level: &'static str,
-    pub(super) error_code: &'static str,
-    pub(super) message: String,
-    pub(super) requested_port: u16,
-    pub(super) bound_port: u16,
-    pub(super) base_url: String,
-}
-
-pub(crate) fn emit_gateway_log<R: tauri::Runtime>(
-    app: &tauri::AppHandle<R>,
+pub(crate) fn emit_gateway_log(
+    sink: &dyn EventSink,
     level: &'static str,
     error_code: &'static str,
     message: String,
@@ -243,47 +78,11 @@ pub(crate) fn emit_gateway_log<R: tauri::Runtime>(
         bound_port: 0,
         base_url: String::new(),
     };
-    gated_emit(
-        app,
-        GATEWAY_LOG_EVENT_NAME,
-        bound_gateway_log_event(payload),
-    );
+    sink.publish(AppEvent::GatewayLog(bound_gateway_log_event(payload)));
 }
 
-pub(crate) fn emit_gateway_debug_log<R: tauri::Runtime>(
-    app: &tauri::AppHandle<R>,
-    message: String,
-) {
-    emit_gateway_debug_log_lazy(app, || message);
-}
-
-pub(crate) fn emit_gateway_debug_log_lazy<R, F>(app: &tauri::AppHandle<R>, build_message: F)
-where
-    R: tauri::Runtime,
-    F: FnOnce() -> String,
-{
-    let enabled = settings::read(app)
-        .map(|cfg| cfg.enable_debug_log)
-        .unwrap_or(false);
-    if !enabled {
-        return;
-    }
-    let message = build_message();
-    tracing::info!(target: "gateway_debug", "{message}");
-}
-
-fn should_emit_gateway_detail_event<R: tauri::Runtime>(app: &tauri::AppHandle<R>) -> bool {
-    let Some(window) = app.get_webview_window(MAIN_WINDOW_LABEL) else {
-        return true;
-    };
-
-    let visible = window.is_visible().unwrap_or(true);
-    let minimized = window.is_minimized().unwrap_or(false);
-    visible && !minimized
-}
-
-fn emit_request_signal<R: tauri::Runtime>(
-    app: &tauri::AppHandle<R>,
+fn emit_request_signal(
+    sink: &dyn EventSink,
     trace_id: String,
     cli_key: String,
     session_id: Option<String>,
@@ -299,11 +98,9 @@ fn emit_request_signal<R: tauri::Runtime>(
         phase,
         ts,
     };
-    gated_emit(
-        app,
-        GATEWAY_REQUEST_SIGNAL_EVENT_NAME,
-        bound_request_signal_event(payload),
-    );
+    sink.publish(AppEvent::GatewayRequestSignal(bound_request_signal_event(
+        payload,
+    )));
 }
 
 fn truncate_chars(mut value: String, max_chars: usize) -> String {
@@ -426,8 +223,8 @@ fn bound_gateway_log_event(mut payload: GatewayLogEvent) -> GatewayLogEvent {
 }
 
 #[allow(clippy::too_many_arguments)]
-pub(super) fn emit_request_event<R: tauri::Runtime>(
-    app: &tauri::AppHandle<R>,
+pub(super) fn emit_request_event(
+    sink: &dyn EventSink,
     trace_id: String,
     cli_key: String,
     session_id: Option<String>,
@@ -445,7 +242,7 @@ pub(super) fn emit_request_event<R: tauri::Runtime>(
     usage: Option<usage::UsageMetrics>,
 ) {
     emit_request_signal(
-        app,
+        sink,
         trace_id.clone(),
         cli_key.clone(),
         session_id.clone(),
@@ -453,10 +250,6 @@ pub(super) fn emit_request_event<R: tauri::Runtime>(
         "complete",
         crate::gateway::util::now_unix_seconds() as i64,
     );
-
-    if !should_emit_gateway_detail_event(app) {
-        return;
-    }
 
     let usage = usage.unwrap_or_default();
     let effective_input_tokens = request_event_effective_input_tokens(&cli_key, &attempts, &usage);
@@ -485,16 +278,14 @@ pub(super) fn emit_request_event<R: tauri::Runtime>(
         claude_model_mapping,
     };
 
-    gated_emit(
-        app,
-        GATEWAY_REQUEST_EVENT_NAME,
-        bound_request_event(payload),
-    );
+    sink.publish(AppEvent::GatewayRequestCompleted(bound_request_event(
+        payload,
+    )));
 }
 
 #[allow(clippy::too_many_arguments)]
-pub(super) fn emit_request_start_event<R: tauri::Runtime>(
-    app: &tauri::AppHandle<R>,
+pub(super) fn emit_request_start_event(
+    sink: &dyn EventSink,
     trace_id: String,
     cli_key: String,
     session_id: Option<String>,
@@ -505,7 +296,7 @@ pub(super) fn emit_request_start_event<R: tauri::Runtime>(
     ts: i64,
 ) {
     emit_request_signal(
-        app,
+        sink,
         trace_id.clone(),
         cli_key.clone(),
         session_id.clone(),
@@ -513,10 +304,6 @@ pub(super) fn emit_request_start_event<R: tauri::Runtime>(
         "start",
         ts,
     );
-
-    if !should_emit_gateway_detail_event(app) {
-        return;
-    }
 
     let payload = GatewayRequestStartEvent {
         trace_id,
@@ -528,41 +315,24 @@ pub(super) fn emit_request_start_event<R: tauri::Runtime>(
         requested_model,
         ts,
     };
-    gated_emit(
-        app,
-        GATEWAY_REQUEST_START_EVENT_NAME,
-        bound_request_start_event(payload),
-    );
+    sink.publish(AppEvent::GatewayRequestStarted(bound_request_start_event(
+        payload,
+    )));
 }
 
-pub(super) fn emit_attempt_event<R: tauri::Runtime>(
-    app: &tauri::AppHandle<R>,
-    payload: GatewayAttemptEvent,
-) {
-    if !should_emit_gateway_detail_event(app) {
-        return;
-    }
-    gated_emit(
-        app,
-        GATEWAY_ATTEMPT_EVENT_NAME,
-        bound_attempt_event(payload),
-    );
+pub(super) fn emit_attempt_event(sink: &dyn EventSink, payload: GatewayAttemptEvent) {
+    sink.publish(AppEvent::GatewayAttempted(bound_attempt_event(payload)));
 }
 
-pub(super) fn emit_circuit_event<R: tauri::Runtime>(
-    app: &tauri::AppHandle<R>,
-    payload: GatewayCircuitEvent,
-) {
-    gated_emit(
-        app,
-        GATEWAY_CIRCUIT_EVENT_NAME,
-        bound_circuit_event(payload),
-    );
+pub(super) fn emit_circuit_event(sink: &dyn EventSink, payload: GatewayCircuitEvent) {
+    sink.publish(AppEvent::GatewayCircuitChanged(bound_circuit_event(
+        payload,
+    )));
 }
 
 #[allow(clippy::too_many_arguments)]
-pub(super) fn emit_circuit_transition<R: tauri::Runtime>(
-    app: &tauri::AppHandle<R>,
+pub(super) fn emit_circuit_transition(
+    sink: &dyn EventSink,
     trace_id: &str,
     cli_key: &str,
     provider_id: i64,
@@ -591,13 +361,109 @@ pub(super) fn emit_circuit_transition<R: tauri::Runtime>(
         first_byte_timeout_secs,
     };
 
-    emit_circuit_event(app, payload);
+    emit_circuit_event(sink, payload);
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use aio_core::RecordingEventSink;
+    use serde::Serialize;
     use serde_json::json;
+
+    fn sample_attempt_event() -> GatewayAttemptEvent {
+        GatewayAttemptEvent {
+            trace_id: "trace-producer".to_string(),
+            cli_key: "codex".to_string(),
+            session_id: None,
+            method: "POST".to_string(),
+            path: "/v1/responses".to_string(),
+            query: None,
+            requested_model: Some("gpt-5.4".to_string()),
+            attempt_index: 1,
+            provider_id: 7,
+            session_reuse: Some(false),
+            provider_name: "Provider A".to_string(),
+            base_url: "https://provider.example".to_string(),
+            outcome: "success".to_string(),
+            status: Some(200),
+            attempt_started_ms: 10,
+            attempt_duration_ms: 5,
+            circuit_state_before: Some("CLOSED"),
+            circuit_state_after: Some("CLOSED"),
+            circuit_failure_count: Some(0),
+            circuit_failure_threshold: Some(5),
+            claude_model_mapping: None,
+        }
+    }
+
+    fn sample_circuit_event() -> GatewayCircuitEvent {
+        GatewayCircuitEvent {
+            trace_id: "trace-producer".to_string(),
+            cli_key: "codex".to_string(),
+            provider_id: 7,
+            provider_name: "Provider A".to_string(),
+            base_url: "https://provider.example".to_string(),
+            prev_state: "CLOSED",
+            next_state: "OPEN",
+            failure_count: 5,
+            failure_threshold: 5,
+            open_until: Some(100),
+            cooldown_until: None,
+            reason: "FAILURE_THRESHOLD_REACHED",
+            ts: 10,
+            trigger_error_code: Some("GW_UPSTREAM_TIMEOUT".to_string()),
+            first_byte_timeout_secs: Some(30),
+        }
+    }
+
+    #[test]
+    fn gateway_event_producers_publish_typed_events_in_order() {
+        let sink = RecordingEventSink::default();
+
+        emit_gateway_log(&sink, "warn", "GW_TEST", "log".to_string());
+        emit_request_start_event(
+            &sink,
+            "trace-producer".to_string(),
+            "codex".to_string(),
+            None,
+            "POST".to_string(),
+            "/v1/responses".to_string(),
+            None,
+            Some("gpt-5.4".to_string()),
+            10,
+        );
+        emit_attempt_event(&sink, sample_attempt_event());
+        emit_request_event(
+            &sink,
+            "trace-producer".to_string(),
+            "codex".to_string(),
+            None,
+            "POST".to_string(),
+            "/v1/responses".to_string(),
+            None,
+            Some("gpt-5.4".to_string()),
+            Some(200),
+            None,
+            None,
+            15,
+            Some(5),
+            Vec::new(),
+            None,
+            None,
+        );
+        emit_circuit_event(&sink, sample_circuit_event());
+
+        let events = sink.events();
+        assert_eq!(events.len(), 7);
+        assert!(matches!(events[0], AppEvent::GatewayLog(_)));
+        assert!(matches!(events[1], AppEvent::GatewayRequestSignal(_)));
+        assert!(matches!(events[2], AppEvent::GatewayRequestStarted(_)));
+        assert!(matches!(events[3], AppEvent::GatewayAttempted(_)));
+        assert!(matches!(events[4], AppEvent::GatewayRequestSignal(_)));
+        assert!(matches!(events[5], AppEvent::GatewayRequestCompleted(_)));
+        assert!(matches!(events[6], AppEvent::GatewayCircuitChanged(_)));
+    }
 
     #[test]
     fn status_event_payload_matches_shared_fixture() {

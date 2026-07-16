@@ -1,4 +1,4 @@
-use crate::app_state::{ensure_db_ready, DbInitState};
+use crate::app_state::{ensure_db_ready, ManagedCoreRuntimeState};
 use crate::blocking;
 use crate::infra::config_migrate;
 use crate::shared::error::AppError;
@@ -37,7 +37,7 @@ fn read_config_import_bundle(file_path: &str) -> Result<config_migrate::ConfigBu
 #[specta::specta]
 pub(crate) async fn config_export(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     file_path: String,
 ) -> Result<bool, String> {
     let file_path = file_path.trim().to_string();
@@ -61,7 +61,7 @@ pub(crate) async fn config_export(
 #[specta::specta]
 pub(crate) async fn config_import(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     file_path: String,
     confirm: Option<RiskyIpcConfirm>,
 ) -> Result<config_migrate::ConfigImportResult, String> {

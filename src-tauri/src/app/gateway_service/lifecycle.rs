@@ -1,6 +1,5 @@
 //! Usage: Gateway lifecycle orchestration and shell-side follow-up actions.
 
-use crate::gateway::events::GATEWAY_STATUS_EVENT_NAME;
 use crate::gateway_control::app_start_gateway;
 use crate::gateway_runtime_access::app_gateway_status;
 use crate::shared::error::AppResult;
@@ -10,7 +9,10 @@ fn emit_gateway_status<R: tauri::Runtime>(
     app: &tauri::AppHandle<R>,
     status: &gateway::GatewayStatus,
 ) {
-    crate::app::heartbeat_watchdog::gated_emit(app, GATEWAY_STATUS_EVENT_NAME, status.clone());
+    crate::app::core_runtime::publish(
+        app,
+        aio_contract::AppEvent::GatewayStatusChanged(status.clone()),
+    );
 }
 
 pub(crate) async fn sync_cli_proxy_to_gateway<R: tauri::Runtime>(

@@ -549,7 +549,7 @@ pub(crate) fn schedule_native_idle_completion(app: tauri::AppHandle) {
     let started = Instant::now();
     let deadline = started + duration;
 
-    tauri::async_runtime::spawn(async move {
+    crate::task_runtime::spawn(async move {
         tokio::time::sleep_until(tokio::time::Instant::from_std(deadline)).await;
         let data = serde_json::json!({
             "completionSource": "native_idle_timer",
@@ -792,7 +792,7 @@ fn record(payload: UiMilestone) -> Result<(), String> {
 #[tauri::command]
 async fn request_logs() -> Result<Vec<crate::request_logs::RequestLogSummary>, String> {
     let config = current_config()?.clone();
-    tauri::async_runtime::spawn_blocking(move || load_request_log_fixture(&config))
+    crate::task_runtime::spawn_blocking(move || load_request_log_fixture(&config))
         .await
         .map_err(|err| format!("join benchmark fixture loader: {err}"))?
 }
@@ -1080,7 +1080,7 @@ async fn run_gateway_load(app: tauri::AppHandle, condition: String) -> Result<Va
         .ok_or_else(|| format!("{GATEWAY_UPSTREAM_ENV} is required for gateway-load"))?;
 
     use tauri::Manager;
-    let state = app.state::<crate::app_state::DbInitState>();
+    let state = app.state::<crate::app_state::ManagedCoreRuntimeState>();
     let db = crate::app_state::ensure_db_ready(app.clone(), &state)
         .await
         .map_err(|err| format!("benchmark database initialization: {err}"))?;

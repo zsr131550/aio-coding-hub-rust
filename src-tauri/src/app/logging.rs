@@ -1,13 +1,13 @@
 //! Usage: Tracing/logging initialization (rolling file logs + best-effort cleanup).
 
 use crate::{app_paths, blocking, settings};
+use aio_core::AppPaths;
 use std::path::{Path, PathBuf};
 use std::sync::{Mutex, OnceLock};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use tracing_appender::non_blocking::WorkerGuard;
 use tracing_subscriber::layer::SubscriberExt;
 
-const LOG_SUBDIR: &str = "logs";
 const LOG_FILE_PREFIX: &str = "aio-coding-hub.log";
 const CLEANUP_INTERVAL: Duration = Duration::from_secs(24 * 60 * 60);
 
@@ -32,7 +32,8 @@ pub(crate) fn init(app: &tauri::AppHandle) {
 }
 
 fn init_impl(app: &tauri::AppHandle) -> crate::shared::error::AppResult<()> {
-    let log_dir = ensure_log_dir(app)?;
+    let paths = app_paths::get(app)?;
+    let log_dir = ensure_log_dir(&paths)?;
     let env_filter = default_env_filter();
 
     let file_appender = tracing_appender::rolling::daily(&log_dir, LOG_FILE_PREFIX);
@@ -94,16 +95,15 @@ fn default_env_filter() -> tracing_subscriber::EnvFilter {
     })
 }
 
-fn ensure_log_dir(app: &tauri::AppHandle) -> crate::shared::error::AppResult<PathBuf> {
-    let base = app_paths::app_data_dir(app)?;
-    let dir = base.join(LOG_SUBDIR);
+fn ensure_log_dir(paths: &AppPaths) -> crate::shared::error::AppResult<PathBuf> {
+    let dir = paths.logs_dir();
     std::fs::create_dir_all(&dir)
         .map_err(|e| format!("failed to create log dir {}: {e}", dir.display()))?;
     Ok(dir)
 }
 
 fn spawn_cleanup_task(app: tauri::AppHandle, log_dir: PathBuf) {
-    tauri::async_runtime::spawn(async move {
+    crate::task_runtime::spawn(async move {
         run_cleanup_once_blocking(app.clone(), log_dir.clone()).await;
 
         let mut interval = tokio::time::interval(CLEANUP_INTERVAL);

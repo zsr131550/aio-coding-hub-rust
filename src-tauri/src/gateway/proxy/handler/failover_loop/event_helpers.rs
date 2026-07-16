@@ -66,7 +66,7 @@ pub(super) async fn emit_attempt_event_and_log<R: tauri::Runtime>(
     };
 
     let state = ctx.state;
-    emit_attempt_event(&state.app, attempt_event);
+    emit_attempt_event(state.events.as_ref(), attempt_event);
 }
 
 pub(super) async fn emit_attempt_event_and_log_with_circuit_before<R: tauri::Runtime>(

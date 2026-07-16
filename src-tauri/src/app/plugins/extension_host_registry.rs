@@ -2,7 +2,7 @@
 
 use super::extension_host::ExtensionHostInstance;
 use super::privacy_redaction_service::PrivacyRedactionService;
-use crate::app::app_state::{ensure_db_ready, DbInitState};
+use crate::app::app_state::{ensure_db_ready, ManagedCoreRuntimeState};
 use crate::app::plugins::runtime_lifecycle::PluginRuntimeInstanceRegistry;
 use crate::db;
 use crate::domain::plugins::{extension_host_contribution_hash, PluginDetail, PluginRuntime};
@@ -626,7 +626,7 @@ impl PluginRuntimeInstanceRegistry for ExtensionHostInstanceLifecycleRegistry {
             .map(|plugin| plugin.summary.plugin_id.clone())
             .collect::<HashSet<_>>();
         let registry = self.registry.clone();
-        tauri::async_runtime::spawn(async move {
+        crate::task_runtime::spawn(async move {
             registry.retain_plugins(&active_plugin_ids).await;
         });
     }
@@ -634,14 +634,14 @@ impl PluginRuntimeInstanceRegistry for ExtensionHostInstanceLifecycleRegistry {
     fn dispose_plugin(&self, plugin_id: &str) {
         let registry = self.registry.clone();
         let plugin_id = plugin_id.to_string();
-        tauri::async_runtime::spawn(async move {
+        crate::task_runtime::spawn(async move {
             registry.dispose_plugin(&plugin_id).await;
         });
     }
 
     fn dispose_all(&self) {
         let registry = self.registry.clone();
-        tauri::async_runtime::spawn(async move {
+        crate::task_runtime::spawn(async move {
             registry.dispose_all().await;
         });
     }
@@ -689,50 +689,41 @@ fn call_timeout_millis(call_timeout: Duration) -> u64 {
     call_timeout.as_millis().try_into().unwrap_or(u64::MAX)
 }
 
-#[derive(Default)]
-pub(crate) struct ExtensionHostRuntimeState {
-    registry: Mutex<Option<Arc<ExtensionHostInstanceRegistry>>>,
+pub(crate) type ExtensionHostInitState =
+    aio_core::AsyncInitState<Arc<ExtensionHostInstanceRegistry>, AppError>;
+
+#[allow(dead_code)]
+pub(crate) async fn registry<R: tauri::Runtime>(
+    state: &ManagedCoreRuntimeState,
+    app: tauri::AppHandle<R>,
+) -> AppResult<Arc<ExtensionHostInstanceRegistry>> {
+    state
+        .plugins()
+        .get_or_try_init(|| async move {
+            let db = ensure_db_ready(app, state).await?;
+            Ok(Arc::new(ExtensionHostInstanceRegistry::new(db)))
+        })
+        .await
 }
 
-impl ExtensionHostRuntimeState {
-    #[allow(dead_code)]
-    pub(crate) async fn registry<R: tauri::Runtime>(
-        &self,
-        app: tauri::AppHandle<R>,
-        db_state: &DbInitState,
-    ) -> AppResult<Arc<ExtensionHostInstanceRegistry>> {
-        if let Some(registry) = { self.registry.lock().await.clone() } {
-            return Ok(registry.clone());
-        }
-
-        let db = ensure_db_ready(app, db_state).await?;
-        let mut guard = self.registry.lock().await;
-        if let Some(registry) = guard.as_ref() {
-            return Ok(registry.clone());
-        }
-        let registry = Arc::new(ExtensionHostInstanceRegistry::new(db));
-        *guard = Some(registry.clone());
-        Ok(registry)
+pub(crate) async fn dispose_all_if_initialized(state: &ExtensionHostInitState) {
+    if let Some(Ok(registry)) = state.cached().await {
+        registry.dispose_all().await;
     }
+}
 
-    pub(crate) async fn dispose_all(&self) {
-        let registry = { self.registry.lock().await.clone() };
-        if let Some(registry) = registry {
-            registry.dispose_all().await;
-        }
+pub(crate) async fn dispose_plugin_if_initialized(state: &ExtensionHostInitState, plugin_id: &str) {
+    if let Some(Ok(registry)) = state.cached().await {
+        registry.dispose_plugin(plugin_id).await;
     }
+}
 
-    pub(crate) async fn dispose_plugin_if_initialized(&self, plugin_id: &str) {
-        let registry = { self.registry.lock().await.clone() };
-        if let Some(registry) = registry {
-            registry.dispose_plugin(plugin_id).await;
-        }
-    }
-
-    #[cfg(test)]
-    async fn set_registry_for_tests(&self, registry: Arc<ExtensionHostInstanceRegistry>) {
-        *self.registry.lock().await = Some(registry);
-    }
+#[cfg(test)]
+async fn set_registry_for_tests(
+    state: &ExtensionHostInitState,
+    registry: Arc<ExtensionHostInstanceRegistry>,
+) {
+    let _ = state.replace_cached(Some(Ok(registry))).await;
 }
 
 fn remove_same_plugin_with_different_key(
@@ -1961,14 +1952,14 @@ mod tests {
 
     #[tokio::test]
     async fn runtime_state_dispose_plugin_if_initialized_is_noop_before_registry_init() {
-        let state = ExtensionHostRuntimeState::default();
+        let state = ExtensionHostInitState::default();
 
-        state.dispose_plugin_if_initialized("acme.echo").await;
+        dispose_plugin_if_initialized(&state, "acme.echo").await;
     }
 
     #[tokio::test]
     async fn runtime_state_dispose_plugin_if_initialized_disposes_existing_registry_instance() {
-        let state = ExtensionHostRuntimeState::default();
+        let state = ExtensionHostInitState::default();
         let factory = Arc::new(FakeExtensionHostFactory::default());
         let registry = Arc::new(ExtensionHostInstanceRegistry::new_for_tests(
             factory.clone(),
@@ -1977,7 +1968,7 @@ mod tests {
                 idle_recycle: Duration::from_secs(120),
             },
         ));
-        state.set_registry_for_tests(registry.clone()).await;
+        set_registry_for_tests(&state, registry.clone()).await;
 
         registry
             .execute_command_with_now(
@@ -1989,7 +1980,7 @@ mod tests {
             .await
             .expect("execute command");
 
-        state.dispose_plugin_if_initialized("acme.echo").await;
+        dispose_plugin_if_initialized(&state, "acme.echo").await;
 
         assert_eq!(factory.disposed_instance_ids(), vec![1]);
         assert_eq!(registry.instance_count().await, 0);

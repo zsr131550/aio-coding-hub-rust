@@ -1,6 +1,6 @@
 //! Usage: Data reset / disk usage related Tauri commands.
 
-use crate::app_state::{ensure_db_ready, prepare_db_reset, DbInitState};
+use crate::app_state::{ensure_db_ready, prepare_db_reset, ManagedCoreRuntimeState};
 use crate::shared::ipc_confirm::{RiskyIpcConfirm, RISKY_APP_DATA_RESET};
 use crate::{app_paths, blocking, data_management};
 
@@ -34,7 +34,7 @@ pub(crate) async fn db_disk_usage_get(
 #[specta::specta]
 pub(crate) async fn db_compact(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
 ) -> Result<data_management::DbCompactResult, String> {
     let db = ensure_db_ready(app.clone(), db_state.inner()).await?;
     blocking::run("db_compact", move || data_management::db_compact(&app, &db))
@@ -46,7 +46,7 @@ pub(crate) async fn db_compact(
 #[specta::specta]
 pub(crate) async fn request_logs_clear_all(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
 ) -> Result<data_management::ClearRequestLogsResult, String> {
     let db = ensure_db_ready(app.clone(), db_state.inner()).await?;
     blocking::run("request_logs_clear_all", move || {
@@ -60,7 +60,7 @@ pub(crate) async fn request_logs_clear_all(
 #[specta::specta]
 pub(crate) async fn app_data_reset(
     app: tauri::AppHandle,
-    db_state: tauri::State<'_, DbInitState>,
+    db_state: tauri::State<'_, ManagedCoreRuntimeState>,
     confirm: Option<RiskyIpcConfirm>,
 ) -> Result<bool, String> {
     RISKY_APP_DATA_RESET.require(confirm, "app_data")?;

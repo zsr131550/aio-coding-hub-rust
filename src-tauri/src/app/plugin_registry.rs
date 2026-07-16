@@ -1,8 +1,6 @@
 //! Usage: Shared Tauri builder setup (managed state + plugin wiring).
 
-use super::{
-    app_state::DbInitState, gateway_state::GatewayState, resident, startup_state::StartupState,
-};
+use super::resident;
 
 #[cfg(desktop)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -21,12 +19,8 @@ const fn desktop_plugin_policy(benchmark_enabled: bool) -> DesktopPluginPolicy {
 
 pub(crate) fn create_builder() -> tauri::Builder<tauri::Wry> {
     let builder = tauri::Builder::default()
-        .manage(DbInitState::default())
-        .manage(GatewayState::default())
         .manage(resident::ResidentState::default())
-        .manage(StartupState::default())
         .manage(crate::app::heartbeat_watchdog::HeartbeatWatchdogState::default())
-        .manage(crate::app::plugins::extension_host_registry::ExtensionHostRuntimeState::default())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_clipboard_manager::init())
@@ -48,6 +42,9 @@ pub(crate) fn create_builder() -> tauri::Builder<tauri::Wry> {
     #[cfg(desktop)]
     let builder = if policy.single_instance {
         builder.plugin(tauri_plugin_single_instance::init(|app, _argv, _cwd| {
+            if let Some(events) = super::core_runtime::try_event_sink(app) {
+                events.publish(aio_contract::AppEvent::PlatformActivationRequested);
+            }
             resident::show_main_window(app);
         }))
     } else {
@@ -87,5 +84,44 @@ mod tests {
             source.contains("#[cfg(desktop)]") && source.contains(&needle),
             "startup request-log reconciliation relies on desktop single-instance ownership"
         );
+    }
+
+    #[test]
+    fn single_instance_publishes_activation_before_showing_window() {
+        let source = std::fs::read_to_string(file!()).expect("read plugin registry source");
+        let production = source
+            .split("#[cfg(test)]")
+            .next()
+            .expect("production source");
+        let activation = production
+            .find("PlatformActivationRequested")
+            .expect("single-instance callback publishes typed activation");
+        let show = production[activation..]
+            .find("resident::show_main_window(app)")
+            .map(|offset| activation + offset)
+            .expect("single-instance callback keeps the existing show/focus action");
+
+        assert!(
+            activation < show,
+            "activation must publish before show/focus"
+        );
+    }
+
+    #[test]
+    fn builder_does_not_manage_fragmented_core_state() {
+        let source = std::fs::read_to_string(file!()).expect("read plugin registry source");
+
+        let legacy_states = [
+            ["Db", "InitState::default"].concat(),
+            ["Gateway", "State::default"].concat(),
+            ["Startup", "State::default"].concat(),
+            ["ExtensionHostRuntime", "State::default"].concat(),
+        ];
+        for legacy_state in legacy_states {
+            assert!(
+                !source.contains(&legacy_state),
+                "{legacy_state} must be owned by the unified runtime state"
+            );
+        }
     }
 }

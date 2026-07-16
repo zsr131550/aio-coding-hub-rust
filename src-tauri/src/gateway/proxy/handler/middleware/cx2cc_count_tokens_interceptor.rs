@@ -1,7 +1,7 @@
 //! Middleware: answers Claude count-tokens requests locally for CX2CC bridges.
 
 use super::{MiddlewareAction, ProxyContext};
-use crate::gateway::events::emit_gateway_debug_log_lazy;
+use crate::gateway::debug_log::emit_gateway_debug_log_lazy;
 use crate::gateway::proxy::provider_adapters;
 use crate::providers;
 use axum::http::{header, HeaderValue, StatusCode};
