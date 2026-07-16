@@ -96,7 +96,9 @@ describe("BenchmarkLogsScene", () => {
 
     markStartupReady();
 
-    expect(await screen.findByTestId("logs-panel")).toHaveAttribute("data-count", "589");
+    await waitFor(() =>
+      expect(screen.getByTestId("logs-panel")).toHaveAttribute("data-count", "589")
+    );
     await waitFor(() => expect(bridge.finish).toHaveBeenCalledTimes(1));
 
     const recordedMilestones = (bridge.record.mock.calls as unknown as Array<[string]>).map(
