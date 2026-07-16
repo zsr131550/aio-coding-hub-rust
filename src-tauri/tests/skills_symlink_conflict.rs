@@ -10,7 +10,7 @@ fn symlink_dir(src: &std::path::Path, dst: &std::path::Path) -> std::io::Result<
 
 #[cfg(windows)]
 fn symlink_dir(src: &std::path::Path, dst: &std::path::Path) -> std::io::Result<()> {
-    std::os::windows::fs::symlink_dir(src, dst)
+    junction::create(src, dst)
 }
 
 #[test]

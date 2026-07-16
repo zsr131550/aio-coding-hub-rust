@@ -10,6 +10,7 @@ pub(crate) fn spawn(app_handle: tauri::AppHandle) -> bool {
     if !try_begin_startup_run(&app_handle) {
         return false;
     }
+    crate::benchmark::milestone("startup_run_started", serde_json::json!({}));
 
     tauri::async_runtime::spawn(async move {
         run(app_handle).await;
@@ -31,6 +32,7 @@ async fn run(app_handle: tauri::AppHandle) {
             return;
         }
     };
+    crate::benchmark::milestone("db_ready", serde_json::json!({}));
 
     match crate::request_logs::reconcile_unresolved_pending(
         &db,
@@ -66,8 +68,10 @@ async fn run(app_handle: tauri::AppHandle) {
             return;
         }
     };
+    crate::benchmark::milestone("settings_ready", serde_json::json!({}));
 
     crate::app::startup_settings::apply_window_state(&app_handle, &settings);
+    crate::benchmark::record_window_visibility(&app_handle, settings.start_minimized);
 
     set_startup_stage(&app_handle, AppStartupStage::StartingGateway);
     let status = match crate::app::startup_gateway::start(&app_handle, db.clone(), &settings).await
@@ -78,6 +82,14 @@ async fn run(app_handle: tauri::AppHandle) {
             return;
         }
     };
+    crate::benchmark::milestone(
+        "gateway_bound",
+        serde_json::json!({
+            "port": status.port,
+            "listenAddr": status.listen_addr,
+        }),
+    );
+    crate::benchmark::record_gateway_ready(&status).await;
 
     set_startup_stage(&app_handle, AppStartupStage::SyncingCliProxy);
     crate::app::startup_gateway::sync_cli_proxy_after_autostart(&app_handle, &status).await;
@@ -85,4 +97,6 @@ async fn run(app_handle: tauri::AppHandle) {
     set_startup_stage(&app_handle, AppStartupStage::FinalizingWsl);
     crate::app::startup_wsl::finalize(&app_handle, db, status.port, settings).await;
     finish_startup_run(&app_handle);
+    crate::benchmark::milestone("startup_ready", serde_json::json!({}));
+    crate::benchmark::schedule_native_idle_completion(app_handle);
 }

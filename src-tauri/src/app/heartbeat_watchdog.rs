@@ -77,8 +77,12 @@ const RESTART_MARKER_FILENAME: &str = "restart_marker";
 const RESTART_MARKER_MAX_BYTES: usize = 64;
 
 #[derive(Debug, Clone, Copy, Serialize)]
-struct HeartbeatPayload {
+pub(crate) struct HeartbeatPayload {
     ts_unix_ms: u64,
+}
+
+pub(crate) fn heartbeat_payload(ts_unix_ms: u64) -> HeartbeatPayload {
+    HeartbeatPayload { ts_unix_ms }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -418,7 +422,7 @@ pub(crate) fn install(app: &tauri::AppHandle) {
 
             if should_emit {
                 let now = now_unix_millis();
-                let payload = HeartbeatPayload { ts_unix_ms: now };
+                let payload = heartbeat_payload(now);
                 if let Err(err) = app.emit(HEARTBEAT_EVENT_NAME, payload) {
                     tracing::debug!("emit heartbeat failed: {}", err);
                 }

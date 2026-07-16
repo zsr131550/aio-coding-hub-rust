@@ -3,13 +3,12 @@ use crate::blocking;
 use crate::commands::providers::oauth_limits::ProviderOAuthLimitsResult;
 use crate::domain::provider_oauth_limits::OAuthLimitSnapshotInput;
 use crate::shared::http_body::read_text_with_limit;
-use crate::shared::ipc_confirm::RiskyIpcConfirm;
+use crate::shared::ipc_confirm::{RiskyIpcConfirm, RISKY_PROVIDER_CODEX_QUOTA_RESET};
 use rand::RngCore;
 use serde::Deserialize;
 use std::collections::HashSet;
 use std::sync::{Mutex, OnceLock};
 
-pub(crate) const PROVIDER_OAUTH_RESET_CODEX_QUOTA_ACTION: &str = "provider_oauth_reset_codex_quota";
 const CODEX_USAGE_URL: &str = "https://chatgpt.com/backend-api/wham/usage";
 const CODEX_RESET_URL: &str =
     "https://chatgpt.com/backend-api/wham/rate-limit-reset-credits/consume";
@@ -57,11 +56,7 @@ fn require_codex_reset_confirm(
     provider_id: i64,
     confirm: Option<RiskyIpcConfirm>,
 ) -> Result<(), String> {
-    RiskyIpcConfirm::require(
-        confirm,
-        PROVIDER_OAUTH_RESET_CODEX_QUOTA_ACTION,
-        codex_reset_confirm_resource(provider_id),
-    )
+    RISKY_PROVIDER_CODEX_QUOTA_RESET.require(confirm, codex_reset_confirm_resource(provider_id))
 }
 
 fn validate_codex_reset_details(
@@ -501,7 +496,7 @@ mod tests {
         let err = require_codex_reset_confirm(
             9,
             Some(confirm(
-                PROVIDER_OAUTH_RESET_CODEX_QUOTA_ACTION,
+                RISKY_PROVIDER_CODEX_QUOTA_RESET.action,
                 "provider:8:codex_reset_credit",
             )),
         )

@@ -1,7 +1,7 @@
 //! Usage: Extension host stdio worker process.
 
 use crate::domain::plugin_contributions::PluginContributes;
-use crate::domain::plugins::PluginManifest;
+use crate::domain::plugins::{extension_host_contribution_hash, PluginManifest};
 use rquickjs::{CatchResultExt, CaughtError, Context, Function, Object, Runtime, Value as JsValue};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
@@ -12,7 +12,26 @@ use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
-const WORKER_VERSION: u32 = 1;
+pub(crate) const WORKER_VERSION: u32 = 1;
+pub(crate) const EXTENSION_HOST_CONFIG_ARGUMENT: &str = "--extension-host-config";
+pub(crate) const EXTENSION_READY_NOTIFICATION: &str = "extension.ready";
+pub(crate) const HOST_CALL_NOTIFICATION: &str = "host.call";
+pub(crate) const EXTENSION_HANDSHAKE_METHOD: &str = "extension.handshake";
+pub(crate) const EXTENSION_ACTIVATE_METHOD: &str = "extension.activate";
+pub(crate) const EXTENSION_DEACTIVATE_METHOD: &str = "extension.deactivate";
+pub(crate) const COMMANDS_EXECUTE_METHOD: &str = "commands.execute";
+pub(crate) const GATEWAY_HOOKS_EXECUTE_METHOD: &str = "gatewayHooks.execute";
+pub(crate) const EXTENSION_HOST_METHODS: &[&str] = &[
+    EXTENSION_HANDSHAKE_METHOD,
+    EXTENSION_ACTIVATE_METHOD,
+    EXTENSION_DEACTIVATE_METHOD,
+    COMMANDS_EXECUTE_METHOD,
+    GATEWAY_HOOKS_EXECUTE_METHOD,
+];
+pub(crate) const EXTENSION_HOST_NOTIFICATIONS: &[&str] =
+    &[EXTENSION_READY_NOTIFICATION, HOST_CALL_NOTIFICATION];
+pub(crate) const EXTENSION_HOST_HANDSHAKE_FAILED_CODE: &str =
+    "PLUGIN_EXTENSION_HOST_HANDSHAKE_FAILED";
 const EXTENSION_HOST_JSON_RPC_BODY_EXPANSION_FACTOR: usize = 6;
 const EXTENSION_HOST_JSON_RPC_OVERHEAD_BYTES: usize = 1024 * 1024;
 const DEFAULT_JS_TIMEOUT_MS: u64 = 30_000;
@@ -52,6 +71,51 @@ struct JsonRpcErrorBody {
     data: Value,
 }
 
+#[derive(Debug, PartialEq, Eq)]
+pub(crate) struct ExtensionHostHandshakeError {
+    pub(crate) code: &'static str,
+    pub(crate) message: &'static str,
+}
+
+pub(crate) fn validate_extension_host_handshake(
+    manifest: &PluginManifest,
+    expected_contribution_hash: Option<&str>,
+    manifest_contribution_hash: &str,
+    params: &Value,
+) -> Result<Value, ExtensionHostHandshakeError> {
+    let plugin_id = params.get("pluginId").and_then(Value::as_str);
+    let version = params.get("version").and_then(Value::as_str);
+    let api_version = params.get("apiVersion").and_then(Value::as_str);
+    let contribution_hash = params.get("contributionHash").and_then(Value::as_str);
+    if plugin_id != Some(manifest.id.as_str())
+        || version != Some(manifest.version.as_str())
+        || api_version != Some(manifest.api_version.as_str())
+    {
+        return Err(ExtensionHostHandshakeError {
+            code: EXTENSION_HOST_HANDSHAKE_FAILED_CODE,
+            message: "extension host handshake metadata did not match manifest",
+        });
+    }
+    if expected_contribution_hash != contribution_hash {
+        return Err(ExtensionHostHandshakeError {
+            code: EXTENSION_HOST_HANDSHAKE_FAILED_CODE,
+            message: "extension host contribution hash did not match worker config",
+        });
+    }
+    if Some(manifest_contribution_hash) != contribution_hash {
+        return Err(ExtensionHostHandshakeError {
+            code: EXTENSION_HOST_HANDSHAKE_FAILED_CODE,
+            message: "extension host contribution hash did not match manifest on disk",
+        });
+    }
+    Ok(json!({
+        "pluginId": manifest.id,
+        "version": manifest.version,
+        "apiVersion": manifest.api_version,
+        "workerVersion": WORKER_VERSION,
+    }))
+}
+
 struct WorkerState {
     manifest: PluginManifest,
     expected_contribution_hash: Option<String>,
@@ -87,7 +151,7 @@ pub fn run_stdio_worker() {
 #[cfg(test)]
 #[test]
 fn extension_host_worker_process_entry_for_tests() {
-    if !std::env::args().any(|arg| arg == "--extension-host-config") {
+    if !std::env::args().any(|arg| arg == EXTENSION_HOST_CONFIG_ARGUMENT) {
         return;
     }
     run_stdio_worker();
@@ -104,7 +168,7 @@ fn run_stdio_worker_inner() -> Result<(), WorkerError> {
     let mut state = WorkerState::load(config.clone())?;
 
     emit_notification(
-        "extension.ready",
+        EXTENSION_READY_NOTIFICATION,
         json!({ "workerVersion": WORKER_VERSION }),
         config.max_line_bytes,
     )?;
@@ -213,7 +277,7 @@ impl WorkerState {
     fn load(config: ExtensionHostWorkerConfig) -> Result<Self, WorkerError> {
         let manifest_path = config.plugin_root.join("plugin.json");
         let manifest: PluginManifest = read_json_file(&manifest_path)?;
-        let manifest_contribution_hash = contribution_hash(&manifest);
+        let manifest_contribution_hash = extension_host_contribution_hash(&manifest);
         if config.contribution_hash.as_deref() != Some(manifest_contribution_hash.as_str()) {
             return Err(WorkerError::new(
                 "PLUGIN_EXTENSION_HOST_HANDSHAKE_FAILED",
@@ -272,16 +336,16 @@ impl WorkerState {
 
     fn handle_request(&mut self, request: JsonRpcRequest) -> Result<Value, WorkerError> {
         match request.method.as_str() {
-            "extension.handshake" => self.handshake(request.params),
-            "extension.activate" => {
+            EXTENSION_HANDSHAKE_METHOD => self.handshake(request.params),
+            EXTENSION_ACTIVATE_METHOD => {
                 self.activate()?;
                 Ok(json!({ "activated": true }))
             }
-            "extension.deactivate" => {
+            EXTENSION_DEACTIVATE_METHOD => {
                 self.deactivate()?;
                 Ok(json!({ "deactivated": true }))
             }
-            "commands.execute" => {
+            COMMANDS_EXECUTE_METHOD => {
                 let command = request
                     .params
                     .get("command")
@@ -295,7 +359,7 @@ impl WorkerState {
                 let args = request.params.get("args").cloned().unwrap_or(Value::Null);
                 self.execute_command(command, args)
             }
-            "gatewayHooks.execute" => {
+            GATEWAY_HOOKS_EXECUTE_METHOD => {
                 let hook = request
                     .params
                     .get("hook")
@@ -367,37 +431,13 @@ impl WorkerState {
     }
 
     fn handshake(&self, params: Value) -> Result<Value, WorkerError> {
-        let plugin_id = params.get("pluginId").and_then(Value::as_str);
-        let version = params.get("version").and_then(Value::as_str);
-        let api_version = params.get("apiVersion").and_then(Value::as_str);
-        let contribution_hash = params.get("contributionHash").and_then(Value::as_str);
-        if plugin_id != Some(self.manifest.id.as_str())
-            || version != Some(self.manifest.version.as_str())
-            || api_version != Some(self.manifest.api_version.as_str())
-        {
-            return Err(WorkerError::new(
-                "PLUGIN_EXTENSION_HOST_HANDSHAKE_FAILED",
-                "extension host handshake metadata did not match manifest",
-            ));
-        }
-        if self.expected_contribution_hash.as_deref() != contribution_hash {
-            return Err(WorkerError::new(
-                "PLUGIN_EXTENSION_HOST_HANDSHAKE_FAILED",
-                "extension host contribution hash did not match worker config",
-            ));
-        }
-        if Some(self.manifest_contribution_hash.as_str()) != contribution_hash {
-            return Err(WorkerError::new(
-                "PLUGIN_EXTENSION_HOST_HANDSHAKE_FAILED",
-                "extension host contribution hash did not match manifest on disk",
-            ));
-        }
-        Ok(json!({
-            "pluginId": self.manifest.id,
-            "version": self.manifest.version,
-            "apiVersion": self.manifest.api_version,
-            "workerVersion": WORKER_VERSION,
-        }))
+        validate_extension_host_handshake(
+            &self.manifest,
+            self.expected_contribution_hash.as_deref(),
+            &self.manifest_contribution_hash,
+            &params,
+        )
+        .map_err(|error| WorkerError::new(error.code, error.message))
     }
 
     fn activate(&mut self) -> Result<(), WorkerError> {
@@ -849,7 +889,7 @@ fn read_config_from_args(
     let mut args = args.into_iter();
     let mut config_path = None;
     while let Some(arg) = args.next() {
-        if arg == "--extension-host-config" {
+        if arg == EXTENSION_HOST_CONFIG_ARGUMENT {
             config_path = args.next();
             break;
         }
@@ -857,7 +897,7 @@ fn read_config_from_args(
     let config_path = config_path.ok_or_else(|| {
         WorkerError::new(
             "PLUGIN_EXTENSION_HOST_INVALID_CONFIG",
-            "--extension-host-config is required",
+            format!("{EXTENSION_HOST_CONFIG_ARGUMENT} is required"),
         )
     })?;
     read_json_file(Path::new(&config_path))
@@ -900,21 +940,6 @@ fn declared_gateway_hooks(contributes: Option<&PluginContributes>) -> BTreeSet<S
                 .collect()
         })
         .unwrap_or_default()
-}
-
-fn contribution_hash(manifest: &PluginManifest) -> String {
-    use sha2::Digest;
-
-    let bytes = serde_json::to_vec(&json!({
-        "runtime": manifest.runtime,
-        "main": manifest.main,
-        "activationEvents": manifest.activation_events,
-        "contributes": manifest.contributes,
-        "capabilities": manifest.capabilities,
-        "permissions": manifest.permissions,
-    }))
-    .unwrap_or_default();
-    format!("{:x}", sha2::Sha256::digest(bytes))
 }
 
 fn resolve_child_path(root: &Path, child: &str) -> Result<PathBuf, WorkerError> {
@@ -1037,7 +1062,7 @@ fn host_call(
         json!({
             "jsonrpc": "2.0",
             "id": id,
-            "method": "host.call",
+            "method": HOST_CALL_NOTIFICATION,
             "params": {
                 "method": method,
                 "params": params,

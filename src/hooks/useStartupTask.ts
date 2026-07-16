@@ -7,14 +7,22 @@ import { logToConsole } from "../services/consoleLog";
  * @param task    - Async function to execute.
  * @param stage   - Label used for warning logs on failure.
  * @param message - Human-readable failure description for logs.
+ * @param enabled - Whether the task should run.
  */
-export function useStartupTask(task: () => Promise<unknown>, stage: string, message: string) {
+export function useStartupTask(
+  task: () => Promise<unknown>,
+  stage: string,
+  message: string,
+  enabled = true
+) {
   useEffect(() => {
+    if (!enabled) return;
+
     task().catch((error) => {
       logToConsole("warn", message, {
         stage,
         error: String(error),
       });
     });
-  }, [message, stage, task]);
+  }, [enabled, message, stage, task]);
 }

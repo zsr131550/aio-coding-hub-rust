@@ -2510,7 +2510,7 @@ fn copy_dir_recursive(src: &Path, dst: &Path) -> AppResult<()> {
     Ok(())
 }
 
-fn validate_config_against_schema(
+pub(crate) fn validate_config_against_schema(
     schema: Option<&serde_json::Value>,
     config: &serde_json::Value,
 ) -> AppResult<()> {
@@ -3549,6 +3549,12 @@ INSERT INTO plugins (
             ])
         );
 
+        // The pipeline owns a child process tied to this runtime. Declare the
+        // runtime first so Rust drops the pipeline and child before the runtime.
+        let rt = tokio::runtime::Builder::new_current_thread()
+            .enable_all()
+            .build()
+            .unwrap();
         let pipeline = GatewayPluginPipeline::for_tests(
             active,
             Arc::new(
@@ -3558,10 +3564,6 @@ INSERT INTO plugins (
             ),
             GatewayPluginPipelineConfig::default(),
         );
-        let rt = tokio::runtime::Builder::new_current_thread()
-            .enable_all()
-            .build()
-            .unwrap();
         let output = rt
             .block_on(
                 pipeline.run_request_hook(GatewayRequestHookInput {
@@ -3644,6 +3646,11 @@ INSERT INTO plugins (
             ])
         );
 
+        // Keep the child-owning pipeline inside the runtime's lifetime.
+        let rt = tokio::runtime::Builder::new_current_thread()
+            .enable_all()
+            .build()
+            .unwrap();
         let pipeline = GatewayPluginPipeline::for_tests(
             active,
             Arc::new(
@@ -3653,10 +3660,6 @@ INSERT INTO plugins (
             ),
             GatewayPluginPipelineConfig::default(),
         );
-        let rt = tokio::runtime::Builder::new_current_thread()
-            .enable_all()
-            .build()
-            .unwrap();
         let output = rt
             .block_on(
                 pipeline.run_request_hook(GatewayRequestHookInput {
@@ -4803,10 +4806,11 @@ INSERT INTO plugins (
         assert_eq!(detail.summary.plugin_id, "local.safe");
         assert_eq!(detail.install_source, PluginInstallSource::Local);
         assert_eq!(detail.summary.status, PluginStatus::Disabled);
-        assert!(detail
-            .installed_dir
-            .as_deref()
-            .is_some_and(|path| path.ends_with("plugins/installed/local.safe/1.0.0")));
+        let expected_install_dir = installed_dir.join("local.safe").join("1.0.0");
+        assert_eq!(
+            detail.installed_dir.as_deref().map(std::path::Path::new),
+            Some(expected_install_dir.as_path())
+        );
         assert!(installed_dir
             .join("local.safe")
             .join("1.0.0")
@@ -4998,10 +5002,15 @@ INSERT INTO plugins (
 
         assert_eq!(detail.summary.plugin_id, "local.signed-valid");
         assert_eq!(detail.summary.status, PluginStatus::Disabled);
-        assert!(detail
-            .installed_dir
-            .as_deref()
-            .is_some_and(|path| path.ends_with("plugins/installed/local.signed-valid/1.0.0")));
+        let expected_install_dir = dir
+            .path()
+            .join("plugins/installed")
+            .join("local.signed-valid")
+            .join("1.0.0");
+        assert_eq!(
+            detail.installed_dir.as_deref().map(std::path::Path::new),
+            Some(expected_install_dir.as_path())
+        );
     }
 
     #[test]
@@ -5661,10 +5670,14 @@ INSERT INTO plugin_market_sources(
             rolled_back.summary.current_version.as_deref(),
             Some("1.0.0")
         );
-        assert!(rolled_back
-            .installed_dir
-            .as_deref()
-            .is_some_and(|path| path.ends_with("plugins/installed/local.manual/1.0.0")));
+        let expected_install_dir = installed_dir.join("local.manual").join("1.0.0");
+        assert_eq!(
+            rolled_back
+                .installed_dir
+                .as_deref()
+                .map(std::path::Path::new),
+            Some(expected_install_dir.as_path())
+        );
     }
 
     #[test]

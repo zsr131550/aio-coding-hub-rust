@@ -60,6 +60,21 @@ pub struct PluginManifest {
     pub category: Option<String>,
 }
 
+pub(crate) fn extension_host_contribution_hash(manifest: &PluginManifest) -> String {
+    use sha2::Digest as _;
+
+    let bytes = serde_json::to_vec(&serde_json::json!({
+        "runtime": manifest.runtime,
+        "main": manifest.main,
+        "activationEvents": manifest.activation_events,
+        "contributes": manifest.contributes,
+        "capabilities": manifest.capabilities,
+        "permissions": manifest.permissions,
+    }))
+    .unwrap_or_default();
+    format!("{:x}", sha2::Sha256::digest(bytes))
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize, specta::Type, PartialEq, Eq)]
 #[serde(tag = "kind", rename_all = "camelCase")]
 pub enum PluginRuntime {

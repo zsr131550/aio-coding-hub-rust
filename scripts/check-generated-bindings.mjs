@@ -1,12 +1,15 @@
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const scriptDir = dirname(fileURLToPath(import.meta.url));
+const scriptPath = fileURLToPath(import.meta.url);
+const scriptDir = dirname(scriptPath);
 const repoRoot = dirname(scriptDir);
 const bindingsPath = join(repoRoot, "src", "generated", "bindings.ts");
 const bindingsPrettierPath = "src/generated/bindings.ts";
+const genTypesScriptPath = join(scriptDir, "tauri-gen-types.mjs");
+const prettierCliPath = join(repoRoot, "node_modules", "prettier", "bin", "prettier.cjs");
 const EXPECTED_HOME_USAGE_PERIOD_LITERALS = ["last7", "last15", "last30", "month"];
 
 function parseHomeUsagePeriodLiterals(source) {
@@ -27,49 +30,45 @@ function assertHomeUsagePeriodContract(source) {
     )}; received ${actual.join(", ")}.`
   );
 }
-const before = existsSync(bindingsPath) ? readFileSync(bindingsPath, "utf8") : null;
-
-function quoteForCmd(arg) {
-  return /^[A-Za-z0-9_./:-]+$/.test(arg) ? arg : `"${arg.replaceAll('"', '""')}"`;
-}
-
-function runPnpm(args) {
-  const options = {
+export function runNodeTool(args, options = {}) {
+  execFileSync(process.execPath, args, {
     cwd: repoRoot,
     stdio: "inherit",
-  };
+    ...options,
+  });
+}
 
-  if (process.platform === "win32") {
-    const command = `pnpm ${args.map(quoteForCmd).join(" ")}`;
-    execFileSync(process.env.ComSpec ?? "cmd.exe", ["/d", "/s", "/c", command], options);
-    return;
+export function checkGeneratedBindings() {
+  const before = existsSync(bindingsPath) ? readFileSync(bindingsPath, "utf8") : null;
+
+  runNodeTool([genTypesScriptPath]);
+
+  // Format the freshly generated file so comparison uses the committed style.
+  runNodeTool([prettierCliPath, "--write", bindingsPrettierPath]);
+
+  const after = existsSync(bindingsPath) ? readFileSync(bindingsPath, "utf8") : null;
+  if (after == null) {
+    throw new Error("Generated bindings file is missing: src/generated/bindings.ts");
   }
 
-  execFileSync("pnpm", args, options);
+  assertHomeUsagePeriodContract(after);
+
+  if (before !== after) {
+    throw new Error(
+      "Generated bindings were outdated. Review and commit src/generated/bindings.ts."
+    );
+  }
 }
 
-runPnpm(["tauri:gen-types"]);
-
-// Format the freshly generated file so the comparison uses the same style
-// as the committed version (which passes through prettier on pre-commit).
-runPnpm(["exec", "prettier", "--write", bindingsPrettierPath]);
-
-const after = existsSync(bindingsPath) ? readFileSync(bindingsPath, "utf8") : null;
-if (after == null) {
-  console.error("Generated bindings file is missing: src/generated/bindings.ts");
-  process.exit(1);
-}
-
-if (after != null) {
+if (process.argv[1] && resolve(process.argv[1]) === resolve(scriptPath)) {
   try {
-    assertHomeUsagePeriodContract(after);
+    if (process.argv[2] === "--self-test-failing-child") {
+      runNodeTool(["-e", "process.exit(23)"], { stdio: "pipe" });
+    } else {
+      checkGeneratedBindings();
+    }
   } catch (error) {
-    console.error(String(error));
+    console.error(error instanceof Error ? error.message : String(error));
     process.exit(1);
   }
-}
-
-if (before !== after) {
-  console.error("Generated bindings were outdated. Review and commit src/generated/bindings.ts.");
-  process.exit(1);
 }

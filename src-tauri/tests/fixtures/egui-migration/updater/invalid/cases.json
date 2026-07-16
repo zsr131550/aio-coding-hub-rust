@@ -1,0 +1,20 @@
+{
+  "cases": [
+    {
+      "expectedStage": "parse",
+      "id": "truncated",
+      "path": "truncated.json"
+    },
+    {
+      "expectedStage": "target-lookup",
+      "id": "missing-platform",
+      "path": "missing-platform.json"
+    },
+    {
+      "expectedStage": "signature",
+      "id": "invalid-signature",
+      "path": "invalid-signature.json"
+    }
+  ],
+  "schemaVersion": 1
+}

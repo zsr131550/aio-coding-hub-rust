@@ -133,6 +133,21 @@ jobs:
       - name: Generated IPC bindings contract
         run: pnpm check:generated-bindings
 
+      - name: Generated IPC bindings runner self-test
+        run: node scripts/check-generated-bindings.selftest.mjs
+
+      - name: egui migration fixture contract
+        run: pnpm check:egui-fixtures
+
+      - name: egui baseline runner self-test
+        run: pnpm test:egui-baseline-self
+
+      - name: egui baseline matrix self-test
+        run: pnpm test:egui-baseline-matrix-self
+
+      - name: egui baseline registry contract
+        run: pnpm check:egui-baseline-registry
+
       - name: Plugin TypeScript SDK typecheck
         run: pnpm --filter @aio-coding-hub/plugin-sdk typecheck
 
@@ -218,6 +233,9 @@ jobs:
         env:
           CARGO_BUILD_JOBS: "1"
         run: cargo test --locked -- --test-threads=1
+
+      - name: egui migration compatibility contract
+        run: node scripts/egui-compat-contract.mjs
 
       - name: Install cargo-audit
         run: cargo install cargo-audit --locked

@@ -2,6 +2,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { describe, expect, it, vi } from "vitest";
 import { AppRoutes } from "../AppRoutes";
+import routeContract from "../app-routes.contract.json";
 
 vi.mock("../../layout/AppLayout", async () => {
   const { Outlet } = await vi.importActual<typeof import("react-router-dom")>("react-router-dom");
@@ -77,24 +78,11 @@ function renderRoute(path: string) {
 }
 
 describe("app/AppRoutes", () => {
-  it.each([
-    ["/", "home-route"],
-    ["/providers", "providers-route"],
-    ["/sessions", "sessions-route"],
-    ["/sessions/claude/project-1", "sessions-project-route"],
-    ["/sessions/claude/project-1/session/session-1", "sessions-messages-route"],
-    ["/workspaces", "workspaces-route"],
-    ["/prompts", "prompts-route"],
-    ["/mcp", "mcp-route"],
-    ["/plugins", "plugins-route"],
-    ["/logs", "logs-route"],
-    ["/console", "console-route"],
-    ["/usage", "usage-route"],
-    ["/settings/general", "settings-route"],
-    ["/cli-manager", "cli-manager-route"],
-    ["/skills", "skills-route"],
-    ["/skills/market", "skills-market-route"],
-  ])("renders %s", async (path, heading) => {
+  const pageCases = routeContract.routes
+    .filter((route) => route.kind !== "fallback")
+    .map((route) => [route.samplePath, `${route.id}-route`] as const);
+
+  it.each(pageCases)("renders %s", async (path, heading) => {
     renderRoute(path);
 
     expect(await screen.findByRole("heading", { name: heading })).toBeInTheDocument();
@@ -102,7 +90,9 @@ describe("app/AppRoutes", () => {
   });
 
   it("redirects unknown paths to home", async () => {
-    renderRoute("/missing");
+    const fallback = routeContract.routes.find((route) => route.kind === "fallback");
+    if (!fallback) throw new Error("route contract is missing its fallback route");
+    renderRoute(fallback.samplePath);
 
     await waitFor(() => {
       expect(screen.getByRole("heading", { name: "home-route" })).toBeInTheDocument();

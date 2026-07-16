@@ -1,0 +1,23 @@
+{
+  "notes": "Synthetic updater fixture; never install.",
+  "platforms": {
+    "darwin-aarch64": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVRMFlhMml3K1YzOUwvOFppWFYyRnlac1hOazZnU2I1ZHF0Z0lnbHl2QTJPZ05tK3hVS2RLZkxuUmhCcUxUYnBxNGhxSlpNZ3pQUE05dTFkVE9CWDBiOC94eHR1K0R0YXc0PQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0MTE1MzcwCWZpbGU6Zml4dHVyZS1hc3NldC5iaW4KMFA5SG1pNEgrSGo5c2oycTlPVUR2ZnZyNDVZdk9nZ2R5dVNpY284ZFE3bkpZS3draWxRejlmKzNKN3QwcnlRVWF6Wm5xMUVvMWt1VjE5Tm9LMFB4Q1E9PQo=",
+      "url": "https://fixture.invalid/releases/v0.60.13/aio-coding-hub-darwin-aarch64.bin"
+    },
+    "darwin-x86_64": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVRMFlhMml3K1YzOUwvOFppWFYyRnlac1hOazZnU2I1ZHF0Z0lnbHl2QTJPZ05tK3hVS2RLZkxuUmhCcUxUYnBxNGhxSlpNZ3pQUE05dTFkVE9CWDBiOC94eHR1K0R0YXc0PQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0MTE1MzcwCWZpbGU6Zml4dHVyZS1hc3NldC5iaW4KMFA5SG1pNEgrSGo5c2oycTlPVUR2ZnZyNDVZdk9nZ2R5dVNpY284ZFE3bkpZS3draWxRejlmKzNKN3QwcnlRVWF6Wm5xMUVvMWt1VjE5Tm9LMFB4Q1E9PQo=",
+      "url": "https://fixture.invalid/releases/v0.60.13/aio-coding-hub-darwin-x86_64.bin"
+    },
+    "linux-x86_64": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVRMFlhMml3K1YzOUwvOFppWFYyRnlac1hOazZnU2I1ZHF0Z0lnbHl2QTJPZ05tK3hVS2RLZkxuUmhCcUxUYnBxNGhxSlpNZ3pQUE05dTFkVE9CWDBiOC94eHR1K0R0YXc0PQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0MTE1MzcwCWZpbGU6Zml4dHVyZS1hc3NldC5iaW4KMFA5SG1pNEgrSGo5c2oycTlPVUR2ZnZyNDVZdk9nZ2R5dVNpY284ZFE3bkpZS3draWxRejlmKzNKN3QwcnlRVWF6Wm5xMUVvMWt1VjE5Tm9LMFB4Q1E9PQo=",
+      "url": "https://fixture.invalid/releases/v0.60.13/aio-coding-hub-linux-x86_64.bin"
+    },
+    "windows-x86_64": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVRMFlhMml3K1YzOUwvOFppWFYyRnlac1hOazZnU2I1ZHF0Z0lnbHl2QTJPZ05tK3hVS2RLZkxuUmhCcUxUYnBxNGhxSlpNZ3pQUE05dTFkVE9CWDBiOC94eHR1K0R0YXc0PQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg0MTE1MzcwCWZpbGU6Zml4dHVyZS1hc3NldC5iaW4KMFA5SG1pNEgrSGo5c2oycTlPVUR2ZnZyNDVZdk9nZ2R5dVNpY284ZFE3bkpZS3draWxRejlmKzNKN3QwcnlRVWF6Wm5xMUVvMWt1VjE5Tm9LMFB4Q1E9PQo=",
+      "url": "https://fixture.invalid/releases/v0.60.13/aio-coding-hub-windows-x86_64.bin"
+    }
+  },
+  "pub_date": "2026-07-15T00:00:00Z",
+  "version": "0.60.13"
+}

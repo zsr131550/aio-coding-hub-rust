@@ -1,6 +1,6 @@
 //! Usage: Request log DTOs and insertion payloads.
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone)]
 pub struct RequestLogInsert {
@@ -34,7 +34,7 @@ pub struct RequestLogInsert {
     pub created_at: i64,
 }
 
-#[derive(Debug, Clone, Serialize, specta::Type)]
+#[derive(Debug, Clone, Deserialize, Serialize, specta::Type)]
 pub struct RequestLogRouteHop {
     pub provider_id: i64,
     pub provider_name: String,
@@ -57,7 +57,7 @@ fn is_false(v: &bool) -> bool {
     !v
 }
 
-#[derive(Debug, Clone, Serialize, specta::Type)]
+#[derive(Debug, Clone, Deserialize, Serialize, specta::Type)]
 pub struct RequestLogSummary {
     pub id: i64,
     pub trace_id: String,

@@ -2,7 +2,7 @@
 
 use crate::app_state::{ensure_db_ready, DbInitState};
 use crate::shared::cli_key::CliKey;
-use crate::shared::ipc_confirm::RiskyIpcConfirm;
+use crate::shared::ipc_confirm::{RiskyIpcConfirm, RISKY_SKILL_LOCAL_DELETE};
 use crate::{blocking, skills};
 
 #[tauri::command]
@@ -226,9 +226,8 @@ pub(crate) async fn skill_local_delete(
     dir_name: String,
     confirm: Option<RiskyIpcConfirm>,
 ) -> Result<bool, String> {
-    RiskyIpcConfirm::require(
+    RISKY_SKILL_LOCAL_DELETE.require(
         confirm,
-        "skill_local_delete",
         format!("workspace:{workspace_id}:skill-local:{dir_name}"),
     )?;
     let db = ensure_db_ready(app.clone(), db_state.inner()).await?;

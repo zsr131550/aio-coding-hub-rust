@@ -42,6 +42,8 @@ fn create_skill_repo(root: &Path) {
     run_git(root, &["checkout", "-B", "main"]);
     run_git(root, &["config", "user.email", "skill-test@example.com"]);
     run_git(root, &["config", "user.name", "Skill Test"]);
+    std::fs::write(root.join(".gitattributes"), "* text=auto eol=lf\n")
+        .expect("write fixture attributes");
     write_repo_skill(root, "v1");
     commit_repo(root, "skill v1");
 }

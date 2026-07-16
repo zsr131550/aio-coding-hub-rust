@@ -85,6 +85,12 @@ import {
   applySettingsRuntimeSnapshot,
   resetSettingsRuntimeController,
 } from "../app/settingsRuntimeController";
+import { useAppBootstrap } from "../app/useAppBootstrap";
+
+function BootstrapHarness({ enableBackgroundTasks }: { enableBackgroundTasks: boolean }) {
+  useAppBootstrap({ enableBackgroundTasks });
+  return null;
+}
 
 async function renderApp() {
   const { default: App } = await import("../App");
@@ -139,6 +145,25 @@ describe("App bootstrap", () => {
       expect(setBackgroundTaskSchedulerForeground).toHaveBeenCalledWith(true);
       expect(updateCheckNow).not.toHaveBeenCalled();
       expect(cliProxyStatusAll).not.toHaveBeenCalled();
+    });
+  });
+
+  it("keeps required startup wiring but does not register background tasks when disabled", async () => {
+    const client = createTestQueryClient();
+    render(
+      <QueryClientProvider client={client}>
+        <BootstrapHarness enableBackgroundTasks={false} />
+      </QueryClientProvider>
+    );
+
+    await vi.waitFor(() => {
+      expect(listenAppHeartbeat).toHaveBeenCalledTimes(1);
+      expect(syncAppStartupStatusSnapshot).toHaveBeenCalledTimes(1);
+      expect(startupSyncModelPricesOnce).not.toHaveBeenCalled();
+      expect(startupSyncDefaultPromptsFromFilesOncePerSession).not.toHaveBeenCalled();
+      expect(registerBackgroundTask).not.toHaveBeenCalled();
+      expect(startBackgroundTaskScheduler).not.toHaveBeenCalled();
+      expect(setBackgroundTaskSchedulerForeground).not.toHaveBeenCalled();
     });
   });
 });

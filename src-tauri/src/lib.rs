@@ -1,10 +1,40 @@
 mod app;
+mod benchmark;
 mod commands;
+mod compatibility_contract;
 mod domain;
 mod gateway;
 mod infra;
 mod shared;
 pub mod test_support;
+
+// Cargo's tests linker directive covers integration tests, but the library's
+// unit-test harness retains native archives only when the crate references one.
+#[cfg(all(test, target_os = "windows", target_env = "msvc"))]
+#[link(name = "resource", kind = "static")]
+unsafe extern "C" {}
+
+#[cfg(test)]
+mod benchmark_contract_tests;
+#[cfg(test)]
+mod egui_fixture_contract;
+
+pub const EXTENSION_HOST_WORKER_ARGUMENT: &str = "--extension-host-worker";
+pub const BENCHMARK_INITIALIZATION_EXIT_CODE: i32 = 78;
+
+pub fn initialize_benchmark() -> Result<(), String> {
+    match benchmark::initialize_from_env() {
+        Ok(true) => {
+            benchmark::milestone(
+                "process_entry",
+                benchmark::process_entry_data(std::process::id()),
+            );
+            Ok(())
+        }
+        Ok(false) => Ok(()),
+        Err(err) => Err(format!("benchmark initialization failed: {err}")),
+    }
+}
 
 pub(crate) use app::{app_state, gateway_control, gateway_runtime_access, notice, resident};
 pub(crate) use domain::{
@@ -27,12 +57,15 @@ pub fn run() {
     // creation failure on Wayland (AppImage bundled-lib conflict, issue #93).
     crate::app::linux_webkit_compat::apply();
 
+    let mut context = tauri::generate_context!();
+    benchmark::configure_tauri_context(&mut context, benchmark::test_home());
+
     let app = commands::registry::register_runtime_commands(
         crate::app::plugin_registry::create_builder(),
     )
     .on_window_event(resident::on_window_event)
     .setup(crate::app::bootstrap::setup)
-    .build(tauri::generate_context!())
+    .build(context)
     .expect("error while building tauri application");
 
     app.run(crate::app::lifecycle::handle_run_event);
@@ -46,6 +79,8 @@ pub fn run_extension_host_worker() {
 pub fn export_typescript_bindings(output_path: &str) -> Result<(), String> {
     commands::registry::export_typescript_bindings(output_path)
 }
+
+pub use compatibility_contract::export_compatibility_contract;
 
 /// Specta type export smoke test.
 ///

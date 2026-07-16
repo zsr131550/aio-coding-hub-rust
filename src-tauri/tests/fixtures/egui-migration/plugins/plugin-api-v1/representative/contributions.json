@@ -1,0 +1,34 @@
+{
+  "commands": [
+    {
+      "command": "fixture.inspect",
+      "title": "Inspect fixture"
+    }
+  ],
+  "gatewayHooks": [
+    {
+      "failurePolicy": "fail-open",
+      "name": "gateway.request.beforeSend",
+      "priority": 10,
+      "timeoutMs": 5000
+    }
+  ],
+  "ui": {
+    "settings.sections": [
+      {
+        "id": "fixture.settings",
+        "schema": {
+          "fields": [
+            {
+              "key": "enabled",
+              "label": "Enabled",
+              "type": "boolean"
+            }
+          ],
+          "type": "section"
+        },
+        "title": "Fixture settings"
+      }
+    ]
+  }
+}

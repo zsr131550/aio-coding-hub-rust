@@ -4,6 +4,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { AppLayout } from "../layout/AppLayout";
 import { HomePage } from "../pages/HomePage";
 import { Spinner } from "../ui/Spinner";
+import routeContract from "./app-routes.contract.json";
 
 const CliManagerPage = lazy(() =>
   import("../pages/CliManagerPage").then((m) => ({ default: m.CliManagerPage }))
@@ -45,6 +46,57 @@ const WorkspacesPage = lazy(() =>
   import("../pages/WorkspacesPage").then((m) => ({ default: m.WorkspacesPage }))
 );
 
+type PageRouteId =
+  | "providers"
+  | "sessions"
+  | "sessions-project"
+  | "sessions-messages"
+  | "workspaces"
+  | "prompts"
+  | "mcp"
+  | "plugins"
+  | "logs"
+  | "console"
+  | "usage"
+  | "settings"
+  | "cli-manager"
+  | "skills"
+  | "skills-market";
+
+type RouteContractEntry = {
+  id: string;
+  kind: "index" | "page" | "fallback";
+  path: string;
+  samplePath: string;
+  redirectTo?: string;
+};
+
+const pageComponents: Record<PageRouteId, ComponentType> = {
+  providers: ProvidersPage,
+  sessions: SessionsPage,
+  "sessions-project": SessionsProjectPage,
+  "sessions-messages": SessionsMessagesPage,
+  workspaces: WorkspacesPage,
+  prompts: PromptsPage,
+  mcp: McpPage,
+  plugins: PluginsPage,
+  logs: LogsPage,
+  console: ConsolePage,
+  usage: UsagePage,
+  settings: SettingsPage,
+  "cli-manager": CliManagerPage,
+  skills: SkillsPage,
+  "skills-market": SkillsMarketPage,
+};
+
+const routes = routeContract.routes as RouteContractEntry[];
+
+function pageComponent(routeId: string): ComponentType {
+  const page = pageComponents[routeId as PageRouteId];
+  if (!page) throw new Error(`Route contract references unknown page id: ${routeId}`);
+  return page;
+}
+
 function PageLoadingFallback() {
   return (
     <div className="flex h-full items-center justify-center">
@@ -65,29 +117,22 @@ export function AppRoutes() {
   return (
     <Routes>
       <Route element={<AppLayout />}>
-        <Route index element={<HomePage />} />
-        <Route path="/providers" element={<LazyPage Page={ProvidersPage} />} />
-        <Route path="/sessions" element={<LazyPage Page={SessionsPage} />} />
-        <Route
-          path="/sessions/:source/:projectId"
-          element={<LazyPage Page={SessionsProjectPage} />}
-        />
-        <Route
-          path="/sessions/:source/:projectId/session/*"
-          element={<LazyPage Page={SessionsMessagesPage} />}
-        />
-        <Route path="/workspaces" element={<LazyPage Page={WorkspacesPage} />} />
-        <Route path="/prompts" element={<LazyPage Page={PromptsPage} />} />
-        <Route path="/mcp" element={<LazyPage Page={McpPage} />} />
-        <Route path="/plugins" element={<LazyPage Page={PluginsPage} />} />
-        <Route path="/logs" element={<LazyPage Page={LogsPage} />} />
-        <Route path="/console" element={<LazyPage Page={ConsolePage} />} />
-        <Route path="/usage" element={<LazyPage Page={UsagePage} />} />
-        <Route path="/settings/*" element={<LazyPage Page={SettingsPage} />} />
-        <Route path="/cli-manager" element={<LazyPage Page={CliManagerPage} />} />
-        <Route path="/skills" element={<LazyPage Page={SkillsPage} />} />
-        <Route path="/skills/market" element={<LazyPage Page={SkillsMarketPage} />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
+        {routes.map((route) => {
+          if (route.kind === "index") {
+            return <Route key={route.id} index element={<HomePage />} />;
+          }
+          if (route.kind === "fallback") {
+            return (
+              <Route
+                key={route.id}
+                path={route.path}
+                element={<Navigate to={route.redirectTo ?? "/"} replace />}
+              />
+            );
+          }
+          const Page = pageComponent(route.id);
+          return <Route key={route.id} path={route.path} element={<LazyPage Page={Page} />} />;
+        })}
       </Route>
     </Routes>
   );

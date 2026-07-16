@@ -599,6 +599,21 @@ mod tests {
     use super::*;
     use serde_json::json;
 
+    #[test]
+    fn status_event_payload_matches_shared_fixture() {
+        let status = crate::gateway::GatewayStatus {
+            running: true,
+            port: Some(37123),
+            base_url: Some("http://127.0.0.1:37123".to_string()),
+            listen_addr: Some("127.0.0.1:37123".to_string()),
+        };
+
+        assert_matches_fixture(
+            &status,
+            include_str!("../../../src/services/gateway/__fixtures__/gatewayEvents/status.json"),
+        );
+    }
+
     fn sample_mapping() -> ClaudeModelMapping {
         ClaudeModelMapping {
             requested_model: "claude-sonnet".to_string(),

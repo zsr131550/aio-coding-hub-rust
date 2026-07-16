@@ -239,13 +239,7 @@ fn extract_zip_bytes(
                 "plugin package must contain plugin.json",
             )
         })?;
-    reject_unsupported_manifest_runtime(&manifest_bytes)?;
-    let manifest: PluginManifest = serde_json::from_slice(&manifest_bytes).map_err(|error| {
-        AppError::new(
-            "PLUGIN_INVALID_MANIFEST",
-            format!("failed to parse plugin package manifest: {error}"),
-        )
-    })?;
+    let manifest = parse_plugin_manifest_bytes(&manifest_bytes)?;
     validate_extension_main(&root_dir, &manifest)?;
     if validate_manifest_for_host {
         crate::domain::plugins::validate_manifest(&manifest, env!("CARGO_PKG_VERSION"))?;
@@ -256,6 +250,16 @@ fn extract_zip_bytes(
         manifest,
         checksum,
         package_bytes: bytes,
+    })
+}
+
+pub(crate) fn parse_plugin_manifest_bytes(manifest_bytes: &[u8]) -> AppResult<PluginManifest> {
+    reject_unsupported_manifest_runtime(manifest_bytes)?;
+    serde_json::from_slice(manifest_bytes).map_err(|error| {
+        AppError::new(
+            "PLUGIN_INVALID_MANIFEST",
+            format!("failed to parse plugin package manifest: {error}"),
+        )
     })
 }
 

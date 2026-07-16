@@ -1,0 +1,3503 @@
+{
+  "schemaVersion": 1,
+  "status": "complete",
+  "tool": {
+    "name": "egui-baseline",
+    "version": 1
+  },
+  "repository": {
+    "commit": "057c06821b5159fda202bce5cfbf1ef3afb410f9",
+    "dirty": true,
+    "statusSha256": "5309620c680c948a583e99b73e8bb3becf10fa5f59f422514e9140d8ab11a6a3"
+  },
+  "app": {
+    "version": "0.60.13",
+    "executable": "src-tauri/target/x86_64-pc-windows-msvc/release/aio-coding-hub.exe",
+    "executableSha256": "38af9a75bf0adfe8f83f9cfa243bd20b7267de45439540a58c3362624e56bdb9",
+    "executableBytes": 36398592,
+    "installers": [
+      {
+        "kind": "file",
+        "path": "bundle/msi/AIO Coding Hub_0.60.13_x64_en-US.msi",
+        "bytes": 15028224,
+        "sha256": "2b74ebd903b5a8bc36acdcd6c93f231c4f4d64360f0b624b07fbaed8f9a1daea"
+      }
+    ],
+    "buildProvenance": {
+      "path": "src-tauri/target/x86_64-pc-windows-msvc/release/aio-coding-hub.exe.build-provenance.json",
+      "sha256": "5bfa9b8a2c69428b1acd61fc86268fe1f78703967c93b8904708154b66c71922",
+      "profile": "release",
+      "target": "x86_64-pc-windows-msvc",
+      "producer": "scripts/tauri-build.mjs",
+      "configOverlaySha256": "045e55901593915f744feabfb9a952abeeaa02d23342681e2bbe236a0da221e3"
+    }
+  },
+  "environment": {
+    "platform": "win32",
+    "arch": "x64",
+    "osRelease": "10.0.26200",
+    "kernelType": "Windows_NT",
+    "cpuModel": "Intel(R) Core(TM) Ultra 7 270K Plus",
+    "logicalCpuCount": 24,
+    "totalMemoryBytes": 33693593600,
+    "nodeVersion": "v24.16.0",
+    "locale": "C.UTF-8",
+    "timezone": "UTC",
+    "gpuRenderer": null,
+    "webViewRuntime": null,
+    "power": null,
+    "processMetrics": {
+      "collector": "windows-cim-v1",
+      "identity": {
+        "precision": "exact",
+        "source": "Win32_Process.CreationDate"
+      },
+      "metrics": {
+        "workingSetBytes": {
+          "availability": "available",
+          "source": "Win32_Process.WorkingSetSize",
+          "semantics": "resident working set bytes"
+        },
+        "privateBytes": {
+          "availability": "available",
+          "source": "Win32_Process.PrivatePageCount",
+          "semantics": "private committed bytes"
+        },
+        "cpuTimeMs": {
+          "availability": "available",
+          "source": "Win32_Process.KernelModeTime+UserModeTime",
+          "semantics": "cumulative kernel and user CPU time"
+        }
+      }
+    }
+  },
+  "protocol": {
+    "warmups": 2,
+    "runs": 10,
+    "sampleIntervalMs": 1000,
+    "processTree": "pid-birth-image identity descendants; retained after reparent",
+    "percentile": "nearest-rank",
+    "median": "midpoint for even sample counts"
+  },
+  "scenario": {
+    "id": "startup-cold-process",
+    "fixture": "current",
+    "fixtureHash": "164523fe1ff6c40c2f1474e7bbe140e800e9645e68ef4bcb76960b9cfa5ec2c8",
+    "fixtureArtifacts": {
+      "aio-coding-hub.db": {
+        "bytes": 458752,
+        "sha256": "d16ccfe66f2b2093bbfdf08437fa886c6fd718099c84cefbc618f75cc6d119e1"
+      },
+      "settings.json": {
+        "bytes": 2563,
+        "sha256": "b6aae8bed69d185cf424de92d5367c142db4b13e5b10d5bf5da300d6cd0fde4a"
+      }
+    },
+    "durationMs": null,
+    "window": {
+      "width": 1500,
+      "height": 900,
+      "startMinimized": false
+    }
+  },
+  "warmupSummaries": [
+    {
+      "index": 0,
+      "exitCode": 0,
+      "durationMs": 1134.1824000000001,
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "index": 1,
+      "exitCode": 0,
+      "durationMs": 1144.2881,
+      "warnings": [],
+      "failures": []
+    }
+  ],
+  "rawRuns": [
+    {
+      "runId": "startup-cold-process-run-01",
+      "scenario": "startup-cold-process",
+      "launchStartedUnixMs": 1784173701798,
+      "exitCode": 0,
+      "signal": null,
+      "durationMs": 1171.7591000000002,
+      "isolation": {
+        "home": "$RUN_HOME",
+        "appData": "$RUN_HOME/.aio-coding-hub",
+        "roamingAppData": "$RUN_HOME/AppData/Roaming",
+        "localAppData": "$RUN_HOME/AppData/Local",
+        "xdgConfigHome": "$RUN_HOME/.config",
+        "xdgDataHome": "$RUN_HOME/.local/share",
+        "xdgCacheHome": "$RUN_HOME/.cache",
+        "temp": "$RUN_HOME/tmp",
+        "codexHome": "$RUN_HOME/.codex",
+        "webviewData": "$RUN_HOME/.aio-benchmark/webview"
+      },
+      "cleanup": {
+        "terminated": [],
+        "skipped": [],
+        "errors": []
+      },
+      "milestones": [
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-01",
+          "scenario": "startup-cold-process",
+          "seq": 1,
+          "milestone": "process_entry",
+          "elapsedMs": 0.0429,
+          "wallClockUnixMs": 1784173701806,
+          "data": {
+            "appVersion": "0.60.13",
+            "pid": 54856
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-01",
+          "scenario": "startup-cold-process",
+          "seq": 2,
+          "milestone": "tauri_setup_started",
+          "elapsedMs": 237.57139999999998,
+          "wallClockUnixMs": 1784173702044,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-01",
+          "scenario": "startup-cold-process",
+          "seq": 3,
+          "milestone": "tauri_setup_completed",
+          "elapsedMs": 246.88959999999997,
+          "wallClockUnixMs": 1784173702053,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-01",
+          "scenario": "startup-cold-process",
+          "seq": 4,
+          "milestone": "startup_run_started",
+          "elapsedMs": 247.067,
+          "wallClockUnixMs": 1784173702053,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-01",
+          "scenario": "startup-cold-process",
+          "seq": 5,
+          "milestone": "db_ready",
+          "elapsedMs": 252.85609999999997,
+          "wallClockUnixMs": 1784173702059,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-01",
+          "scenario": "startup-cold-process",
+          "seq": 6,
+          "milestone": "settings_ready",
+          "elapsedMs": 253.53730000000002,
+          "wallClockUnixMs": 1784173702060,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-01",
+          "scenario": "startup-cold-process",
+          "seq": 7,
+          "milestone": "window_visible",
+          "elapsedMs": 275.581,
+          "wallClockUnixMs": 1784173702082,
+          "data": {
+            "logicalHeight": 900,
+            "logicalWidth": 1500,
+            "physicalHeight": 900,
+            "physicalWidth": 1500,
+            "scaleFactor": 1,
+            "startMinimized": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-01",
+          "scenario": "startup-cold-process",
+          "seq": 8,
+          "milestone": "gateway_bound",
+          "elapsedMs": 292.2287,
+          "wallClockUnixMs": 1784173702099,
+          "data": {
+            "listenAddr": "127.0.0.1:37124",
+            "port": 37124
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-01",
+          "scenario": "startup-cold-process",
+          "seq": 9,
+          "milestone": "gateway_ready",
+          "elapsedMs": 295.8791,
+          "wallClockUnixMs": 1784173702102,
+          "data": {
+            "port": 37124
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-01",
+          "scenario": "startup-cold-process",
+          "seq": 10,
+          "milestone": "startup_ready",
+          "elapsedMs": 296.6223,
+          "wallClockUnixMs": 1784173702103,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-01",
+          "scenario": "startup-cold-process",
+          "seq": 11,
+          "milestone": "first_interactive",
+          "elapsedMs": 639.4599,
+          "wallClockUnixMs": 1784173702446,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-01",
+          "scenario": "startup-cold-process",
+          "seq": 12,
+          "milestone": "scenario_completed",
+          "elapsedMs": 641.2738999999999,
+          "wallClockUnixMs": 1784173702448,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-01",
+          "scenario": "startup-cold-process",
+          "seq": 13,
+          "milestone": "shutdown_started",
+          "elapsedMs": 641.3937,
+          "wallClockUnixMs": 1784173702448,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-01",
+          "scenario": "startup-cold-process",
+          "seq": 14,
+          "milestone": "shutdown_completed",
+          "elapsedMs": 642.1456,
+          "wallClockUnixMs": 1784173702449,
+          "data": {}
+        }
+      ],
+      "samples": [
+        {
+          "atMs": 385.94309999999996,
+          "atUnixMs": 1784173702186,
+          "processes": [
+            {
+              "pid": 7344,
+              "ppid": 25796,
+              "birthToken": "unix-ms:1784173701832",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 10588160,
+              "privateBytes": 2551808,
+              "cpuTimeMs": 0
+            },
+            {
+              "pid": 25796,
+              "ppid": 54856,
+              "birthToken": "unix-ms:1784173701823",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 123396096,
+              "privateBytes": 45105152,
+              "cpuTimeMs": 375
+            },
+            {
+              "pid": 34420,
+              "ppid": 25796,
+              "birthToken": "unix-ms:1784173701919",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 39448576,
+              "privateBytes": 14913536,
+              "cpuTimeMs": 93.75
+            },
+            {
+              "pid": 34700,
+              "ppid": 25796,
+              "birthToken": "unix-ms:1784173701980",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 49840128,
+              "privateBytes": 22519808,
+              "cpuTimeMs": 62.5
+            },
+            {
+              "pid": 46236,
+              "ppid": 25796,
+              "birthToken": "unix-ms:1784173701916",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 32030720,
+              "privateBytes": 40116224,
+              "cpuTimeMs": 140.625
+            },
+            {
+              "pid": 54856,
+              "ppid": 45672,
+              "birthToken": "unix-ms:1784173701799",
+              "identityPrecision": "exact",
+              "imageName": "aio-coding-hub.exe",
+              "workingSetBytes": 35627008,
+              "privateBytes": 11337728,
+              "cpuTimeMs": 62.5
+            },
+            {
+              "pid": 56920,
+              "ppid": 25796,
+              "birthToken": "unix-ms:1784173701934",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 20033536,
+              "privateBytes": 9474048,
+              "cpuTimeMs": 31.25
+            }
+          ],
+          "totals": {
+            "processCount": 7,
+            "workingSetBytes": 310964224,
+            "privateBytes": 146018304,
+            "cpuTimeMs": 765.625
+          }
+        }
+      ],
+      "stdout": "",
+      "stderr": "",
+      "warnings": [],
+      "failures": [],
+      "metrics": {
+        "tauriSetupCompletedMs": 246.88959999999997,
+        "dbReadyMs": 252.85609999999997,
+        "gatewayReadyMs": 295.8791,
+        "startupReadyMs": 296.6223,
+        "firstInteractiveMs": 639.4599,
+        "shutdownCompletedMs": 642.1456,
+        "launchToProcessEntryMs": 7.999999999999999,
+        "launchToTauriSetupCompletedMs": 254.84669999999997,
+        "launchToDbReadyMs": 260.8132,
+        "launchToGatewayReadyMs": 303.8362,
+        "launchToStartupReadyMs": 304.5794,
+        "launchToFirstInteractiveMs": 647.4169999999999,
+        "launchToShutdownCompletedMs": 650.1026999999999,
+        "windowPhysicalWidth": 1500,
+        "windowPhysicalHeight": 900,
+        "windowLogicalWidth": 1500,
+        "windowLogicalHeight": 900,
+        "windowScaleFactor": 1,
+        "peakWorkingSetBytes": 310964224,
+        "medianWorkingSetBytes": 310964224,
+        "peakPrivateBytes": 146018304,
+        "cpuTimeDeltaMs": 0,
+        "maxProcessCount": 7
+      },
+      "index": 0
+    },
+    {
+      "runId": "startup-cold-process-run-02",
+      "scenario": "startup-cold-process",
+      "launchStartedUnixMs": 1784173703020,
+      "exitCode": 0,
+      "signal": null,
+      "durationMs": 1153.9165000000003,
+      "isolation": {
+        "home": "$RUN_HOME",
+        "appData": "$RUN_HOME/.aio-coding-hub",
+        "roamingAppData": "$RUN_HOME/AppData/Roaming",
+        "localAppData": "$RUN_HOME/AppData/Local",
+        "xdgConfigHome": "$RUN_HOME/.config",
+        "xdgDataHome": "$RUN_HOME/.local/share",
+        "xdgCacheHome": "$RUN_HOME/.cache",
+        "temp": "$RUN_HOME/tmp",
+        "codexHome": "$RUN_HOME/.codex",
+        "webviewData": "$RUN_HOME/.aio-benchmark/webview"
+      },
+      "cleanup": {
+        "terminated": [],
+        "skipped": [],
+        "errors": []
+      },
+      "milestones": [
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-02",
+          "scenario": "startup-cold-process",
+          "seq": 1,
+          "milestone": "process_entry",
+          "elapsedMs": 0.0432,
+          "wallClockUnixMs": 1784173703029,
+          "data": {
+            "appVersion": "0.60.13",
+            "pid": 35080
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-02",
+          "scenario": "startup-cold-process",
+          "seq": 2,
+          "milestone": "tauri_setup_started",
+          "elapsedMs": 233.77,
+          "wallClockUnixMs": 1784173703263,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-02",
+          "scenario": "startup-cold-process",
+          "seq": 3,
+          "milestone": "tauri_setup_completed",
+          "elapsedMs": 240.83180000000002,
+          "wallClockUnixMs": 1784173703270,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-02",
+          "scenario": "startup-cold-process",
+          "seq": 4,
+          "milestone": "startup_run_started",
+          "elapsedMs": 240.982,
+          "wallClockUnixMs": 1784173703270,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-02",
+          "scenario": "startup-cold-process",
+          "seq": 5,
+          "milestone": "db_ready",
+          "elapsedMs": 246.84320000000002,
+          "wallClockUnixMs": 1784173703276,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-02",
+          "scenario": "startup-cold-process",
+          "seq": 6,
+          "milestone": "settings_ready",
+          "elapsedMs": 247.5515,
+          "wallClockUnixMs": 1784173703277,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-02",
+          "scenario": "startup-cold-process",
+          "seq": 7,
+          "milestone": "window_visible",
+          "elapsedMs": 270.9993,
+          "wallClockUnixMs": 1784173703300,
+          "data": {
+            "logicalHeight": 900,
+            "logicalWidth": 1500,
+            "physicalHeight": 900,
+            "physicalWidth": 1500,
+            "scaleFactor": 1,
+            "startMinimized": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-02",
+          "scenario": "startup-cold-process",
+          "seq": 8,
+          "milestone": "gateway_bound",
+          "elapsedMs": 287.2293,
+          "wallClockUnixMs": 1784173703316,
+          "data": {
+            "listenAddr": "127.0.0.1:37124",
+            "port": 37124
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-02",
+          "scenario": "startup-cold-process",
+          "seq": 9,
+          "milestone": "gateway_ready",
+          "elapsedMs": 290.78090000000003,
+          "wallClockUnixMs": 1784173703320,
+          "data": {
+            "port": 37124
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-02",
+          "scenario": "startup-cold-process",
+          "seq": 10,
+          "milestone": "startup_ready",
+          "elapsedMs": 291.4663,
+          "wallClockUnixMs": 1784173703321,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-02",
+          "scenario": "startup-cold-process",
+          "seq": 11,
+          "milestone": "first_interactive",
+          "elapsedMs": 659.6005,
+          "wallClockUnixMs": 1784173703689,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-02",
+          "scenario": "startup-cold-process",
+          "seq": 12,
+          "milestone": "scenario_completed",
+          "elapsedMs": 660.885,
+          "wallClockUnixMs": 1784173703690,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-02",
+          "scenario": "startup-cold-process",
+          "seq": 13,
+          "milestone": "shutdown_started",
+          "elapsedMs": 661.1361999999999,
+          "wallClockUnixMs": 1784173703690,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-02",
+          "scenario": "startup-cold-process",
+          "seq": 14,
+          "milestone": "shutdown_completed",
+          "elapsedMs": 662.2320000000001,
+          "wallClockUnixMs": 1784173703691,
+          "data": {}
+        }
+      ],
+      "samples": [
+        {
+          "atMs": 385.3868999999995,
+          "atUnixMs": 1784173703408,
+          "processes": [
+            {
+              "pid": 4716,
+              "ppid": 49104,
+              "birthToken": "unix-ms:1784173703055",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 10588160,
+              "privateBytes": 2568192,
+              "cpuTimeMs": 15.625
+            },
+            {
+              "pid": 33056,
+              "ppid": 49104,
+              "birthToken": "unix-ms:1784173703200",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 49934336,
+              "privateBytes": 22528000,
+              "cpuTimeMs": 46.875
+            },
+            {
+              "pid": 35080,
+              "ppid": 45672,
+              "birthToken": "unix-ms:1784173703022",
+              "identityPrecision": "exact",
+              "imageName": "aio-coding-hub.exe",
+              "workingSetBytes": 37539840,
+              "privateBytes": 12918784,
+              "cpuTimeMs": 46.875
+            },
+            {
+              "pid": 41640,
+              "ppid": 49104,
+              "birthToken": "unix-ms:1784173703141",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 39399424,
+              "privateBytes": 14880768,
+              "cpuTimeMs": 125
+            },
+            {
+              "pid": 46396,
+              "ppid": 49104,
+              "birthToken": "unix-ms:1784173703156",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 20193280,
+              "privateBytes": 9515008,
+              "cpuTimeMs": 78.125
+            },
+            {
+              "pid": 49104,
+              "ppid": 35080,
+              "birthToken": "unix-ms:1784173703047",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 123535360,
+              "privateBytes": 44855296,
+              "cpuTimeMs": 453.125
+            },
+            {
+              "pid": 58248,
+              "ppid": 49104,
+              "birthToken": "unix-ms:1784173703138",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 38367232,
+              "privateBytes": 41943040,
+              "cpuTimeMs": 156.25
+            }
+          ],
+          "totals": {
+            "processCount": 7,
+            "workingSetBytes": 319557632,
+            "privateBytes": 149209088,
+            "cpuTimeMs": 921.875
+          }
+        }
+      ],
+      "stdout": "",
+      "stderr": "[0716/114823.801:ERROR:ui/gfx/win/window_impl.cc:172] Failed to unregister class Chrome_WidgetWin_0. Error = 1411\r\n",
+      "warnings": [],
+      "failures": [],
+      "metrics": {
+        "tauriSetupCompletedMs": 240.83180000000002,
+        "dbReadyMs": 246.84320000000002,
+        "gatewayReadyMs": 290.78090000000003,
+        "startupReadyMs": 291.4663,
+        "firstInteractiveMs": 659.6005,
+        "shutdownCompletedMs": 662.2320000000001,
+        "launchToProcessEntryMs": 9,
+        "launchToTauriSetupCompletedMs": 249.7886,
+        "launchToDbReadyMs": 255.8,
+        "launchToGatewayReadyMs": 299.7377,
+        "launchToStartupReadyMs": 300.4231,
+        "launchToFirstInteractiveMs": 668.5573,
+        "launchToShutdownCompletedMs": 671.1888000000001,
+        "windowPhysicalWidth": 1500,
+        "windowPhysicalHeight": 900,
+        "windowLogicalWidth": 1500,
+        "windowLogicalHeight": 900,
+        "windowScaleFactor": 1,
+        "peakWorkingSetBytes": 319557632,
+        "medianWorkingSetBytes": 319557632,
+        "peakPrivateBytes": 149209088,
+        "cpuTimeDeltaMs": 0,
+        "maxProcessCount": 7
+      },
+      "index": 1
+    },
+    {
+      "runId": "startup-cold-process-run-03",
+      "scenario": "startup-cold-process",
+      "launchStartedUnixMs": 1784173704226,
+      "exitCode": 0,
+      "signal": null,
+      "durationMs": 1215.6652999999997,
+      "isolation": {
+        "home": "$RUN_HOME",
+        "appData": "$RUN_HOME/.aio-coding-hub",
+        "roamingAppData": "$RUN_HOME/AppData/Roaming",
+        "localAppData": "$RUN_HOME/AppData/Local",
+        "xdgConfigHome": "$RUN_HOME/.config",
+        "xdgDataHome": "$RUN_HOME/.local/share",
+        "xdgCacheHome": "$RUN_HOME/.cache",
+        "temp": "$RUN_HOME/tmp",
+        "codexHome": "$RUN_HOME/.codex",
+        "webviewData": "$RUN_HOME/.aio-benchmark/webview"
+      },
+      "cleanup": {
+        "terminated": [],
+        "skipped": [],
+        "errors": []
+      },
+      "milestones": [
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-03",
+          "scenario": "startup-cold-process",
+          "seq": 1,
+          "milestone": "process_entry",
+          "elapsedMs": 0.0396,
+          "wallClockUnixMs": 1784173704234,
+          "data": {
+            "appVersion": "0.60.13",
+            "pid": 39384
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-03",
+          "scenario": "startup-cold-process",
+          "seq": 2,
+          "milestone": "tauri_setup_started",
+          "elapsedMs": 268.0167,
+          "wallClockUnixMs": 1784173704502,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-03",
+          "scenario": "startup-cold-process",
+          "seq": 3,
+          "milestone": "tauri_setup_completed",
+          "elapsedMs": 275.9198,
+          "wallClockUnixMs": 1784173704510,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-03",
+          "scenario": "startup-cold-process",
+          "seq": 4,
+          "milestone": "startup_run_started",
+          "elapsedMs": 276.0841,
+          "wallClockUnixMs": 1784173704510,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-03",
+          "scenario": "startup-cold-process",
+          "seq": 5,
+          "milestone": "db_ready",
+          "elapsedMs": 281.6703,
+          "wallClockUnixMs": 1784173704516,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-03",
+          "scenario": "startup-cold-process",
+          "seq": 6,
+          "milestone": "settings_ready",
+          "elapsedMs": 282.2704,
+          "wallClockUnixMs": 1784173704517,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-03",
+          "scenario": "startup-cold-process",
+          "seq": 7,
+          "milestone": "window_visible",
+          "elapsedMs": 305.0042,
+          "wallClockUnixMs": 1784173704539,
+          "data": {
+            "logicalHeight": 900,
+            "logicalWidth": 1500,
+            "physicalHeight": 900,
+            "physicalWidth": 1500,
+            "scaleFactor": 1,
+            "startMinimized": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-03",
+          "scenario": "startup-cold-process",
+          "seq": 8,
+          "milestone": "gateway_bound",
+          "elapsedMs": 320.1259,
+          "wallClockUnixMs": 1784173704554,
+          "data": {
+            "listenAddr": "127.0.0.1:37124",
+            "port": 37124
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-03",
+          "scenario": "startup-cold-process",
+          "seq": 9,
+          "milestone": "gateway_ready",
+          "elapsedMs": 323.8412,
+          "wallClockUnixMs": 1784173704558,
+          "data": {
+            "port": 37124
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-03",
+          "scenario": "startup-cold-process",
+          "seq": 10,
+          "milestone": "startup_ready",
+          "elapsedMs": 324.5233,
+          "wallClockUnixMs": 1784173704559,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-03",
+          "scenario": "startup-cold-process",
+          "seq": 11,
+          "milestone": "first_interactive",
+          "elapsedMs": 696.1524000000001,
+          "wallClockUnixMs": 1784173704930,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-03",
+          "scenario": "startup-cold-process",
+          "seq": 12,
+          "milestone": "scenario_completed",
+          "elapsedMs": 697.4552000000001,
+          "wallClockUnixMs": 1784173704932,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-03",
+          "scenario": "startup-cold-process",
+          "seq": 13,
+          "milestone": "shutdown_started",
+          "elapsedMs": 697.5823,
+          "wallClockUnixMs": 1784173704932,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-03",
+          "scenario": "startup-cold-process",
+          "seq": 14,
+          "milestone": "shutdown_completed",
+          "elapsedMs": 698.3958,
+          "wallClockUnixMs": 1784173704933,
+          "data": {}
+        }
+      ],
+      "samples": [
+        {
+          "atMs": 416.4948999999997,
+          "atUnixMs": 1784173704644,
+          "processes": [
+            {
+              "pid": 30564,
+              "ppid": 59068,
+              "birthToken": "unix-ms:1784173704260",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 10584064,
+              "privateBytes": 2551808,
+              "cpuTimeMs": 15.625
+            },
+            {
+              "pid": 39384,
+              "ppid": 45672,
+              "birthToken": "unix-ms:1784173704227",
+              "identityPrecision": "exact",
+              "imageName": "aio-coding-hub.exe",
+              "workingSetBytes": 23601152,
+              "privateBytes": 4050944,
+              "cpuTimeMs": 46.875
+            },
+            {
+              "pid": 43360,
+              "ppid": 59068,
+              "birthToken": "unix-ms:1784173704395",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 19718144,
+              "privateBytes": 9424896,
+              "cpuTimeMs": 15.625
+            },
+            {
+              "pid": 57664,
+              "ppid": 59068,
+              "birthToken": "unix-ms:1784173704380",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 38469632,
+              "privateBytes": 14548992,
+              "cpuTimeMs": 140.625
+            },
+            {
+              "pid": 58596,
+              "ppid": 59068,
+              "birthToken": "unix-ms:1784173704364",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 32497664,
+              "privateBytes": 15372288,
+              "cpuTimeMs": 125
+            },
+            {
+              "pid": 59068,
+              "ppid": 39384,
+              "birthToken": "unix-ms:1784173704251",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 121769984,
+              "privateBytes": 45731840,
+              "cpuTimeMs": 500
+            },
+            {
+              "pid": 62900,
+              "ppid": 59068,
+              "birthToken": "unix-ms:1784173704438",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 46329856,
+              "privateBytes": 21700608,
+              "cpuTimeMs": 46.875
+            }
+          ],
+          "totals": {
+            "processCount": 7,
+            "workingSetBytes": 292970496,
+            "privateBytes": 113381376,
+            "cpuTimeMs": 890.625
+          }
+        }
+      ],
+      "stdout": "",
+      "stderr": "",
+      "warnings": [],
+      "failures": [],
+      "metrics": {
+        "tauriSetupCompletedMs": 275.9198,
+        "dbReadyMs": 281.6703,
+        "gatewayReadyMs": 323.8412,
+        "startupReadyMs": 324.5233,
+        "firstInteractiveMs": 696.1524000000001,
+        "shutdownCompletedMs": 698.3958,
+        "launchToProcessEntryMs": 8,
+        "launchToTauriSetupCompletedMs": 283.8802,
+        "launchToDbReadyMs": 289.6307,
+        "launchToGatewayReadyMs": 331.8016,
+        "launchToStartupReadyMs": 332.4837,
+        "launchToFirstInteractiveMs": 704.1128000000001,
+        "launchToShutdownCompletedMs": 706.3562000000001,
+        "windowPhysicalWidth": 1500,
+        "windowPhysicalHeight": 900,
+        "windowLogicalWidth": 1500,
+        "windowLogicalHeight": 900,
+        "windowScaleFactor": 1,
+        "peakWorkingSetBytes": 292970496,
+        "medianWorkingSetBytes": 292970496,
+        "peakPrivateBytes": 113381376,
+        "cpuTimeDeltaMs": 0,
+        "maxProcessCount": 7
+      },
+      "index": 2
+    },
+    {
+      "runId": "startup-cold-process-run-04",
+      "scenario": "startup-cold-process",
+      "launchStartedUnixMs": 1784173705496,
+      "exitCode": 0,
+      "signal": null,
+      "durationMs": 1104.3602,
+      "isolation": {
+        "home": "$RUN_HOME",
+        "appData": "$RUN_HOME/.aio-coding-hub",
+        "roamingAppData": "$RUN_HOME/AppData/Roaming",
+        "localAppData": "$RUN_HOME/AppData/Local",
+        "xdgConfigHome": "$RUN_HOME/.config",
+        "xdgDataHome": "$RUN_HOME/.local/share",
+        "xdgCacheHome": "$RUN_HOME/.cache",
+        "temp": "$RUN_HOME/tmp",
+        "codexHome": "$RUN_HOME/.codex",
+        "webviewData": "$RUN_HOME/.aio-benchmark/webview"
+      },
+      "cleanup": {
+        "terminated": [],
+        "skipped": [],
+        "errors": []
+      },
+      "milestones": [
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-04",
+          "scenario": "startup-cold-process",
+          "seq": 1,
+          "milestone": "process_entry",
+          "elapsedMs": 0.043699999999999996,
+          "wallClockUnixMs": 1784173705506,
+          "data": {
+            "appVersion": "0.60.13",
+            "pid": 18828
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-04",
+          "scenario": "startup-cold-process",
+          "seq": 2,
+          "milestone": "tauri_setup_started",
+          "elapsedMs": 239.4749,
+          "wallClockUnixMs": 1784173705745,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-04",
+          "scenario": "startup-cold-process",
+          "seq": 3,
+          "milestone": "tauri_setup_completed",
+          "elapsedMs": 246.6886,
+          "wallClockUnixMs": 1784173705753,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-04",
+          "scenario": "startup-cold-process",
+          "seq": 4,
+          "milestone": "startup_run_started",
+          "elapsedMs": 246.8588,
+          "wallClockUnixMs": 1784173705753,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-04",
+          "scenario": "startup-cold-process",
+          "seq": 5,
+          "milestone": "db_ready",
+          "elapsedMs": 252.36189999999996,
+          "wallClockUnixMs": 1784173705758,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-04",
+          "scenario": "startup-cold-process",
+          "seq": 6,
+          "milestone": "settings_ready",
+          "elapsedMs": 253.04910000000004,
+          "wallClockUnixMs": 1784173705759,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-04",
+          "scenario": "startup-cold-process",
+          "seq": 7,
+          "milestone": "window_visible",
+          "elapsedMs": 274.5074,
+          "wallClockUnixMs": 1784173705780,
+          "data": {
+            "logicalHeight": 900,
+            "logicalWidth": 1500,
+            "physicalHeight": 900,
+            "physicalWidth": 1500,
+            "scaleFactor": 1,
+            "startMinimized": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-04",
+          "scenario": "startup-cold-process",
+          "seq": 8,
+          "milestone": "gateway_bound",
+          "elapsedMs": 289.6952,
+          "wallClockUnixMs": 1784173705796,
+          "data": {
+            "listenAddr": "127.0.0.1:37124",
+            "port": 37124
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-04",
+          "scenario": "startup-cold-process",
+          "seq": 9,
+          "milestone": "gateway_ready",
+          "elapsedMs": 293.9105,
+          "wallClockUnixMs": 1784173705800,
+          "data": {
+            "port": 37124
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-04",
+          "scenario": "startup-cold-process",
+          "seq": 10,
+          "milestone": "startup_ready",
+          "elapsedMs": 294.62539999999996,
+          "wallClockUnixMs": 1784173705801,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-04",
+          "scenario": "startup-cold-process",
+          "seq": 11,
+          "milestone": "first_interactive",
+          "elapsedMs": 614.0735000000001,
+          "wallClockUnixMs": 1784173706120,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-04",
+          "scenario": "startup-cold-process",
+          "seq": 12,
+          "milestone": "scenario_completed",
+          "elapsedMs": 615.1915,
+          "wallClockUnixMs": 1784173706121,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-04",
+          "scenario": "startup-cold-process",
+          "seq": 13,
+          "milestone": "shutdown_started",
+          "elapsedMs": 615.3195000000001,
+          "wallClockUnixMs": 1784173706121,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-04",
+          "scenario": "startup-cold-process",
+          "seq": 14,
+          "milestone": "shutdown_completed",
+          "elapsedMs": 616.1958,
+          "wallClockUnixMs": 1784173706122,
+          "data": {}
+        }
+      ],
+      "samples": [
+        {
+          "atMs": 389.08530000000064,
+          "atUnixMs": 1784173705888,
+          "processes": [
+            {
+              "pid": 18828,
+              "ppid": 45672,
+              "birthToken": "unix-ms:1784173705497",
+              "identityPrecision": "exact",
+              "imageName": "aio-coding-hub.exe",
+              "workingSetBytes": 35508224,
+              "privateBytes": 11210752,
+              "cpuTimeMs": 78.125
+            },
+            {
+              "pid": 26028,
+              "ppid": 35276,
+              "birthToken": "unix-ms:1784173705532",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 10584064,
+              "privateBytes": 2547712,
+              "cpuTimeMs": 15.625
+            },
+            {
+              "pid": 33088,
+              "ppid": 35276,
+              "birthToken": "unix-ms:1784173705619",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 39768064,
+              "privateBytes": 15331328,
+              "cpuTimeMs": 187.5
+            },
+            {
+              "pid": 35276,
+              "ppid": 18828,
+              "birthToken": "unix-ms:1784173705523",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 123543552,
+              "privateBytes": 45989888,
+              "cpuTimeMs": 296.875
+            },
+            {
+              "pid": 39608,
+              "ppid": 35276,
+              "birthToken": "unix-ms:1784173705635",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 20041728,
+              "privateBytes": 9469952,
+              "cpuTimeMs": 46.875
+            },
+            {
+              "pid": 41960,
+              "ppid": 35276,
+              "birthToken": "unix-ms:1784173705681",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 49831936,
+              "privateBytes": 22523904,
+              "cpuTimeMs": 46.875
+            },
+            {
+              "pid": 47384,
+              "ppid": 35276,
+              "birthToken": "unix-ms:1784173705618",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 33562624,
+              "privateBytes": 40206336,
+              "cpuTimeMs": 156.25
+            }
+          ],
+          "totals": {
+            "processCount": 7,
+            "workingSetBytes": 312840192,
+            "privateBytes": 147279872,
+            "cpuTimeMs": 828.125
+          }
+        }
+      ],
+      "stdout": "",
+      "stderr": "",
+      "warnings": [],
+      "failures": [],
+      "metrics": {
+        "tauriSetupCompletedMs": 246.6886,
+        "dbReadyMs": 252.36189999999996,
+        "gatewayReadyMs": 293.9105,
+        "startupReadyMs": 294.62539999999996,
+        "firstInteractiveMs": 614.0735000000001,
+        "shutdownCompletedMs": 616.1958,
+        "launchToProcessEntryMs": 10,
+        "launchToTauriSetupCompletedMs": 256.6449,
+        "launchToDbReadyMs": 262.3182,
+        "launchToGatewayReadyMs": 303.8668,
+        "launchToStartupReadyMs": 304.58169999999996,
+        "launchToFirstInteractiveMs": 624.0298000000001,
+        "launchToShutdownCompletedMs": 626.1521,
+        "windowPhysicalWidth": 1500,
+        "windowPhysicalHeight": 900,
+        "windowLogicalWidth": 1500,
+        "windowLogicalHeight": 900,
+        "windowScaleFactor": 1,
+        "peakWorkingSetBytes": 312840192,
+        "medianWorkingSetBytes": 312840192,
+        "peakPrivateBytes": 147279872,
+        "cpuTimeDeltaMs": 0,
+        "maxProcessCount": 7
+      },
+      "index": 3
+    },
+    {
+      "runId": "startup-cold-process-run-05",
+      "scenario": "startup-cold-process",
+      "launchStartedUnixMs": 1784173706652,
+      "exitCode": 0,
+      "signal": null,
+      "durationMs": 1167.5336000000007,
+      "isolation": {
+        "home": "$RUN_HOME",
+        "appData": "$RUN_HOME/.aio-coding-hub",
+        "roamingAppData": "$RUN_HOME/AppData/Roaming",
+        "localAppData": "$RUN_HOME/AppData/Local",
+        "xdgConfigHome": "$RUN_HOME/.config",
+        "xdgDataHome": "$RUN_HOME/.local/share",
+        "xdgCacheHome": "$RUN_HOME/.cache",
+        "temp": "$RUN_HOME/tmp",
+        "codexHome": "$RUN_HOME/.codex",
+        "webviewData": "$RUN_HOME/.aio-benchmark/webview"
+      },
+      "cleanup": {
+        "terminated": [],
+        "skipped": [],
+        "errors": []
+      },
+      "milestones": [
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-05",
+          "scenario": "startup-cold-process",
+          "seq": 1,
+          "milestone": "process_entry",
+          "elapsedMs": 0.0426,
+          "wallClockUnixMs": 1784173706661,
+          "data": {
+            "appVersion": "0.60.13",
+            "pid": 55012
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-05",
+          "scenario": "startup-cold-process",
+          "seq": 2,
+          "milestone": "tauri_setup_started",
+          "elapsedMs": 247.8155,
+          "wallClockUnixMs": 1784173706909,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-05",
+          "scenario": "startup-cold-process",
+          "seq": 3,
+          "milestone": "tauri_setup_completed",
+          "elapsedMs": 254.7933,
+          "wallClockUnixMs": 1784173706916,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-05",
+          "scenario": "startup-cold-process",
+          "seq": 4,
+          "milestone": "startup_run_started",
+          "elapsedMs": 254.9537,
+          "wallClockUnixMs": 1784173706916,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-05",
+          "scenario": "startup-cold-process",
+          "seq": 5,
+          "milestone": "db_ready",
+          "elapsedMs": 260.3209,
+          "wallClockUnixMs": 1784173706921,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-05",
+          "scenario": "startup-cold-process",
+          "seq": 6,
+          "milestone": "settings_ready",
+          "elapsedMs": 261.0384,
+          "wallClockUnixMs": 1784173706922,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-05",
+          "scenario": "startup-cold-process",
+          "seq": 7,
+          "milestone": "window_visible",
+          "elapsedMs": 283.9058,
+          "wallClockUnixMs": 1784173706945,
+          "data": {
+            "logicalHeight": 900,
+            "logicalWidth": 1500,
+            "physicalHeight": 900,
+            "physicalWidth": 1500,
+            "scaleFactor": 1,
+            "startMinimized": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-05",
+          "scenario": "startup-cold-process",
+          "seq": 8,
+          "milestone": "gateway_bound",
+          "elapsedMs": 299.12420000000003,
+          "wallClockUnixMs": 1784173706960,
+          "data": {
+            "listenAddr": "127.0.0.1:37124",
+            "port": 37124
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-05",
+          "scenario": "startup-cold-process",
+          "seq": 9,
+          "milestone": "gateway_ready",
+          "elapsedMs": 302.4481,
+          "wallClockUnixMs": 1784173706964,
+          "data": {
+            "port": 37124
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-05",
+          "scenario": "startup-cold-process",
+          "seq": 10,
+          "milestone": "startup_ready",
+          "elapsedMs": 303.12879999999996,
+          "wallClockUnixMs": 1784173706964,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-05",
+          "scenario": "startup-cold-process",
+          "seq": 11,
+          "milestone": "first_interactive",
+          "elapsedMs": 671.4999,
+          "wallClockUnixMs": 1784173707333,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-05",
+          "scenario": "startup-cold-process",
+          "seq": 12,
+          "milestone": "scenario_completed",
+          "elapsedMs": 672.6595,
+          "wallClockUnixMs": 1784173707334,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-05",
+          "scenario": "startup-cold-process",
+          "seq": 13,
+          "milestone": "shutdown_started",
+          "elapsedMs": 672.766,
+          "wallClockUnixMs": 1784173707334,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-05",
+          "scenario": "startup-cold-process",
+          "seq": 14,
+          "milestone": "shutdown_completed",
+          "elapsedMs": 673.7570000000001,
+          "wallClockUnixMs": 1784173707335,
+          "data": {}
+        }
+      ],
+      "samples": [
+        {
+          "atMs": 373.33380000000034,
+          "atUnixMs": 1784173707028,
+          "processes": [
+            {
+              "pid": 43208,
+              "ppid": 56332,
+              "birthToken": "unix-ms:1784173706841",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 49254400,
+              "privateBytes": 24530944,
+              "cpuTimeMs": 62.5
+            },
+            {
+              "pid": 49852,
+              "ppid": 56332,
+              "birthToken": "unix-ms:1784173706694",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 10575872,
+              "privateBytes": 2547712,
+              "cpuTimeMs": 0
+            },
+            {
+              "pid": 50848,
+              "ppid": 56332,
+              "birthToken": "unix-ms:1784173706795",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 19709952,
+              "privateBytes": 9428992,
+              "cpuTimeMs": 31.25
+            },
+            {
+              "pid": 55012,
+              "ppid": 45672,
+              "birthToken": "unix-ms:1784173706654",
+              "identityPrecision": "exact",
+              "imageName": "aio-coding-hub.exe",
+              "workingSetBytes": 31596544,
+              "privateBytes": 10141696,
+              "cpuTimeMs": 78.125
+            },
+            {
+              "pid": 56332,
+              "ppid": 55012,
+              "birthToken": "unix-ms:1784173706684",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 122572800,
+              "privateBytes": 45334528,
+              "cpuTimeMs": 421.875
+            },
+            {
+              "pid": 58244,
+              "ppid": 56332,
+              "birthToken": "unix-ms:1784173706778",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 32542720,
+              "privateBytes": 15388672,
+              "cpuTimeMs": 140.625
+            },
+            {
+              "pid": 58824,
+              "ppid": 56332,
+              "birthToken": "unix-ms:1784173706780",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 38445056,
+              "privateBytes": 14479360,
+              "cpuTimeMs": 93.75
+            }
+          ],
+          "totals": {
+            "processCount": 7,
+            "workingSetBytes": 304697344,
+            "privateBytes": 121851904,
+            "cpuTimeMs": 828.125
+          }
+        }
+      ],
+      "stdout": "",
+      "stderr": "",
+      "warnings": [],
+      "failures": [],
+      "metrics": {
+        "tauriSetupCompletedMs": 254.7933,
+        "dbReadyMs": 260.3209,
+        "gatewayReadyMs": 302.4481,
+        "startupReadyMs": 303.12879999999996,
+        "firstInteractiveMs": 671.4999,
+        "shutdownCompletedMs": 673.7570000000001,
+        "launchToProcessEntryMs": 9,
+        "launchToTauriSetupCompletedMs": 263.7507,
+        "launchToDbReadyMs": 269.2783,
+        "launchToGatewayReadyMs": 311.4055,
+        "launchToStartupReadyMs": 312.08619999999996,
+        "launchToFirstInteractiveMs": 680.4573,
+        "launchToShutdownCompletedMs": 682.7144000000001,
+        "windowPhysicalWidth": 1500,
+        "windowPhysicalHeight": 900,
+        "windowLogicalWidth": 1500,
+        "windowLogicalHeight": 900,
+        "windowScaleFactor": 1,
+        "peakWorkingSetBytes": 304697344,
+        "medianWorkingSetBytes": 304697344,
+        "peakPrivateBytes": 121851904,
+        "cpuTimeDeltaMs": 0,
+        "maxProcessCount": 7
+      },
+      "index": 4
+    },
+    {
+      "runId": "startup-cold-process-run-06",
+      "scenario": "startup-cold-process",
+      "launchStartedUnixMs": 1784173707869,
+      "exitCode": 0,
+      "signal": null,
+      "durationMs": 1094.9215999999997,
+      "isolation": {
+        "home": "$RUN_HOME",
+        "appData": "$RUN_HOME/.aio-coding-hub",
+        "roamingAppData": "$RUN_HOME/AppData/Roaming",
+        "localAppData": "$RUN_HOME/AppData/Local",
+        "xdgConfigHome": "$RUN_HOME/.config",
+        "xdgDataHome": "$RUN_HOME/.local/share",
+        "xdgCacheHome": "$RUN_HOME/.cache",
+        "temp": "$RUN_HOME/tmp",
+        "codexHome": "$RUN_HOME/.codex",
+        "webviewData": "$RUN_HOME/.aio-benchmark/webview"
+      },
+      "cleanup": {
+        "terminated": [],
+        "skipped": [],
+        "errors": []
+      },
+      "milestones": [
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-06",
+          "scenario": "startup-cold-process",
+          "seq": 1,
+          "milestone": "process_entry",
+          "elapsedMs": 0.0439,
+          "wallClockUnixMs": 1784173707878,
+          "data": {
+            "appVersion": "0.60.13",
+            "pid": 57728
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-06",
+          "scenario": "startup-cold-process",
+          "seq": 2,
+          "milestone": "tauri_setup_started",
+          "elapsedMs": 234.7804,
+          "wallClockUnixMs": 1784173708113,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-06",
+          "scenario": "startup-cold-process",
+          "seq": 3,
+          "milestone": "tauri_setup_completed",
+          "elapsedMs": 242.2955,
+          "wallClockUnixMs": 1784173708121,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-06",
+          "scenario": "startup-cold-process",
+          "seq": 4,
+          "milestone": "startup_run_started",
+          "elapsedMs": 242.4411,
+          "wallClockUnixMs": 1784173708121,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-06",
+          "scenario": "startup-cold-process",
+          "seq": 5,
+          "milestone": "db_ready",
+          "elapsedMs": 248.143,
+          "wallClockUnixMs": 1784173708126,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-06",
+          "scenario": "startup-cold-process",
+          "seq": 6,
+          "milestone": "settings_ready",
+          "elapsedMs": 248.8031,
+          "wallClockUnixMs": 1784173708127,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-06",
+          "scenario": "startup-cold-process",
+          "seq": 7,
+          "milestone": "window_visible",
+          "elapsedMs": 270.646,
+          "wallClockUnixMs": 1784173708149,
+          "data": {
+            "logicalHeight": 900,
+            "logicalWidth": 1500,
+            "physicalHeight": 900,
+            "physicalWidth": 1500,
+            "scaleFactor": 1,
+            "startMinimized": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-06",
+          "scenario": "startup-cold-process",
+          "seq": 8,
+          "milestone": "gateway_bound",
+          "elapsedMs": 286.3736,
+          "wallClockUnixMs": 1784173708165,
+          "data": {
+            "listenAddr": "127.0.0.1:37124",
+            "port": 37124
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-06",
+          "scenario": "startup-cold-process",
+          "seq": 9,
+          "milestone": "gateway_ready",
+          "elapsedMs": 289.7299,
+          "wallClockUnixMs": 1784173708168,
+          "data": {
+            "port": 37124
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-06",
+          "scenario": "startup-cold-process",
+          "seq": 10,
+          "milestone": "startup_ready",
+          "elapsedMs": 290.3947,
+          "wallClockUnixMs": 1784173708169,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-06",
+          "scenario": "startup-cold-process",
+          "seq": 11,
+          "milestone": "first_interactive",
+          "elapsedMs": 608.9884,
+          "wallClockUnixMs": 1784173708487,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-06",
+          "scenario": "startup-cold-process",
+          "seq": 12,
+          "milestone": "scenario_completed",
+          "elapsedMs": 610.1997,
+          "wallClockUnixMs": 1784173708488,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-06",
+          "scenario": "startup-cold-process",
+          "seq": 13,
+          "milestone": "shutdown_started",
+          "elapsedMs": 610.3408000000001,
+          "wallClockUnixMs": 1784173708489,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-06",
+          "scenario": "startup-cold-process",
+          "seq": 14,
+          "milestone": "shutdown_completed",
+          "elapsedMs": 611.1852,
+          "wallClockUnixMs": 1784173708489,
+          "data": {}
+        }
+      ],
+      "samples": [
+        {
+          "atMs": 374.3201999999983,
+          "atUnixMs": 1784173708246,
+          "processes": [
+            {
+              "pid": 36604,
+              "ppid": 37664,
+              "birthToken": "unix-ms:1784173707991",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 39227392,
+              "privateBytes": 14745600,
+              "cpuTimeMs": 125
+            },
+            {
+              "pid": 37664,
+              "ppid": 57728,
+              "birthToken": "unix-ms:1784173707895",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 123621376,
+              "privateBytes": 45383680,
+              "cpuTimeMs": 437.5
+            },
+            {
+              "pid": 39696,
+              "ppid": 37664,
+              "birthToken": "unix-ms:1784173707904",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 10584064,
+              "privateBytes": 2551808,
+              "cpuTimeMs": 15.625
+            },
+            {
+              "pid": 45736,
+              "ppid": 37664,
+              "birthToken": "unix-ms:1784173707988",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 32890880,
+              "privateBytes": 15388672,
+              "cpuTimeMs": 125
+            },
+            {
+              "pid": 56692,
+              "ppid": 37664,
+              "birthToken": "unix-ms:1784173708049",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 49852416,
+              "privateBytes": 22528000,
+              "cpuTimeMs": 78.125
+            },
+            {
+              "pid": 57728,
+              "ppid": 45672,
+              "birthToken": "unix-ms:1784173707870",
+              "identityPrecision": "exact",
+              "imageName": "aio-coding-hub.exe",
+              "workingSetBytes": 35504128,
+              "privateBytes": 11223040,
+              "cpuTimeMs": 46.875
+            },
+            {
+              "pid": 60716,
+              "ppid": 37664,
+              "birthToken": "unix-ms:1784173708006",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 20054016,
+              "privateBytes": 9457664,
+              "cpuTimeMs": 15.625
+            }
+          ],
+          "totals": {
+            "processCount": 7,
+            "workingSetBytes": 311734272,
+            "privateBytes": 121278464,
+            "cpuTimeMs": 843.75
+          }
+        }
+      ],
+      "stdout": "",
+      "stderr": "",
+      "warnings": [],
+      "failures": [],
+      "metrics": {
+        "tauriSetupCompletedMs": 242.2955,
+        "dbReadyMs": 248.143,
+        "gatewayReadyMs": 289.7299,
+        "startupReadyMs": 290.3947,
+        "firstInteractiveMs": 608.9884,
+        "shutdownCompletedMs": 611.1852,
+        "launchToProcessEntryMs": 9,
+        "launchToTauriSetupCompletedMs": 251.2516,
+        "launchToDbReadyMs": 257.0991,
+        "launchToGatewayReadyMs": 298.686,
+        "launchToStartupReadyMs": 299.3508,
+        "launchToFirstInteractiveMs": 617.9445,
+        "launchToShutdownCompletedMs": 620.1413,
+        "windowPhysicalWidth": 1500,
+        "windowPhysicalHeight": 900,
+        "windowLogicalWidth": 1500,
+        "windowLogicalHeight": 900,
+        "windowScaleFactor": 1,
+        "peakWorkingSetBytes": 311734272,
+        "medianWorkingSetBytes": 311734272,
+        "peakPrivateBytes": 121278464,
+        "cpuTimeDeltaMs": 0,
+        "maxProcessCount": 7
+      },
+      "index": 5
+    },
+    {
+      "runId": "startup-cold-process-run-07",
+      "scenario": "startup-cold-process",
+      "launchStartedUnixMs": 1784173709016,
+      "exitCode": 0,
+      "signal": null,
+      "durationMs": 1184.2392999999993,
+      "isolation": {
+        "home": "$RUN_HOME",
+        "appData": "$RUN_HOME/.aio-coding-hub",
+        "roamingAppData": "$RUN_HOME/AppData/Roaming",
+        "localAppData": "$RUN_HOME/AppData/Local",
+        "xdgConfigHome": "$RUN_HOME/.config",
+        "xdgDataHome": "$RUN_HOME/.local/share",
+        "xdgCacheHome": "$RUN_HOME/.cache",
+        "temp": "$RUN_HOME/tmp",
+        "codexHome": "$RUN_HOME/.codex",
+        "webviewData": "$RUN_HOME/.aio-benchmark/webview"
+      },
+      "cleanup": {
+        "terminated": [],
+        "skipped": [],
+        "errors": []
+      },
+      "milestones": [
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-07",
+          "scenario": "startup-cold-process",
+          "seq": 1,
+          "milestone": "process_entry",
+          "elapsedMs": 0.0455,
+          "wallClockUnixMs": 1784173709025,
+          "data": {
+            "appVersion": "0.60.13",
+            "pid": 37512
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-07",
+          "scenario": "startup-cold-process",
+          "seq": 2,
+          "milestone": "tauri_setup_started",
+          "elapsedMs": 251.57309999999998,
+          "wallClockUnixMs": 1784173709277,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-07",
+          "scenario": "startup-cold-process",
+          "seq": 3,
+          "milestone": "tauri_setup_completed",
+          "elapsedMs": 258.4763,
+          "wallClockUnixMs": 1784173709284,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-07",
+          "scenario": "startup-cold-process",
+          "seq": 4,
+          "milestone": "startup_run_started",
+          "elapsedMs": 258.6595,
+          "wallClockUnixMs": 1784173709284,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-07",
+          "scenario": "startup-cold-process",
+          "seq": 5,
+          "milestone": "db_ready",
+          "elapsedMs": 264.72950000000003,
+          "wallClockUnixMs": 1784173709290,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-07",
+          "scenario": "startup-cold-process",
+          "seq": 6,
+          "milestone": "settings_ready",
+          "elapsedMs": 265.37129999999996,
+          "wallClockUnixMs": 1784173709291,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-07",
+          "scenario": "startup-cold-process",
+          "seq": 7,
+          "milestone": "window_visible",
+          "elapsedMs": 289.8773,
+          "wallClockUnixMs": 1784173709315,
+          "data": {
+            "logicalHeight": 900,
+            "logicalWidth": 1500,
+            "physicalHeight": 900,
+            "physicalWidth": 1500,
+            "scaleFactor": 1,
+            "startMinimized": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-07",
+          "scenario": "startup-cold-process",
+          "seq": 8,
+          "milestone": "gateway_bound",
+          "elapsedMs": 305.01270000000005,
+          "wallClockUnixMs": 1784173709330,
+          "data": {
+            "listenAddr": "127.0.0.1:37124",
+            "port": 37124
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-07",
+          "scenario": "startup-cold-process",
+          "seq": 9,
+          "milestone": "gateway_ready",
+          "elapsedMs": 308.7213,
+          "wallClockUnixMs": 1784173709334,
+          "data": {
+            "port": 37124
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-07",
+          "scenario": "startup-cold-process",
+          "seq": 10,
+          "milestone": "startup_ready",
+          "elapsedMs": 309.4381,
+          "wallClockUnixMs": 1784173709335,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-07",
+          "scenario": "startup-cold-process",
+          "seq": 11,
+          "milestone": "first_interactive",
+          "elapsedMs": 684.4962999999999,
+          "wallClockUnixMs": 1784173709710,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-07",
+          "scenario": "startup-cold-process",
+          "seq": 12,
+          "milestone": "scenario_completed",
+          "elapsedMs": 685.7262,
+          "wallClockUnixMs": 1784173709711,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-07",
+          "scenario": "startup-cold-process",
+          "seq": 13,
+          "milestone": "shutdown_started",
+          "elapsedMs": 685.8421999999999,
+          "wallClockUnixMs": 1784173709711,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-07",
+          "scenario": "startup-cold-process",
+          "seq": 14,
+          "milestone": "shutdown_completed",
+          "elapsedMs": 686.6139,
+          "wallClockUnixMs": 1784173709712,
+          "data": {}
+        }
+      ],
+      "samples": [
+        {
+          "atMs": 391.9313999999995,
+          "atUnixMs": 1784173709410,
+          "processes": [
+            {
+              "pid": 18192,
+              "ppid": 48340,
+              "birthToken": "unix-ms:1784173709062",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 10579968,
+              "privateBytes": 2560000,
+              "cpuTimeMs": 15.625
+            },
+            {
+              "pid": 29980,
+              "ppid": 48340,
+              "birthToken": "unix-ms:1784173709165",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 20021248,
+              "privateBytes": 9457664,
+              "cpuTimeMs": 31.25
+            },
+            {
+              "pid": 37512,
+              "ppid": 45672,
+              "birthToken": "unix-ms:1784173709017",
+              "identityPrecision": "exact",
+              "imageName": "aio-coding-hub.exe",
+              "workingSetBytes": 35561472,
+              "privateBytes": 11227136,
+              "cpuTimeMs": 62.5
+            },
+            {
+              "pid": 48340,
+              "ppid": 37512,
+              "birthToken": "unix-ms:1784173709042",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 122916864,
+              "privateBytes": 44765184,
+              "cpuTimeMs": 343.75
+            },
+            {
+              "pid": 50572,
+              "ppid": 48340,
+              "birthToken": "unix-ms:1784173709213",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 49827840,
+              "privateBytes": 22499328,
+              "cpuTimeMs": 62.5
+            },
+            {
+              "pid": 59044,
+              "ppid": 48340,
+              "birthToken": "unix-ms:1784173709147",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 35962880,
+              "privateBytes": 41111552,
+              "cpuTimeMs": 140.625
+            },
+            {
+              "pid": 61592,
+              "ppid": 48340,
+              "birthToken": "unix-ms:1784173709150",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 39358464,
+              "privateBytes": 14888960,
+              "cpuTimeMs": 62.5
+            }
+          ],
+          "totals": {
+            "processCount": 7,
+            "workingSetBytes": 314228736,
+            "privateBytes": 146509824,
+            "cpuTimeMs": 718.75
+          }
+        }
+      ],
+      "stdout": "",
+      "stderr": "",
+      "warnings": [],
+      "failures": [],
+      "metrics": {
+        "tauriSetupCompletedMs": 258.4763,
+        "dbReadyMs": 264.72950000000003,
+        "gatewayReadyMs": 308.7213,
+        "startupReadyMs": 309.4381,
+        "firstInteractiveMs": 684.4962999999999,
+        "shutdownCompletedMs": 686.6139,
+        "launchToProcessEntryMs": 9,
+        "launchToTauriSetupCompletedMs": 267.4308,
+        "launchToDbReadyMs": 273.684,
+        "launchToGatewayReadyMs": 317.6758,
+        "launchToStartupReadyMs": 318.3926,
+        "launchToFirstInteractiveMs": 693.4508,
+        "launchToShutdownCompletedMs": 695.5684,
+        "windowPhysicalWidth": 1500,
+        "windowPhysicalHeight": 900,
+        "windowLogicalWidth": 1500,
+        "windowLogicalHeight": 900,
+        "windowScaleFactor": 1,
+        "peakWorkingSetBytes": 314228736,
+        "medianWorkingSetBytes": 314228736,
+        "peakPrivateBytes": 146509824,
+        "cpuTimeDeltaMs": 0,
+        "maxProcessCount": 7
+      },
+      "index": 6
+    },
+    {
+      "runId": "startup-cold-process-run-08",
+      "scenario": "startup-cold-process",
+      "launchStartedUnixMs": 1784173710253,
+      "exitCode": 0,
+      "signal": null,
+      "durationMs": 1166.2052999999996,
+      "isolation": {
+        "home": "$RUN_HOME",
+        "appData": "$RUN_HOME/.aio-coding-hub",
+        "roamingAppData": "$RUN_HOME/AppData/Roaming",
+        "localAppData": "$RUN_HOME/AppData/Local",
+        "xdgConfigHome": "$RUN_HOME/.config",
+        "xdgDataHome": "$RUN_HOME/.local/share",
+        "xdgCacheHome": "$RUN_HOME/.cache",
+        "temp": "$RUN_HOME/tmp",
+        "codexHome": "$RUN_HOME/.codex",
+        "webviewData": "$RUN_HOME/.aio-benchmark/webview"
+      },
+      "cleanup": {
+        "terminated": [],
+        "skipped": [],
+        "errors": []
+      },
+      "milestones": [
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-08",
+          "scenario": "startup-cold-process",
+          "seq": 1,
+          "milestone": "process_entry",
+          "elapsedMs": 0.0424,
+          "wallClockUnixMs": 1784173710262,
+          "data": {
+            "appVersion": "0.60.13",
+            "pid": 26580
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-08",
+          "scenario": "startup-cold-process",
+          "seq": 2,
+          "milestone": "tauri_setup_started",
+          "elapsedMs": 235.3166,
+          "wallClockUnixMs": 1784173710498,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-08",
+          "scenario": "startup-cold-process",
+          "seq": 3,
+          "milestone": "tauri_setup_completed",
+          "elapsedMs": 242.605,
+          "wallClockUnixMs": 1784173710505,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-08",
+          "scenario": "startup-cold-process",
+          "seq": 4,
+          "milestone": "startup_run_started",
+          "elapsedMs": 242.7798,
+          "wallClockUnixMs": 1784173710505,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-08",
+          "scenario": "startup-cold-process",
+          "seq": 5,
+          "milestone": "db_ready",
+          "elapsedMs": 248.82000000000002,
+          "wallClockUnixMs": 1784173710511,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-08",
+          "scenario": "startup-cold-process",
+          "seq": 6,
+          "milestone": "settings_ready",
+          "elapsedMs": 249.6449,
+          "wallClockUnixMs": 1784173710512,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-08",
+          "scenario": "startup-cold-process",
+          "seq": 7,
+          "milestone": "window_visible",
+          "elapsedMs": 272.2237,
+          "wallClockUnixMs": 1784173710535,
+          "data": {
+            "logicalHeight": 900,
+            "logicalWidth": 1500,
+            "physicalHeight": 900,
+            "physicalWidth": 1500,
+            "scaleFactor": 1,
+            "startMinimized": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-08",
+          "scenario": "startup-cold-process",
+          "seq": 8,
+          "milestone": "gateway_bound",
+          "elapsedMs": 288.63030000000003,
+          "wallClockUnixMs": 1784173710551,
+          "data": {
+            "listenAddr": "127.0.0.1:37124",
+            "port": 37124
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-08",
+          "scenario": "startup-cold-process",
+          "seq": 9,
+          "milestone": "gateway_ready",
+          "elapsedMs": 292.379,
+          "wallClockUnixMs": 1784173710555,
+          "data": {
+            "port": 37124
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-08",
+          "scenario": "startup-cold-process",
+          "seq": 10,
+          "milestone": "startup_ready",
+          "elapsedMs": 293.09839999999997,
+          "wallClockUnixMs": 1784173710555,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-08",
+          "scenario": "startup-cold-process",
+          "seq": 11,
+          "milestone": "first_interactive",
+          "elapsedMs": 640.6359,
+          "wallClockUnixMs": 1784173710903,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-08",
+          "scenario": "startup-cold-process",
+          "seq": 12,
+          "milestone": "scenario_completed",
+          "elapsedMs": 642.7393,
+          "wallClockUnixMs": 1784173710905,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-08",
+          "scenario": "startup-cold-process",
+          "seq": 13,
+          "milestone": "shutdown_started",
+          "elapsedMs": 642.8619,
+          "wallClockUnixMs": 1784173710905,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-08",
+          "scenario": "startup-cold-process",
+          "seq": 14,
+          "milestone": "shutdown_completed",
+          "elapsedMs": 643.7699,
+          "wallClockUnixMs": 1784173710906,
+          "data": {}
+        }
+      ],
+      "samples": [
+        {
+          "atMs": 391.53799999999865,
+          "atUnixMs": 1784173710647,
+          "processes": [
+            {
+              "pid": 7148,
+              "ppid": 47692,
+              "birthToken": "unix-ms:1784173710391",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 20185088,
+              "privateBytes": 9494528,
+              "cpuTimeMs": 31.25
+            },
+            {
+              "pid": 26580,
+              "ppid": 45672,
+              "birthToken": "unix-ms:1784173710254",
+              "identityPrecision": "exact",
+              "imageName": "aio-coding-hub.exe",
+              "workingSetBytes": 37318656,
+              "privateBytes": 12959744,
+              "cpuTimeMs": 15.625
+            },
+            {
+              "pid": 45548,
+              "ppid": 47692,
+              "birthToken": "unix-ms:1784173710373",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 38342656,
+              "privateBytes": 41930752,
+              "cpuTimeMs": 156.25
+            },
+            {
+              "pid": 47692,
+              "ppid": 26580,
+              "birthToken": "unix-ms:1784173710279",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 124358656,
+              "privateBytes": 45838336,
+              "cpuTimeMs": 421.875
+            },
+            {
+              "pid": 48732,
+              "ppid": 47692,
+              "birthToken": "unix-ms:1784173710433",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 49963008,
+              "privateBytes": 22544384,
+              "cpuTimeMs": 46.875
+            },
+            {
+              "pid": 56416,
+              "ppid": 47692,
+              "birthToken": "unix-ms:1784173710288",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 10579968,
+              "privateBytes": 2551808,
+              "cpuTimeMs": 0
+            },
+            {
+              "pid": 60960,
+              "ppid": 47692,
+              "birthToken": "unix-ms:1784173710375",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 39190528,
+              "privateBytes": 14655488,
+              "cpuTimeMs": 171.875
+            }
+          ],
+          "totals": {
+            "processCount": 7,
+            "workingSetBytes": 319938560,
+            "privateBytes": 149975040,
+            "cpuTimeMs": 843.75
+          }
+        }
+      ],
+      "stdout": "",
+      "stderr": "",
+      "warnings": [],
+      "failures": [],
+      "metrics": {
+        "tauriSetupCompletedMs": 242.605,
+        "dbReadyMs": 248.82000000000002,
+        "gatewayReadyMs": 292.379,
+        "startupReadyMs": 293.09839999999997,
+        "firstInteractiveMs": 640.6359,
+        "shutdownCompletedMs": 643.7699,
+        "launchToProcessEntryMs": 9,
+        "launchToTauriSetupCompletedMs": 251.5626,
+        "launchToDbReadyMs": 257.77760000000006,
+        "launchToGatewayReadyMs": 301.33660000000003,
+        "launchToStartupReadyMs": 302.056,
+        "launchToFirstInteractiveMs": 649.5935,
+        "launchToShutdownCompletedMs": 652.7275,
+        "windowPhysicalWidth": 1500,
+        "windowPhysicalHeight": 900,
+        "windowLogicalWidth": 1500,
+        "windowLogicalHeight": 900,
+        "windowScaleFactor": 1,
+        "peakWorkingSetBytes": 319938560,
+        "medianWorkingSetBytes": 319938560,
+        "peakPrivateBytes": 149975040,
+        "cpuTimeDeltaMs": 0,
+        "maxProcessCount": 7
+      },
+      "index": 7
+    },
+    {
+      "runId": "startup-cold-process-run-09",
+      "scenario": "startup-cold-process",
+      "launchStartedUnixMs": 1784173711467,
+      "exitCode": 0,
+      "signal": null,
+      "durationMs": 1159.7109999999993,
+      "isolation": {
+        "home": "$RUN_HOME",
+        "appData": "$RUN_HOME/.aio-coding-hub",
+        "roamingAppData": "$RUN_HOME/AppData/Roaming",
+        "localAppData": "$RUN_HOME/AppData/Local",
+        "xdgConfigHome": "$RUN_HOME/.config",
+        "xdgDataHome": "$RUN_HOME/.local/share",
+        "xdgCacheHome": "$RUN_HOME/.cache",
+        "temp": "$RUN_HOME/tmp",
+        "codexHome": "$RUN_HOME/.codex",
+        "webviewData": "$RUN_HOME/.aio-benchmark/webview"
+      },
+      "cleanup": {
+        "terminated": [],
+        "skipped": [],
+        "errors": []
+      },
+      "milestones": [
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-09",
+          "scenario": "startup-cold-process",
+          "seq": 1,
+          "milestone": "process_entry",
+          "elapsedMs": 0.0436,
+          "wallClockUnixMs": 1784173711476,
+          "data": {
+            "appVersion": "0.60.13",
+            "pid": 55904
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-09",
+          "scenario": "startup-cold-process",
+          "seq": 2,
+          "milestone": "tauri_setup_started",
+          "elapsedMs": 240.0267,
+          "wallClockUnixMs": 1784173711716,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-09",
+          "scenario": "startup-cold-process",
+          "seq": 3,
+          "milestone": "tauri_setup_completed",
+          "elapsedMs": 248.0195,
+          "wallClockUnixMs": 1784173711724,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-09",
+          "scenario": "startup-cold-process",
+          "seq": 4,
+          "milestone": "startup_run_started",
+          "elapsedMs": 248.1748,
+          "wallClockUnixMs": 1784173711724,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-09",
+          "scenario": "startup-cold-process",
+          "seq": 5,
+          "milestone": "db_ready",
+          "elapsedMs": 254.21319999999997,
+          "wallClockUnixMs": 1784173711730,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-09",
+          "scenario": "startup-cold-process",
+          "seq": 6,
+          "milestone": "settings_ready",
+          "elapsedMs": 254.8447,
+          "wallClockUnixMs": 1784173711731,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-09",
+          "scenario": "startup-cold-process",
+          "seq": 7,
+          "milestone": "window_visible",
+          "elapsedMs": 278.6872,
+          "wallClockUnixMs": 1784173711754,
+          "data": {
+            "logicalHeight": 900,
+            "logicalWidth": 1500,
+            "physicalHeight": 900,
+            "physicalWidth": 1500,
+            "scaleFactor": 1,
+            "startMinimized": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-09",
+          "scenario": "startup-cold-process",
+          "seq": 8,
+          "milestone": "gateway_bound",
+          "elapsedMs": 294.1288,
+          "wallClockUnixMs": 1784173711770,
+          "data": {
+            "listenAddr": "127.0.0.1:37124",
+            "port": 37124
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-09",
+          "scenario": "startup-cold-process",
+          "seq": 9,
+          "milestone": "gateway_ready",
+          "elapsedMs": 297.23159999999996,
+          "wallClockUnixMs": 1784173711773,
+          "data": {
+            "port": 37124
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-09",
+          "scenario": "startup-cold-process",
+          "seq": 10,
+          "milestone": "startup_ready",
+          "elapsedMs": 297.929,
+          "wallClockUnixMs": 1784173711774,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-09",
+          "scenario": "startup-cold-process",
+          "seq": 11,
+          "milestone": "first_interactive",
+          "elapsedMs": 667.8458,
+          "wallClockUnixMs": 1784173712144,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-09",
+          "scenario": "startup-cold-process",
+          "seq": 12,
+          "milestone": "scenario_completed",
+          "elapsedMs": 669.4789,
+          "wallClockUnixMs": 1784173712145,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-09",
+          "scenario": "startup-cold-process",
+          "seq": 13,
+          "milestone": "shutdown_started",
+          "elapsedMs": 669.6051,
+          "wallClockUnixMs": 1784173712145,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-09",
+          "scenario": "startup-cold-process",
+          "seq": 14,
+          "milestone": "shutdown_completed",
+          "elapsedMs": 670.5569999999999,
+          "wallClockUnixMs": 1784173712146,
+          "data": {}
+        }
+      ],
+      "samples": [
+        {
+          "atMs": 398.58280000000013,
+          "atUnixMs": 1784173711867,
+          "processes": [
+            {
+              "pid": 10184,
+              "ppid": 55904,
+              "birthToken": "unix-ms:1784173711493",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 123850752,
+              "privateBytes": 45350912,
+              "cpuTimeMs": 437.5
+            },
+            {
+              "pid": 16752,
+              "ppid": 10184,
+              "birthToken": "unix-ms:1784173711650",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 49913856,
+              "privateBytes": 22532096,
+              "cpuTimeMs": 78.125
+            },
+            {
+              "pid": 46792,
+              "ppid": 10184,
+              "birthToken": "unix-ms:1784173711503",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 10588160,
+              "privateBytes": 2568192,
+              "cpuTimeMs": 0
+            },
+            {
+              "pid": 47824,
+              "ppid": 10184,
+              "birthToken": "unix-ms:1784173711589",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 45920256,
+              "privateBytes": 54788096,
+              "cpuTimeMs": 265.625
+            },
+            {
+              "pid": 55904,
+              "ppid": 45672,
+              "birthToken": "unix-ms:1784173711468",
+              "identityPrecision": "exact",
+              "imageName": "aio-coding-hub.exe",
+              "workingSetBytes": 40947712,
+              "privateBytes": 17145856,
+              "cpuTimeMs": 93.75
+            },
+            {
+              "pid": 59016,
+              "ppid": 10184,
+              "birthToken": "unix-ms:1784173711606",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 20193280,
+              "privateBytes": 9482240,
+              "cpuTimeMs": 31.25
+            },
+            {
+              "pid": 61204,
+              "ppid": 10184,
+              "birthToken": "unix-ms:1784173711590",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 39444480,
+              "privateBytes": 14893056,
+              "cpuTimeMs": 93.75
+            }
+          ],
+          "totals": {
+            "processCount": 7,
+            "workingSetBytes": 330858496,
+            "privateBytes": 166760448,
+            "cpuTimeMs": 1000
+          }
+        }
+      ],
+      "stdout": "",
+      "stderr": "",
+      "warnings": [],
+      "failures": [],
+      "metrics": {
+        "tauriSetupCompletedMs": 248.0195,
+        "dbReadyMs": 254.21319999999997,
+        "gatewayReadyMs": 297.23159999999996,
+        "startupReadyMs": 297.929,
+        "firstInteractiveMs": 667.8458,
+        "shutdownCompletedMs": 670.5569999999999,
+        "launchToProcessEntryMs": 9,
+        "launchToTauriSetupCompletedMs": 256.97589999999997,
+        "launchToDbReadyMs": 263.16959999999995,
+        "launchToGatewayReadyMs": 306.18799999999993,
+        "launchToStartupReadyMs": 306.88539999999995,
+        "launchToFirstInteractiveMs": 676.8022000000001,
+        "launchToShutdownCompletedMs": 679.5133999999999,
+        "windowPhysicalWidth": 1500,
+        "windowPhysicalHeight": 900,
+        "windowLogicalWidth": 1500,
+        "windowLogicalHeight": 900,
+        "windowScaleFactor": 1,
+        "peakWorkingSetBytes": 330858496,
+        "medianWorkingSetBytes": 330858496,
+        "peakPrivateBytes": 166760448,
+        "cpuTimeDeltaMs": 0,
+        "maxProcessCount": 7
+      },
+      "index": 8
+    },
+    {
+      "runId": "startup-cold-process-run-10",
+      "scenario": "startup-cold-process",
+      "launchStartedUnixMs": 1784173712676,
+      "exitCode": 0,
+      "signal": null,
+      "durationMs": 1168.6332999999995,
+      "isolation": {
+        "home": "$RUN_HOME",
+        "appData": "$RUN_HOME/.aio-coding-hub",
+        "roamingAppData": "$RUN_HOME/AppData/Roaming",
+        "localAppData": "$RUN_HOME/AppData/Local",
+        "xdgConfigHome": "$RUN_HOME/.config",
+        "xdgDataHome": "$RUN_HOME/.local/share",
+        "xdgCacheHome": "$RUN_HOME/.cache",
+        "temp": "$RUN_HOME/tmp",
+        "codexHome": "$RUN_HOME/.codex",
+        "webviewData": "$RUN_HOME/.aio-benchmark/webview"
+      },
+      "cleanup": {
+        "terminated": [],
+        "skipped": [],
+        "errors": []
+      },
+      "milestones": [
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-10",
+          "scenario": "startup-cold-process",
+          "seq": 1,
+          "milestone": "process_entry",
+          "elapsedMs": 0.040299999999999996,
+          "wallClockUnixMs": 1784173712685,
+          "data": {
+            "appVersion": "0.60.13",
+            "pid": 28052
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-10",
+          "scenario": "startup-cold-process",
+          "seq": 2,
+          "milestone": "tauri_setup_started",
+          "elapsedMs": 238.3422,
+          "wallClockUnixMs": 1784173712924,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-10",
+          "scenario": "startup-cold-process",
+          "seq": 3,
+          "milestone": "tauri_setup_completed",
+          "elapsedMs": 247.4652,
+          "wallClockUnixMs": 1784173712933,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-10",
+          "scenario": "startup-cold-process",
+          "seq": 4,
+          "milestone": "startup_run_started",
+          "elapsedMs": 247.6497,
+          "wallClockUnixMs": 1784173712933,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-10",
+          "scenario": "startup-cold-process",
+          "seq": 5,
+          "milestone": "db_ready",
+          "elapsedMs": 253.3199,
+          "wallClockUnixMs": 1784173712939,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-10",
+          "scenario": "startup-cold-process",
+          "seq": 6,
+          "milestone": "settings_ready",
+          "elapsedMs": 254.0955,
+          "wallClockUnixMs": 1784173712939,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-10",
+          "scenario": "startup-cold-process",
+          "seq": 7,
+          "milestone": "window_visible",
+          "elapsedMs": 277.02369999999996,
+          "wallClockUnixMs": 1784173712962,
+          "data": {
+            "logicalHeight": 900,
+            "logicalWidth": 1500,
+            "physicalHeight": 900,
+            "physicalWidth": 1500,
+            "scaleFactor": 1,
+            "startMinimized": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-10",
+          "scenario": "startup-cold-process",
+          "seq": 8,
+          "milestone": "gateway_bound",
+          "elapsedMs": 292.9326,
+          "wallClockUnixMs": 1784173712978,
+          "data": {
+            "listenAddr": "127.0.0.1:37124",
+            "port": 37124
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-10",
+          "scenario": "startup-cold-process",
+          "seq": 9,
+          "milestone": "gateway_ready",
+          "elapsedMs": 296.493,
+          "wallClockUnixMs": 1784173712982,
+          "data": {
+            "port": 37124
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-10",
+          "scenario": "startup-cold-process",
+          "seq": 10,
+          "milestone": "startup_ready",
+          "elapsedMs": 297.20439999999996,
+          "wallClockUnixMs": 1784173712982,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-10",
+          "scenario": "startup-cold-process",
+          "seq": 11,
+          "milestone": "first_interactive",
+          "elapsedMs": 670.3915999999999,
+          "wallClockUnixMs": 1784173713356,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-10",
+          "scenario": "startup-cold-process",
+          "seq": 12,
+          "milestone": "scenario_completed",
+          "elapsedMs": 671.5907,
+          "wallClockUnixMs": 1784173713357,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-10",
+          "scenario": "startup-cold-process",
+          "seq": 13,
+          "milestone": "shutdown_started",
+          "elapsedMs": 671.7236,
+          "wallClockUnixMs": 1784173713357,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "startup-cold-process-run-10",
+          "scenario": "startup-cold-process",
+          "seq": 14,
+          "milestone": "shutdown_completed",
+          "elapsedMs": 672.5663,
+          "wallClockUnixMs": 1784173713358,
+          "data": {}
+        }
+      ],
+      "samples": [
+        {
+          "atMs": 398.84820000000036,
+          "atUnixMs": 1784173713077,
+          "processes": [
+            {
+              "pid": 7336,
+              "ppid": 57528,
+              "birthToken": "unix-ms:1784173712799",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 39460864,
+              "privateBytes": 14958592,
+              "cpuTimeMs": 46.875
+            },
+            {
+              "pid": 28052,
+              "ppid": 45672,
+              "birthToken": "unix-ms:1784173712677",
+              "identityPrecision": "exact",
+              "imageName": "aio-coding-hub.exe",
+              "workingSetBytes": 36970496,
+              "privateBytes": 13361152,
+              "cpuTimeMs": 78.125
+            },
+            {
+              "pid": 28388,
+              "ppid": 57528,
+              "birthToken": "unix-ms:1784173712858",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 49909760,
+              "privateBytes": 22532096,
+              "cpuTimeMs": 62.5
+            },
+            {
+              "pid": 33524,
+              "ppid": 57528,
+              "birthToken": "unix-ms:1784173712814",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 20180992,
+              "privateBytes": 9490432,
+              "cpuTimeMs": 15.625
+            },
+            {
+              "pid": 34532,
+              "ppid": 57528,
+              "birthToken": "unix-ms:1784173712712",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 10575872,
+              "privateBytes": 2555904,
+              "cpuTimeMs": 15.625
+            },
+            {
+              "pid": 40148,
+              "ppid": 57528,
+              "birthToken": "unix-ms:1784173712796",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 40620032,
+              "privateBytes": 52101120,
+              "cpuTimeMs": 187.5
+            },
+            {
+              "pid": 57528,
+              "ppid": 28052,
+              "birthToken": "unix-ms:1784173712703",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 123625472,
+              "privateBytes": 44871680,
+              "cpuTimeMs": 515.625
+            }
+          ],
+          "totals": {
+            "processCount": 7,
+            "workingSetBytes": 321343488,
+            "privateBytes": 159870976,
+            "cpuTimeMs": 921.875
+          }
+        }
+      ],
+      "stdout": "",
+      "stderr": "",
+      "warnings": [],
+      "failures": [],
+      "metrics": {
+        "tauriSetupCompletedMs": 247.4652,
+        "dbReadyMs": 253.3199,
+        "gatewayReadyMs": 296.493,
+        "startupReadyMs": 297.20439999999996,
+        "firstInteractiveMs": 670.3915999999999,
+        "shutdownCompletedMs": 672.5663,
+        "launchToProcessEntryMs": 9,
+        "launchToTauriSetupCompletedMs": 256.4249,
+        "launchToDbReadyMs": 262.27959999999996,
+        "launchToGatewayReadyMs": 305.4527,
+        "launchToStartupReadyMs": 306.16409999999996,
+        "launchToFirstInteractiveMs": 679.3512999999999,
+        "launchToShutdownCompletedMs": 681.526,
+        "windowPhysicalWidth": 1500,
+        "windowPhysicalHeight": 900,
+        "windowLogicalWidth": 1500,
+        "windowLogicalHeight": 900,
+        "windowScaleFactor": 1,
+        "peakWorkingSetBytes": 321343488,
+        "medianWorkingSetBytes": 321343488,
+        "peakPrivateBytes": 159870976,
+        "cpuTimeDeltaMs": 0,
+        "maxProcessCount": 7
+      },
+      "index": 9
+    }
+  ],
+  "aggregates": {
+    "cpuTimeDeltaMs": {
+      "min": 0,
+      "max": 0,
+      "median": 0,
+      "p95": 0,
+      "samples": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "dbReadyMs": {
+      "min": 246.84320000000002,
+      "max": 281.6703,
+      "median": 253.08799999999997,
+      "p95": 281.6703,
+      "samples": [
+        252.85609999999997,
+        246.84320000000002,
+        281.6703,
+        252.36189999999996,
+        260.3209,
+        248.143,
+        264.72950000000003,
+        248.82000000000002,
+        254.21319999999997,
+        253.3199
+      ]
+    },
+    "firstInteractiveMs": {
+      "min": 608.9884,
+      "max": 696.1524000000001,
+      "median": 663.72315,
+      "p95": 696.1524000000001,
+      "samples": [
+        639.4599,
+        659.6005,
+        696.1524000000001,
+        614.0735000000001,
+        671.4999,
+        608.9884,
+        684.4962999999999,
+        640.6359,
+        667.8458,
+        670.3915999999999
+      ]
+    },
+    "gatewayReadyMs": {
+      "min": 289.7299,
+      "max": 323.8412,
+      "median": 296.18605,
+      "p95": 323.8412,
+      "samples": [
+        295.8791,
+        290.78090000000003,
+        323.8412,
+        293.9105,
+        302.4481,
+        289.7299,
+        308.7213,
+        292.379,
+        297.23159999999996,
+        296.493
+      ]
+    },
+    "launchToDbReadyMs": {
+      "min": 255.8,
+      "max": 289.6307,
+      "median": 262.2989,
+      "p95": 289.6307,
+      "samples": [
+        260.8132,
+        255.8,
+        289.6307,
+        262.3182,
+        269.2783,
+        257.0991,
+        273.684,
+        257.77760000000006,
+        263.16959999999995,
+        262.27959999999996
+      ]
+    },
+    "launchToFirstInteractiveMs": {
+      "min": 617.9445,
+      "max": 704.1128000000001,
+      "median": 672.67975,
+      "p95": 704.1128000000001,
+      "samples": [
+        647.4169999999999,
+        668.5573,
+        704.1128000000001,
+        624.0298000000001,
+        680.4573,
+        617.9445,
+        693.4508,
+        649.5935,
+        676.8022000000001,
+        679.3512999999999
+      ]
+    },
+    "launchToGatewayReadyMs": {
+      "min": 298.686,
+      "max": 331.8016,
+      "median": 304.65975000000003,
+      "p95": 331.8016,
+      "samples": [
+        303.8362,
+        299.7377,
+        331.8016,
+        303.8668,
+        311.4055,
+        298.686,
+        317.6758,
+        301.33660000000003,
+        306.18799999999993,
+        305.4527
+      ]
+    },
+    "launchToProcessEntryMs": {
+      "min": 7.999999999999999,
+      "max": 10,
+      "median": 9,
+      "p95": 10,
+      "samples": [
+        7.999999999999999,
+        9,
+        8,
+        10,
+        9,
+        9,
+        9,
+        9,
+        9,
+        9
+      ]
+    },
+    "launchToShutdownCompletedMs": {
+      "min": 620.1413,
+      "max": 706.3562000000001,
+      "median": 675.3511000000001,
+      "p95": 706.3562000000001,
+      "samples": [
+        650.1026999999999,
+        671.1888000000001,
+        706.3562000000001,
+        626.1521,
+        682.7144000000001,
+        620.1413,
+        695.5684,
+        652.7275,
+        679.5133999999999,
+        681.526
+      ]
+    },
+    "launchToStartupReadyMs": {
+      "min": 299.3508,
+      "max": 332.4837,
+      "median": 305.37289999999996,
+      "p95": 332.4837,
+      "samples": [
+        304.5794,
+        300.4231,
+        332.4837,
+        304.58169999999996,
+        312.08619999999996,
+        299.3508,
+        318.3926,
+        302.056,
+        306.88539999999995,
+        306.16409999999996
+      ]
+    },
+    "launchToTauriSetupCompletedMs": {
+      "min": 249.7886,
+      "max": 283.8802,
+      "median": 256.5349,
+      "p95": 283.8802,
+      "samples": [
+        254.84669999999997,
+        249.7886,
+        283.8802,
+        256.6449,
+        263.7507,
+        251.2516,
+        267.4308,
+        251.5626,
+        256.97589999999997,
+        256.4249
+      ]
+    },
+    "maxProcessCount": {
+      "min": 7,
+      "max": 7,
+      "median": 7,
+      "p95": 7,
+      "samples": [
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7
+      ]
+    },
+    "medianWorkingSetBytes": {
+      "min": 292970496,
+      "max": 330858496,
+      "median": 313534464,
+      "p95": 330858496,
+      "samples": [
+        310964224,
+        319557632,
+        292970496,
+        312840192,
+        304697344,
+        311734272,
+        314228736,
+        319938560,
+        330858496,
+        321343488
+      ]
+    },
+    "peakPrivateBytes": {
+      "min": 113381376,
+      "max": 166760448,
+      "median": 146894848,
+      "p95": 166760448,
+      "samples": [
+        146018304,
+        149209088,
+        113381376,
+        147279872,
+        121851904,
+        121278464,
+        146509824,
+        149975040,
+        166760448,
+        159870976
+      ]
+    },
+    "peakWorkingSetBytes": {
+      "min": 292970496,
+      "max": 330858496,
+      "median": 313534464,
+      "p95": 330858496,
+      "samples": [
+        310964224,
+        319557632,
+        292970496,
+        312840192,
+        304697344,
+        311734272,
+        314228736,
+        319938560,
+        330858496,
+        321343488
+      ]
+    },
+    "shutdownCompletedMs": {
+      "min": 611.1852,
+      "max": 698.3958,
+      "median": 666.3945,
+      "p95": 698.3958,
+      "samples": [
+        642.1456,
+        662.2320000000001,
+        698.3958,
+        616.1958,
+        673.7570000000001,
+        611.1852,
+        686.6139,
+        643.7699,
+        670.5569999999999,
+        672.5663
+      ]
+    },
+    "startupReadyMs": {
+      "min": 290.3947,
+      "max": 324.5233,
+      "median": 296.91335,
+      "p95": 324.5233,
+      "samples": [
+        296.6223,
+        291.4663,
+        324.5233,
+        294.62539999999996,
+        303.12879999999996,
+        290.3947,
+        309.4381,
+        293.09839999999997,
+        297.929,
+        297.20439999999996
+      ]
+    },
+    "tauriSetupCompletedMs": {
+      "min": 240.83180000000002,
+      "max": 275.9198,
+      "median": 247.17739999999998,
+      "p95": 275.9198,
+      "samples": [
+        246.88959999999997,
+        240.83180000000002,
+        275.9198,
+        246.6886,
+        254.7933,
+        242.2955,
+        258.4763,
+        242.605,
+        248.0195,
+        247.4652
+      ]
+    },
+    "windowLogicalHeight": {
+      "min": 900,
+      "max": 900,
+      "median": 900,
+      "p95": 900,
+      "samples": [
+        900,
+        900,
+        900,
+        900,
+        900,
+        900,
+        900,
+        900,
+        900,
+        900
+      ]
+    },
+    "windowLogicalWidth": {
+      "min": 1500,
+      "max": 1500,
+      "median": 1500,
+      "p95": 1500,
+      "samples": [
+        1500,
+        1500,
+        1500,
+        1500,
+        1500,
+        1500,
+        1500,
+        1500,
+        1500,
+        1500
+      ]
+    },
+    "windowPhysicalHeight": {
+      "min": 900,
+      "max": 900,
+      "median": 900,
+      "p95": 900,
+      "samples": [
+        900,
+        900,
+        900,
+        900,
+        900,
+        900,
+        900,
+        900,
+        900,
+        900
+      ]
+    },
+    "windowPhysicalWidth": {
+      "min": 1500,
+      "max": 1500,
+      "median": 1500,
+      "p95": 1500,
+      "samples": [
+        1500,
+        1500,
+        1500,
+        1500,
+        1500,
+        1500,
+        1500,
+        1500,
+        1500,
+        1500
+      ]
+    },
+    "windowScaleFactor": {
+      "min": 1,
+      "max": 1,
+      "median": 1,
+      "p95": 1,
+      "samples": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  "warnings": [],
+  "failures": [],
+  "pendingPlatforms": [
+    "darwin",
+    "linux"
+  ]
+}

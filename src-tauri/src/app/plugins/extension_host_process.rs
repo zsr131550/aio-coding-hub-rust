@@ -311,7 +311,9 @@ impl ExtensionHostChildProcess {
             if response.get("id").and_then(|value| value.as_u64()) == Some(expected_id) {
                 return Ok(response);
             }
-            if response.get("method").and_then(|value| value.as_str()) == Some("host.call") {
+            if response.get("method").and_then(|value| value.as_str())
+                == Some(super::extension_host_worker::HOST_CALL_NOTIFICATION)
+            {
                 let id = response.get("id").cloned().unwrap_or(JsonValue::Null);
                 let result = self.handle_host_call(response);
                 let message = match result {

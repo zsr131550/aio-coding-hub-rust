@@ -1,0 +1,500 @@
+[
+  {
+    "objectType": "index",
+    "name": "idx_claude_model_validation_runs_provider_id_id",
+    "tableName": "claude_model_validation_runs",
+    "sql": "CREATE INDEX idx_claude_model_validation_runs_provider_id_id ON claude_model_validation_runs(provider_id, id)"
+  },
+  {
+    "objectType": "index",
+    "name": "idx_default_route_providers_cli_sort_order",
+    "tableName": "default_route_providers",
+    "sql": "CREATE INDEX idx_default_route_providers_cli_sort_order ON default_route_providers(cli_key, sort_order)"
+  },
+  {
+    "objectType": "index",
+    "name": "idx_default_route_providers_provider_id",
+    "tableName": "default_route_providers",
+    "sql": "CREATE INDEX idx_default_route_providers_provider_id ON default_route_providers(provider_id)"
+  },
+  {
+    "objectType": "index",
+    "name": "idx_mcp_servers_enabled_flags",
+    "tableName": "mcp_servers",
+    "sql": "CREATE INDEX idx_mcp_servers_enabled_flags ON mcp_servers(enabled_claude, enabled_codex, enabled_gemini)"
+  },
+  {
+    "objectType": "index",
+    "name": "idx_mcp_servers_normalized_name",
+    "tableName": "mcp_servers",
+    "sql": "CREATE INDEX idx_mcp_servers_normalized_name ON mcp_servers(normalized_name)"
+  },
+  {
+    "objectType": "index",
+    "name": "idx_mcp_servers_updated_at",
+    "tableName": "mcp_servers",
+    "sql": "CREATE INDEX idx_mcp_servers_updated_at ON mcp_servers(updated_at)"
+  },
+  {
+    "objectType": "index",
+    "name": "idx_model_prices_cli_key",
+    "tableName": "model_prices",
+    "sql": "CREATE INDEX idx_model_prices_cli_key ON model_prices(cli_key)"
+  },
+  {
+    "objectType": "index",
+    "name": "idx_model_prices_cli_key_model",
+    "tableName": "model_prices",
+    "sql": "CREATE INDEX idx_model_prices_cli_key_model ON model_prices(cli_key, model)"
+  },
+  {
+    "objectType": "index",
+    "name": "idx_plugin_audit_logs_plugin_created_at",
+    "tableName": "plugin_audit_logs",
+    "sql": "CREATE INDEX idx_plugin_audit_logs_plugin_created_at\n  ON plugin_audit_logs(plugin_id, created_at)"
+  },
+  {
+    "objectType": "index",
+    "name": "idx_plugin_audit_logs_trace_id",
+    "tableName": "plugin_audit_logs",
+    "sql": "CREATE INDEX idx_plugin_audit_logs_trace_id\n  ON plugin_audit_logs(trace_id)"
+  },
+  {
+    "objectType": "index",
+    "name": "idx_plugin_hook_execution_reports_created_at",
+    "tableName": "plugin_hook_execution_reports",
+    "sql": "CREATE INDEX idx_plugin_hook_execution_reports_created_at\n  ON plugin_hook_execution_reports(created_at)"
+  },
+  {
+    "objectType": "index",
+    "name": "idx_plugin_hook_execution_reports_plugin_created_at",
+    "tableName": "plugin_hook_execution_reports",
+    "sql": "CREATE INDEX idx_plugin_hook_execution_reports_plugin_created_at\n  ON plugin_hook_execution_reports(plugin_id, created_at)"
+  },
+  {
+    "objectType": "index",
+    "name": "idx_plugin_hook_execution_reports_plugin_hook_created_at",
+    "tableName": "plugin_hook_execution_reports",
+    "sql": "CREATE INDEX idx_plugin_hook_execution_reports_plugin_hook_created_at\n  ON plugin_hook_execution_reports(plugin_id, hook_name, created_at)"
+  },
+  {
+    "objectType": "index",
+    "name": "idx_plugin_hook_execution_reports_trace_id",
+    "tableName": "plugin_hook_execution_reports",
+    "sql": "CREATE INDEX idx_plugin_hook_execution_reports_trace_id\n  ON plugin_hook_execution_reports(trace_id)"
+  },
+  {
+    "objectType": "index",
+    "name": "idx_plugin_runtime_failures_plugin_created_at",
+    "tableName": "plugin_runtime_failures",
+    "sql": "CREATE INDEX idx_plugin_runtime_failures_plugin_created_at\n  ON plugin_runtime_failures(plugin_id, created_at)"
+  },
+  {
+    "objectType": "index",
+    "name": "idx_plugin_versions_plugin_id_created_at",
+    "tableName": "plugin_versions",
+    "sql": "CREATE INDEX idx_plugin_versions_plugin_id_created_at\n  ON plugin_versions(plugin_id, created_at)"
+  },
+  {
+    "objectType": "index",
+    "name": "idx_plugins_status_updated_at",
+    "tableName": "plugins",
+    "sql": "CREATE INDEX idx_plugins_status_updated_at\n  ON plugins(status, updated_at)"
+  },
+  {
+    "objectType": "index",
+    "name": "idx_prompts_workspace_id",
+    "tableName": "prompts",
+    "sql": "CREATE INDEX idx_prompts_workspace_id ON prompts(workspace_id)"
+  },
+  {
+    "objectType": "index",
+    "name": "idx_prompts_workspace_id_updated_at",
+    "tableName": "prompts",
+    "sql": "CREATE INDEX idx_prompts_workspace_id_updated_at ON prompts(workspace_id, updated_at)"
+  },
+  {
+    "objectType": "index",
+    "name": "idx_prompts_workspace_single_enabled",
+    "tableName": "prompts",
+    "sql": "CREATE UNIQUE INDEX idx_prompts_workspace_single_enabled\n  ON prompts(workspace_id)\n  WHERE enabled = 1"
+  },
+  {
+    "objectType": "index",
+    "name": "idx_provider_circuit_breakers_state",
+    "tableName": "provider_circuit_breakers",
+    "sql": "CREATE INDEX idx_provider_circuit_breakers_state ON provider_circuit_breakers(state)"
+  },
+  {
+    "objectType": "index",
+    "name": "idx_provider_extension_values_plugin_namespace",
+    "tableName": "provider_extension_values",
+    "sql": "CREATE INDEX idx_provider_extension_values_plugin_namespace\n  ON provider_extension_values(plugin_id, namespace)"
+  },
+  {
+    "objectType": "index",
+    "name": "idx_provider_oauth_limit_snapshots_checked_at",
+    "tableName": "provider_oauth_limit_snapshots",
+    "sql": "CREATE INDEX idx_provider_oauth_limit_snapshots_checked_at\n  ON provider_oauth_limit_snapshots(checked_at)"
+  },
+  {
+    "objectType": "index",
+    "name": "idx_provider_pool_order_cli_sort_order",
+    "tableName": "provider_pool_order",
+    "sql": "CREATE INDEX idx_provider_pool_order_cli_sort_order ON provider_pool_order(cli_key, sort_order)"
+  },
+  {
+    "objectType": "index",
+    "name": "idx_provider_pool_order_provider_id",
+    "tableName": "provider_pool_order",
+    "sql": "CREATE INDEX idx_provider_pool_order_provider_id ON provider_pool_order(provider_id)"
+  },
+  {
+    "objectType": "index",
+    "name": "idx_providers_cli_key",
+    "tableName": "providers",
+    "sql": "CREATE INDEX idx_providers_cli_key ON providers(cli_key)"
+  },
+  {
+    "objectType": "index",
+    "name": "idx_providers_cli_key_sort_order",
+    "tableName": "providers",
+    "sql": "CREATE INDEX idx_providers_cli_key_sort_order ON providers(cli_key, sort_order)"
+  },
+  {
+    "objectType": "index",
+    "name": "idx_request_logs_cli_created_at",
+    "tableName": "request_logs",
+    "sql": "CREATE INDEX idx_request_logs_cli_created_at ON request_logs(cli_key, created_at)"
+  },
+  {
+    "objectType": "index",
+    "name": "idx_request_logs_cli_created_at_excluded",
+    "tableName": "request_logs",
+    "sql": "CREATE INDEX idx_request_logs_cli_created_at_excluded\n  ON request_logs(cli_key, created_at, excluded_from_stats)"
+  },
+  {
+    "objectType": "index",
+    "name": "idx_request_logs_cli_created_at_ms",
+    "tableName": "request_logs",
+    "sql": "CREATE INDEX idx_request_logs_cli_created_at_ms ON request_logs(cli_key, created_at_ms)"
+  },
+  {
+    "objectType": "index",
+    "name": "idx_request_logs_cli_created_at_ms_id",
+    "tableName": "request_logs",
+    "sql": "CREATE INDEX idx_request_logs_cli_created_at_ms_id\n  ON request_logs(cli_key, created_at_ms DESC, id DESC)"
+  },
+  {
+    "objectType": "index",
+    "name": "idx_request_logs_cli_id",
+    "tableName": "request_logs",
+    "sql": "CREATE INDEX idx_request_logs_cli_id\n  ON request_logs(cli_key, id)"
+  },
+  {
+    "objectType": "index",
+    "name": "idx_request_logs_cli_path_created_at_ms_id",
+    "tableName": "request_logs",
+    "sql": "CREATE INDEX idx_request_logs_cli_path_created_at_ms_id\n  ON request_logs(cli_key, path, created_at_ms DESC, id DESC)"
+  },
+  {
+    "objectType": "index",
+    "name": "idx_request_logs_created_at",
+    "tableName": "request_logs",
+    "sql": "CREATE INDEX idx_request_logs_created_at ON request_logs(created_at)"
+  },
+  {
+    "objectType": "index",
+    "name": "idx_request_logs_created_at_ms",
+    "tableName": "request_logs",
+    "sql": "CREATE INDEX idx_request_logs_created_at_ms ON request_logs(created_at_ms)"
+  },
+  {
+    "objectType": "index",
+    "name": "idx_request_logs_final_provider_id_created_at",
+    "tableName": "request_logs",
+    "sql": "CREATE INDEX idx_request_logs_final_provider_id_created_at ON request_logs(final_provider_id, created_at)"
+  },
+  {
+    "objectType": "index",
+    "name": "idx_request_logs_provider_success_cost",
+    "tableName": "request_logs",
+    "sql": "CREATE INDEX idx_request_logs_provider_success_cost\n  ON request_logs(final_provider_id, created_at)\n  WHERE status >= 200 AND status < 300\n    AND error_code IS NULL\n    AND cost_usd_femto IS NOT NULL\n    AND excluded_from_stats = 0"
+  },
+  {
+    "objectType": "index",
+    "name": "idx_request_logs_session_id",
+    "tableName": "request_logs",
+    "sql": "CREATE INDEX idx_request_logs_session_id ON request_logs(session_id)"
+  },
+  {
+    "objectType": "index",
+    "name": "idx_request_logs_trace_id",
+    "tableName": "request_logs",
+    "sql": "CREATE UNIQUE INDEX idx_request_logs_trace_id ON request_logs(trace_id)"
+  },
+  {
+    "objectType": "index",
+    "name": "idx_request_logs_visible_created_at_ms_id",
+    "tableName": "request_logs",
+    "sql": "CREATE INDEX idx_request_logs_visible_created_at_ms_id\n  ON request_logs(created_at_ms DESC, id DESC)\n  WHERE cli_key != 'claude' OR path = '/v1/messages'"
+  },
+  {
+    "objectType": "index",
+    "name": "idx_skill_repos_enabled",
+    "tableName": "skill_repos",
+    "sql": "CREATE INDEX idx_skill_repos_enabled ON skill_repos(enabled)"
+  },
+  {
+    "objectType": "index",
+    "name": "idx_skills_enabled_flags",
+    "tableName": "skills",
+    "sql": "CREATE INDEX idx_skills_enabled_flags ON skills(enabled_claude, enabled_codex, enabled_gemini)"
+  },
+  {
+    "objectType": "index",
+    "name": "idx_skills_normalized_name",
+    "tableName": "skills",
+    "sql": "CREATE INDEX idx_skills_normalized_name ON skills(normalized_name)"
+  },
+  {
+    "objectType": "index",
+    "name": "idx_skills_source",
+    "tableName": "skills",
+    "sql": "CREATE INDEX idx_skills_source ON skills(source_git_url, source_branch, source_subdir)"
+  },
+  {
+    "objectType": "index",
+    "name": "idx_skills_updated_at",
+    "tableName": "skills",
+    "sql": "CREATE INDEX idx_skills_updated_at ON skills(updated_at)"
+  },
+  {
+    "objectType": "index",
+    "name": "idx_sort_mode_active_mode_id",
+    "tableName": "sort_mode_active",
+    "sql": "CREATE INDEX idx_sort_mode_active_mode_id ON sort_mode_active(mode_id)"
+  },
+  {
+    "objectType": "index",
+    "name": "idx_sort_mode_providers_mode_cli_sort_order",
+    "tableName": "sort_mode_providers",
+    "sql": "CREATE INDEX idx_sort_mode_providers_mode_cli_sort_order ON sort_mode_providers(mode_id, cli_key, sort_order)"
+  },
+  {
+    "objectType": "index",
+    "name": "idx_sort_mode_providers_provider_id",
+    "tableName": "sort_mode_providers",
+    "sql": "CREATE INDEX idx_sort_mode_providers_provider_id ON sort_mode_providers(provider_id)"
+  },
+  {
+    "objectType": "index",
+    "name": "idx_workspace_active_workspace_id",
+    "tableName": "workspace_active",
+    "sql": "CREATE INDEX idx_workspace_active_workspace_id ON workspace_active(workspace_id)"
+  },
+  {
+    "objectType": "index",
+    "name": "idx_workspace_mcp_enabled_server_id",
+    "tableName": "workspace_mcp_enabled",
+    "sql": "CREATE INDEX idx_workspace_mcp_enabled_server_id\n  ON workspace_mcp_enabled(server_id)"
+  },
+  {
+    "objectType": "index",
+    "name": "idx_workspace_mcp_enabled_workspace_id",
+    "tableName": "workspace_mcp_enabled",
+    "sql": "CREATE INDEX idx_workspace_mcp_enabled_workspace_id\n  ON workspace_mcp_enabled(workspace_id)"
+  },
+  {
+    "objectType": "index",
+    "name": "idx_workspace_skill_enabled_skill_id",
+    "tableName": "workspace_skill_enabled",
+    "sql": "CREATE INDEX idx_workspace_skill_enabled_skill_id\n  ON workspace_skill_enabled(skill_id)"
+  },
+  {
+    "objectType": "index",
+    "name": "idx_workspace_skill_enabled_workspace_id",
+    "tableName": "workspace_skill_enabled",
+    "sql": "CREATE INDEX idx_workspace_skill_enabled_workspace_id\n  ON workspace_skill_enabled(workspace_id)"
+  },
+  {
+    "objectType": "index",
+    "name": "idx_workspaces_cli_key_updated_at",
+    "tableName": "workspaces",
+    "sql": "CREATE INDEX idx_workspaces_cli_key_updated_at ON workspaces(cli_key, updated_at)"
+  },
+  {
+    "objectType": "table",
+    "name": "claude_model_validation_runs",
+    "tableName": "claude_model_validation_runs",
+    "sql": "CREATE TABLE claude_model_validation_runs (\n  id INTEGER PRIMARY KEY AUTOINCREMENT,\n  provider_id INTEGER NOT NULL,\n  created_at INTEGER NOT NULL,\n  request_json TEXT NOT NULL,\n  result_json TEXT NOT NULL,\n  FOREIGN KEY(provider_id) REFERENCES providers(id) ON DELETE CASCADE\n)"
+  },
+  {
+    "objectType": "table",
+    "name": "default_route_providers",
+    "tableName": "default_route_providers",
+    "sql": "CREATE TABLE default_route_providers (\n  cli_key TEXT NOT NULL,\n  provider_id INTEGER NOT NULL,\n  sort_order INTEGER NOT NULL,\n  created_at INTEGER NOT NULL,\n  updated_at INTEGER NOT NULL,\n  PRIMARY KEY(cli_key, provider_id),\n  FOREIGN KEY(provider_id) REFERENCES providers(id) ON DELETE CASCADE\n)"
+  },
+  {
+    "objectType": "table",
+    "name": "mcp_servers",
+    "tableName": "mcp_servers",
+    "sql": "CREATE TABLE mcp_servers (\n  id INTEGER PRIMARY KEY AUTOINCREMENT,\n  server_key TEXT NOT NULL,\n  name TEXT NOT NULL,\n  transport TEXT NOT NULL,\n  command TEXT,\n  args_json TEXT NOT NULL DEFAULT '[]',\n  env_json TEXT NOT NULL DEFAULT '{}',\n  cwd TEXT,\n  url TEXT,\n  headers_json TEXT NOT NULL DEFAULT '{}',\n  enabled_claude INTEGER NOT NULL DEFAULT 0,\n  enabled_codex INTEGER NOT NULL DEFAULT 0,\n  enabled_gemini INTEGER NOT NULL DEFAULT 0,\n  normalized_name TEXT NOT NULL DEFAULT '',\n  created_at INTEGER NOT NULL,\n  updated_at INTEGER NOT NULL,\n  UNIQUE(server_key)\n)"
+  },
+  {
+    "objectType": "table",
+    "name": "model_prices",
+    "tableName": "model_prices",
+    "sql": "CREATE TABLE model_prices (\n  id INTEGER PRIMARY KEY AUTOINCREMENT,\n  cli_key TEXT NOT NULL,\n  model TEXT NOT NULL,\n  price_json TEXT NOT NULL,\n  currency TEXT NOT NULL DEFAULT 'USD',\n  created_at INTEGER NOT NULL,\n  updated_at INTEGER NOT NULL,\n  UNIQUE(cli_key, model)\n)"
+  },
+  {
+    "objectType": "table",
+    "name": "plugin_audit_logs",
+    "tableName": "plugin_audit_logs",
+    "sql": "CREATE TABLE plugin_audit_logs (\n  id INTEGER PRIMARY KEY AUTOINCREMENT,\n  plugin_id TEXT,\n  trace_id TEXT,\n  event_type TEXT NOT NULL,\n  risk_level TEXT NOT NULL DEFAULT 'low',\n  message TEXT NOT NULL,\n  details_json TEXT NOT NULL DEFAULT '{}',\n  created_at INTEGER NOT NULL,\n  FOREIGN KEY(plugin_id) REFERENCES plugins(plugin_id) ON DELETE SET NULL\n)"
+  },
+  {
+    "objectType": "table",
+    "name": "plugin_configs",
+    "tableName": "plugin_configs",
+    "sql": "CREATE TABLE plugin_configs (\n  plugin_id TEXT PRIMARY KEY,\n  config_version INTEGER NOT NULL DEFAULT 1,\n  config_json TEXT NOT NULL DEFAULT '{}',\n  sensitive_keys_json TEXT NOT NULL DEFAULT '[]',\n  updated_at INTEGER NOT NULL,\n  FOREIGN KEY(plugin_id) REFERENCES plugins(plugin_id) ON DELETE CASCADE\n)"
+  },
+  {
+    "objectType": "table",
+    "name": "plugin_hook_execution_reports",
+    "tableName": "plugin_hook_execution_reports",
+    "sql": "CREATE TABLE plugin_hook_execution_reports (\n  id INTEGER PRIMARY KEY AUTOINCREMENT,\n  plugin_id TEXT NOT NULL,\n  trace_id TEXT,\n  hook_name TEXT NOT NULL,\n  runtime_kind TEXT NOT NULL,\n  status TEXT NOT NULL,\n  started_at_ms INTEGER NOT NULL,\n  duration_ms INTEGER NOT NULL,\n  failure_kind TEXT,\n  error_code TEXT,\n  failure_policy TEXT,\n  circuit_state TEXT,\n  context_budget_json TEXT NOT NULL DEFAULT '{}',\n  output_budget_json TEXT NOT NULL DEFAULT '{}',\n  mutation_summary_json TEXT NOT NULL DEFAULT '{}',\n  replayable INTEGER NOT NULL DEFAULT 0,\n  replay_export_reason TEXT,\n  created_at INTEGER NOT NULL\n)"
+  },
+  {
+    "objectType": "table",
+    "name": "plugin_market_sources",
+    "tableName": "plugin_market_sources",
+    "sql": "CREATE TABLE plugin_market_sources (\n  id INTEGER PRIMARY KEY AUTOINCREMENT,\n  name TEXT NOT NULL UNIQUE,\n  index_url TEXT NOT NULL,\n  enabled INTEGER NOT NULL DEFAULT 1,\n  trusted_public_key TEXT,\n  last_checked_at INTEGER,\n  last_error TEXT,\n  created_at INTEGER NOT NULL,\n  updated_at INTEGER NOT NULL\n)"
+  },
+  {
+    "objectType": "table",
+    "name": "plugin_permissions",
+    "tableName": "plugin_permissions",
+    "sql": "CREATE TABLE plugin_permissions (\n  plugin_id TEXT PRIMARY KEY,\n  permissions_json TEXT NOT NULL DEFAULT '[]',\n  pending_permissions_json TEXT NOT NULL DEFAULT '[]',\n  updated_at INTEGER NOT NULL,\n  FOREIGN KEY(plugin_id) REFERENCES plugins(plugin_id) ON DELETE CASCADE\n)"
+  },
+  {
+    "objectType": "table",
+    "name": "plugin_runtime_failures",
+    "tableName": "plugin_runtime_failures",
+    "sql": "CREATE TABLE plugin_runtime_failures (\n  id INTEGER PRIMARY KEY AUTOINCREMENT,\n  plugin_id TEXT NOT NULL,\n  hook_name TEXT,\n  failure_kind TEXT NOT NULL,\n  message TEXT NOT NULL,\n  trace_id TEXT,\n  created_at INTEGER NOT NULL,\n  FOREIGN KEY(plugin_id) REFERENCES plugins(plugin_id) ON DELETE CASCADE\n)"
+  },
+  {
+    "objectType": "table",
+    "name": "plugin_versions",
+    "tableName": "plugin_versions",
+    "sql": "CREATE TABLE plugin_versions (\n  id INTEGER PRIMARY KEY AUTOINCREMENT,\n  plugin_id TEXT NOT NULL,\n  version TEXT NOT NULL,\n  manifest_json TEXT NOT NULL,\n  package_checksum TEXT,\n  signature TEXT,\n  installed_dir TEXT,\n  created_at INTEGER NOT NULL,\n  UNIQUE(plugin_id, version),\n  FOREIGN KEY(plugin_id) REFERENCES plugins(plugin_id) ON DELETE CASCADE\n)"
+  },
+  {
+    "objectType": "table",
+    "name": "plugins",
+    "tableName": "plugins",
+    "sql": "CREATE TABLE plugins (\n  id INTEGER PRIMARY KEY AUTOINCREMENT,\n  plugin_id TEXT NOT NULL UNIQUE,\n  name TEXT NOT NULL,\n  current_version TEXT,\n  install_source TEXT NOT NULL,\n  status TEXT NOT NULL,\n  manifest_json TEXT NOT NULL,\n  config_json TEXT NOT NULL DEFAULT '{}',\n  granted_permissions_json TEXT NOT NULL DEFAULT '[]',\n  last_error TEXT,\n  installed_dir TEXT,\n  created_at INTEGER NOT NULL,\n  updated_at INTEGER NOT NULL\n)"
+  },
+  {
+    "objectType": "table",
+    "name": "prompts",
+    "tableName": "prompts",
+    "sql": "CREATE TABLE \"prompts\" (\n  id INTEGER PRIMARY KEY AUTOINCREMENT,\n  workspace_id INTEGER NOT NULL,\n  name TEXT NOT NULL,\n  content TEXT NOT NULL,\n  enabled INTEGER NOT NULL DEFAULT 0,\n  created_at INTEGER NOT NULL,\n  updated_at INTEGER NOT NULL,\n  FOREIGN KEY(workspace_id) REFERENCES workspaces(id) ON DELETE CASCADE,\n  UNIQUE(workspace_id, name)\n)"
+  },
+  {
+    "objectType": "table",
+    "name": "provider_circuit_breakers",
+    "tableName": "provider_circuit_breakers",
+    "sql": "CREATE TABLE provider_circuit_breakers (\n  provider_id INTEGER PRIMARY KEY,\n  state TEXT NOT NULL,\n  failure_count INTEGER NOT NULL DEFAULT 0,\n  failure_timestamps_json TEXT NOT NULL DEFAULT '[]',\n  half_open_success_count INTEGER NOT NULL DEFAULT 0,\n  open_until INTEGER,\n  updated_at INTEGER NOT NULL,\n  FOREIGN KEY(provider_id) REFERENCES providers(id) ON DELETE CASCADE\n)"
+  },
+  {
+    "objectType": "table",
+    "name": "provider_extension_values",
+    "tableName": "provider_extension_values",
+    "sql": "CREATE TABLE provider_extension_values (\n  provider_id INTEGER NOT NULL,\n  plugin_id TEXT NOT NULL,\n  namespace TEXT NOT NULL,\n  values_json TEXT NOT NULL DEFAULT '{}',\n  updated_at INTEGER NOT NULL,\n  PRIMARY KEY(provider_id, plugin_id, namespace),\n  FOREIGN KEY(provider_id) REFERENCES providers(id) ON DELETE CASCADE,\n  FOREIGN KEY(plugin_id) REFERENCES plugins(plugin_id) ON DELETE CASCADE\n)"
+  },
+  {
+    "objectType": "table",
+    "name": "provider_oauth_limit_snapshots",
+    "tableName": "provider_oauth_limit_snapshots",
+    "sql": "CREATE TABLE provider_oauth_limit_snapshots (\n  provider_id INTEGER PRIMARY KEY,\n  limit_short_label TEXT,\n  limit_5h_text TEXT,\n  limit_weekly_text TEXT,\n  limit_5h_reset_at INTEGER,\n  limit_weekly_reset_at INTEGER,\n  reset_credit_available_count INTEGER,\n  checked_at INTEGER NOT NULL,\n  updated_at INTEGER NOT NULL,\n  FOREIGN KEY(provider_id) REFERENCES providers(id) ON DELETE CASCADE\n)"
+  },
+  {
+    "objectType": "table",
+    "name": "provider_pool_order",
+    "tableName": "provider_pool_order",
+    "sql": "CREATE TABLE provider_pool_order (\n  cli_key TEXT NOT NULL,\n  provider_id INTEGER NOT NULL,\n  sort_order INTEGER NOT NULL,\n  created_at INTEGER NOT NULL,\n  updated_at INTEGER NOT NULL,\n  PRIMARY KEY(cli_key, provider_id),\n  FOREIGN KEY(provider_id) REFERENCES providers(id) ON DELETE CASCADE\n)"
+  },
+  {
+    "objectType": "table",
+    "name": "providers",
+    "tableName": "providers",
+    "sql": "CREATE TABLE providers (\n  id INTEGER PRIMARY KEY AUTOINCREMENT,\n  cli_key TEXT NOT NULL,\n  name TEXT NOT NULL,\n  base_url TEXT NOT NULL,\n  api_key_plaintext TEXT NOT NULL,\n  enabled INTEGER NOT NULL DEFAULT 1,\n  priority INTEGER NOT NULL DEFAULT 100,\n  created_at INTEGER NOT NULL,\n  updated_at INTEGER NOT NULL,\n  sort_order INTEGER NOT NULL DEFAULT 0,\n  cost_multiplier REAL NOT NULL DEFAULT 1.0,\n  base_urls_json TEXT NOT NULL DEFAULT '[]',\n  base_url_mode TEXT NOT NULL DEFAULT 'order',\n  supported_models_json TEXT NOT NULL DEFAULT '{}',\n  model_mapping_json TEXT NOT NULL DEFAULT '{}',\n  claude_models_json TEXT NOT NULL DEFAULT '{}', limit_5h_usd REAL, limit_daily_usd REAL, daily_reset_mode TEXT NOT NULL DEFAULT 'fixed', daily_reset_time TEXT NOT NULL DEFAULT '00:00:00', limit_weekly_usd REAL, limit_monthly_usd REAL, limit_total_usd REAL, window_5h_start_ts INTEGER, auth_mode TEXT NOT NULL DEFAULT 'api_key', oauth_provider_type TEXT, oauth_access_token TEXT, oauth_refresh_token TEXT, oauth_id_token TEXT, oauth_token_uri TEXT, oauth_client_id TEXT, oauth_client_secret TEXT, oauth_expires_at INTEGER, oauth_email TEXT, oauth_last_refreshed_at INTEGER, oauth_last_error TEXT, oauth_refresh_lead_s INTEGER NOT NULL DEFAULT 3600, tags_json TEXT NOT NULL DEFAULT '[]', note TEXT NOT NULL DEFAULT '', source_provider_id INTEGER DEFAULT NULL REFERENCES providers(id) ON DELETE SET NULL, bridge_type TEXT DEFAULT NULL, stream_idle_timeout_seconds INTEGER DEFAULT NULL,\n  UNIQUE(cli_key, name)\n)"
+  },
+  {
+    "objectType": "table",
+    "name": "request_logs",
+    "tableName": "request_logs",
+    "sql": "CREATE TABLE request_logs (\n  id INTEGER PRIMARY KEY AUTOINCREMENT,\n  trace_id TEXT NOT NULL,\n  cli_key TEXT NOT NULL,\n  method TEXT NOT NULL,\n  path TEXT NOT NULL,\n  query TEXT,\n  status INTEGER,\n  error_code TEXT,\n  duration_ms INTEGER NOT NULL DEFAULT 0,\n  attempts_json TEXT NOT NULL DEFAULT '[]',\n  created_at INTEGER NOT NULL,\n  input_tokens INTEGER,\n  output_tokens INTEGER,\n  total_tokens INTEGER,\n  cache_read_input_tokens INTEGER,\n  cache_creation_input_tokens INTEGER,\n  cache_creation_5m_input_tokens INTEGER,\n  cache_creation_1h_input_tokens INTEGER,\n  usage_json TEXT,\n  ttfb_ms INTEGER,\n  requested_model TEXT,\n  cost_usd_femto INTEGER,\n  cost_multiplier REAL NOT NULL DEFAULT 1.0,\n  excluded_from_stats INTEGER NOT NULL DEFAULT 0,\n  special_settings_json TEXT,\n  created_at_ms INTEGER NOT NULL DEFAULT 0,\n  last_activity_ms INTEGER,\n  activity_details_json TEXT,\n  session_id TEXT,\n  final_provider_id INTEGER\n, provider_chain_json TEXT, error_details_json TEXT)"
+  },
+  {
+    "objectType": "table",
+    "name": "schema_migrations",
+    "tableName": "schema_migrations",
+    "sql": "CREATE TABLE schema_migrations (\n  version INTEGER PRIMARY KEY,\n  applied_at INTEGER NOT NULL\n)"
+  },
+  {
+    "objectType": "table",
+    "name": "skill_repos",
+    "tableName": "skill_repos",
+    "sql": "CREATE TABLE skill_repos (\n  id INTEGER PRIMARY KEY AUTOINCREMENT,\n  git_url TEXT NOT NULL,\n  branch TEXT NOT NULL,\n  enabled INTEGER NOT NULL DEFAULT 1,\n  created_at INTEGER NOT NULL,\n  updated_at INTEGER NOT NULL,\n  UNIQUE(git_url, branch)\n)"
+  },
+  {
+    "objectType": "table",
+    "name": "skills",
+    "tableName": "skills",
+    "sql": "CREATE TABLE skills (\n  id INTEGER PRIMARY KEY AUTOINCREMENT,\n  skill_key TEXT NOT NULL,\n  name TEXT NOT NULL,\n  normalized_name TEXT NOT NULL,\n  description TEXT NOT NULL DEFAULT '',\n  source_git_url TEXT NOT NULL,\n  source_branch TEXT NOT NULL,\n  source_subdir TEXT NOT NULL,\n  installed_commit TEXT DEFAULT NULL,\n  enabled_claude INTEGER NOT NULL DEFAULT 0,\n  enabled_codex INTEGER NOT NULL DEFAULT 0,\n  enabled_gemini INTEGER NOT NULL DEFAULT 0,\n  created_at INTEGER NOT NULL,\n  updated_at INTEGER NOT NULL, installed_content_hash TEXT DEFAULT NULL,\n  UNIQUE(skill_key)\n)"
+  },
+  {
+    "objectType": "table",
+    "name": "sort_mode_active",
+    "tableName": "sort_mode_active",
+    "sql": "CREATE TABLE sort_mode_active (\n  cli_key TEXT PRIMARY KEY,\n  mode_id INTEGER,\n  updated_at INTEGER NOT NULL,\n  FOREIGN KEY(mode_id) REFERENCES sort_modes(id) ON DELETE SET NULL\n)"
+  },
+  {
+    "objectType": "table",
+    "name": "sort_mode_providers",
+    "tableName": "sort_mode_providers",
+    "sql": "CREATE TABLE sort_mode_providers (\n  mode_id INTEGER NOT NULL,\n  cli_key TEXT NOT NULL,\n  provider_id INTEGER NOT NULL,\n  sort_order INTEGER NOT NULL,\n  created_at INTEGER NOT NULL,\n  updated_at INTEGER NOT NULL, enabled INTEGER NOT NULL DEFAULT 1,\n  PRIMARY KEY(mode_id, cli_key, provider_id),\n  FOREIGN KEY(mode_id) REFERENCES sort_modes(id) ON DELETE CASCADE,\n  FOREIGN KEY(provider_id) REFERENCES providers(id) ON DELETE CASCADE\n)"
+  },
+  {
+    "objectType": "table",
+    "name": "sort_modes",
+    "tableName": "sort_modes",
+    "sql": "CREATE TABLE sort_modes (\n  id INTEGER PRIMARY KEY AUTOINCREMENT,\n  name TEXT NOT NULL,\n  created_at INTEGER NOT NULL,\n  updated_at INTEGER NOT NULL,\n  UNIQUE(name)\n)"
+  },
+  {
+    "objectType": "table",
+    "name": "workspace_active",
+    "tableName": "workspace_active",
+    "sql": "CREATE TABLE workspace_active (\n  cli_key TEXT PRIMARY KEY,\n  workspace_id INTEGER,\n  updated_at INTEGER NOT NULL,\n  FOREIGN KEY(workspace_id) REFERENCES workspaces(id) ON DELETE SET NULL\n)"
+  },
+  {
+    "objectType": "table",
+    "name": "workspace_mcp_enabled",
+    "tableName": "workspace_mcp_enabled",
+    "sql": "CREATE TABLE workspace_mcp_enabled (\n  workspace_id INTEGER NOT NULL,\n  server_id INTEGER NOT NULL,\n  created_at INTEGER NOT NULL,\n  updated_at INTEGER NOT NULL,\n  PRIMARY KEY(workspace_id, server_id),\n  FOREIGN KEY(workspace_id) REFERENCES workspaces(id) ON DELETE CASCADE,\n  FOREIGN KEY(server_id) REFERENCES mcp_servers(id) ON DELETE CASCADE\n)"
+  },
+  {
+    "objectType": "table",
+    "name": "workspace_skill_enabled",
+    "tableName": "workspace_skill_enabled",
+    "sql": "CREATE TABLE workspace_skill_enabled (\n  workspace_id INTEGER NOT NULL,\n  skill_id INTEGER NOT NULL,\n  created_at INTEGER NOT NULL,\n  updated_at INTEGER NOT NULL,\n  PRIMARY KEY(workspace_id, skill_id),\n  FOREIGN KEY(workspace_id) REFERENCES workspaces(id) ON DELETE CASCADE,\n  FOREIGN KEY(skill_id) REFERENCES skills(id) ON DELETE CASCADE\n)"
+  },
+  {
+    "objectType": "table",
+    "name": "workspaces",
+    "tableName": "workspaces",
+    "sql": "CREATE TABLE workspaces (\n  id INTEGER PRIMARY KEY AUTOINCREMENT,\n  cli_key TEXT NOT NULL,\n  name TEXT NOT NULL,\n  normalized_name TEXT NOT NULL,\n  created_at INTEGER NOT NULL,\n  updated_at INTEGER NOT NULL,\n  UNIQUE(cli_key, normalized_name)\n)"
+  }
+]

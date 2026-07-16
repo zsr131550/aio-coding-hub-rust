@@ -37,7 +37,7 @@ fn cache_settings(path: &Path, settings: &AppSettings) {
 }
 
 fn settings_path<R: tauri::Runtime>(app: &tauri::AppHandle<R>) -> AppResult<PathBuf> {
-    Ok(app_paths::app_data_dir(app)?.join("settings.json"))
+    Ok(app_paths::app_data_dir(app)?.join(super::SETTINGS_FILE_NAME))
 }
 
 fn legacy_settings_path<R: tauri::Runtime>(app: &tauri::AppHandle<R>) -> AppResult<PathBuf> {
@@ -130,7 +130,7 @@ fn validate_optional_bounded_string(field: &str, value: &str, max_len: usize) ->
     validate_no_control_chars(field, raw)
 }
 
-pub(super) fn parse_settings_json(
+pub(crate) fn parse_settings_json(
     content: &str,
 ) -> AppResult<(AppSettings, bool, serde_json::Value)> {
     let raw: serde_json::Value = serde_json::from_str(content).map_err(invalid_settings_json)?;
@@ -140,7 +140,7 @@ pub(super) fn parse_settings_json(
     Ok((settings, schema_version_present, raw))
 }
 
-pub(super) fn canonical_settings_json(settings: &AppSettings) -> AppResult<serde_json::Value> {
+pub(crate) fn canonical_settings_json(settings: &AppSettings) -> AppResult<serde_json::Value> {
     let mut serialized =
         serde_json::to_value(settings).map_err(|e| format!("failed to serialize settings: {e}"))?;
 
@@ -172,9 +172,27 @@ pub fn read<R: tauri::Runtime>(app: &tauri::AppHandle<R>) -> AppResult<AppSettin
         }
     }
 
-    if !path.exists() {
-        let legacy_path = legacy_settings_path(app)?;
-        if legacy_path.exists() {
+    let settings_file_exists = path
+        .try_exists()
+        .map_err(|e| format!("failed to inspect settings file: {e}"))?;
+    if !settings_file_exists {
+        // A transient resolver failure must not create a current settings file:
+        // that would permanently suppress a later retry of the legacy migration.
+        let legacy_path = match legacy_settings_path(app) {
+            Ok(path) => path,
+            Err(err) => {
+                tracing::debug!(
+                    "legacy settings path unavailable; returning uncached defaults: {}",
+                    err
+                );
+                return Ok(AppSettings::default());
+            }
+        };
+
+        let legacy_file_exists = legacy_path
+            .try_exists()
+            .map_err(|e| format!("failed to inspect legacy settings file: {e}"))?;
+        if legacy_file_exists {
             let content = read_settings_json_file(&legacy_path)?;
             let (settings, schema_version_present, raw_settings_json) =
                 parse_settings_json(&content)?;
@@ -199,14 +217,12 @@ pub fn read<R: tauri::Runtime>(app: &tauri::AppHandle<R>) -> AppResult<AppSettin
                 // best-effort: persist sanitized defaults
             }
             let _ = write(app, &settings);
-            cache_settings(&path, &settings);
             return Ok(settings);
         }
 
         let settings = AppSettings::default();
         // Best-effort: create default settings.json on first read to make the config discoverable/editable.
         let _ = write(app, &settings);
-        cache_settings(&path, &settings);
         return Ok(settings);
     }
 

@@ -15,9 +15,9 @@ mod v34_to_v35;
 
 use rusqlite::Connection;
 
-const LATEST_SCHEMA_VERSION: i64 = 35;
-const MAX_COMPAT_SCHEMA_VERSION: i64 = 35;
-const MIN_SUPPORTED_SCHEMA_VERSION: i64 = 25;
+pub(super) const LATEST_SCHEMA_VERSION: i64 = 35;
+pub(super) const MAX_COMPAT_SCHEMA_VERSION: i64 = 35;
+pub(super) const MIN_SUPPORTED_SCHEMA_VERSION: i64 = 25;
 
 pub(super) fn apply_migrations(conn: &mut Connection) -> crate::shared::error::AppResult<()> {
     let mut user_version = read_user_version(conn)?;

@@ -16,3 +16,6 @@ src-tauri/Cargo.lock
 coverage
 pnpm-lock.yaml
 *.md
+docs/egui-migration/compatibility-contract.json
+docs/egui-migration/baselines/*.json
+src-tauri/tests/fixtures/egui-migration

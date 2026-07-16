@@ -5,14 +5,13 @@ use super::privacy_redaction_service::PrivacyRedactionService;
 use crate::app::app_state::{ensure_db_ready, DbInitState};
 use crate::app::plugins::runtime_lifecycle::PluginRuntimeInstanceRegistry;
 use crate::db;
-use crate::domain::plugins::{PluginDetail, PluginManifest, PluginRuntime};
+use crate::domain::plugins::{extension_host_contribution_hash, PluginDetail, PluginRuntime};
 use crate::gateway::plugins::context::{
     GatewayHookAction, GatewayHookResult, GatewayPluginHookName, GatewayVisibleHookContext,
 };
 use crate::gateway::plugins::permissions::GatewayPluginError;
 use crate::shared::error::{AppError, AppResult};
 use serde_json::{json, Value};
-use sha2::Digest;
 use std::collections::{BTreeMap, HashSet};
 use std::future::Future;
 use std::path::PathBuf;
@@ -671,7 +670,7 @@ impl ExtensionHostInstanceKey {
             main,
             runtime_kind,
             runtime_language,
-            contribution_hash: contribution_hash(&detail.manifest),
+            contribution_hash: extension_host_contribution_hash(&detail.manifest),
             call_timeout_ms: None,
         })
     }
@@ -809,19 +808,6 @@ fn plugin_root(detail: &PluginDetail) -> AppResult<PathBuf> {
                 ),
             )
         })
-}
-
-fn contribution_hash(manifest: &PluginManifest) -> String {
-    let bytes = serde_json::to_vec(&json!({
-        "runtime": manifest.runtime,
-        "main": manifest.main,
-        "activationEvents": manifest.activation_events,
-        "contributes": manifest.contributes,
-        "capabilities": manifest.capabilities,
-        "permissions": manifest.permissions,
-    }))
-    .unwrap_or_default();
-    format!("{:x}", sha2::Sha256::digest(bytes))
 }
 
 fn extension_host_gateway_error(err: AppError) -> GatewayPluginError {

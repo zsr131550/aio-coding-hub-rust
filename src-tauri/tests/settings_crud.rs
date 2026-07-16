@@ -40,6 +40,33 @@ fn settings_read_defaults() {
 }
 
 #[test]
+fn settings_read_defaults_without_legacy_path_does_not_persist_or_cache_them() {
+    let app = support::TestApp::new();
+    let handle = app.handle();
+    let app_data_dir =
+        aio_coding_hub_lib::test_support::app_data_dir(&handle).expect("app data dir");
+    let settings_path = app_data_dir.join("settings.json");
+
+    let mut settings =
+        aio_coding_hub_lib::test_support::settings_get_json(&handle).expect("read defaults");
+    assert!(
+        !settings_path.exists(),
+        "unresolved legacy path must not create a current settings file"
+    );
+
+    settings["preferred_port"] = serde_json::json!(38001);
+    std::fs::write(
+        &settings_path,
+        serde_json::to_vec_pretty(&settings).expect("serialize settings"),
+    )
+    .expect("write current settings");
+
+    let re_read =
+        aio_coding_hub_lib::test_support::settings_get_json(&handle).expect("re-read settings");
+    assert_eq!(json_i64(&re_read, "preferred_port"), 38001);
+}
+
+#[test]
 fn settings_update_and_re_read() {
     let app = support::TestApp::new();
     let handle = app.handle();

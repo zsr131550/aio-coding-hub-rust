@@ -3,7 +3,7 @@ use crate::blocking;
 use crate::infra::config_migrate;
 use crate::shared::error::AppError;
 use crate::shared::fs::read_file_with_max_len;
-use crate::shared::ipc_confirm::RiskyIpcConfirm;
+use crate::shared::ipc_confirm::{RiskyIpcConfirm, RISKY_CONFIG_IMPORT};
 use std::path::Path;
 
 fn map_config_import_read_error(err: AppError) -> String {
@@ -69,7 +69,7 @@ pub(crate) async fn config_import(
     if file_path.is_empty() {
         return Err("SEC_INVALID_INPUT: file_path is required".to_string());
     }
-    RiskyIpcConfirm::require(confirm, "config_import", file_path.clone())?;
+    RISKY_CONFIG_IMPORT.require(confirm, file_path.clone())?;
     #[cfg(windows)]
     let app_for_wsl = app.clone();
     let db = ensure_db_ready(app.clone(), db_state.inner()).await?;

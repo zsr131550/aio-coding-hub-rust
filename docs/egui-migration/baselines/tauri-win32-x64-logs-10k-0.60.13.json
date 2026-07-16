@@ -1,0 +1,3992 @@
+{
+  "schemaVersion": 1,
+  "status": "complete",
+  "tool": {
+    "name": "egui-baseline",
+    "version": 1
+  },
+  "repository": {
+    "commit": "057c06821b5159fda202bce5cfbf1ef3afb410f9",
+    "dirty": true,
+    "statusSha256": "5309620c680c948a583e99b73e8bb3becf10fa5f59f422514e9140d8ab11a6a3"
+  },
+  "app": {
+    "version": "0.60.13",
+    "executable": "src-tauri/target/x86_64-pc-windows-msvc/release/aio-coding-hub.exe",
+    "executableSha256": "38af9a75bf0adfe8f83f9cfa243bd20b7267de45439540a58c3362624e56bdb9",
+    "executableBytes": 36398592,
+    "installers": [
+      {
+        "kind": "file",
+        "path": "bundle/msi/AIO Coding Hub_0.60.13_x64_en-US.msi",
+        "bytes": 15028224,
+        "sha256": "2b74ebd903b5a8bc36acdcd6c93f231c4f4d64360f0b624b07fbaed8f9a1daea"
+      }
+    ],
+    "buildProvenance": {
+      "path": "src-tauri/target/x86_64-pc-windows-msvc/release/aio-coding-hub.exe.build-provenance.json",
+      "sha256": "5bfa9b8a2c69428b1acd61fc86268fe1f78703967c93b8904708154b66c71922",
+      "profile": "release",
+      "target": "x86_64-pc-windows-msvc",
+      "producer": "scripts/tauri-build.mjs",
+      "configOverlaySha256": "045e55901593915f744feabfb9a952abeeaa02d23342681e2bbe236a0da221e3"
+    }
+  },
+  "environment": {
+    "platform": "win32",
+    "arch": "x64",
+    "osRelease": "10.0.26200",
+    "kernelType": "Windows_NT",
+    "cpuModel": "Intel(R) Core(TM) Ultra 7 270K Plus",
+    "logicalCpuCount": 24,
+    "totalMemoryBytes": 33693593600,
+    "nodeVersion": "v24.16.0",
+    "locale": "C.UTF-8",
+    "timezone": "UTC",
+    "gpuRenderer": null,
+    "webViewRuntime": null,
+    "power": null,
+    "processMetrics": {
+      "collector": "windows-cim-v1",
+      "identity": {
+        "precision": "exact",
+        "source": "Win32_Process.CreationDate"
+      },
+      "metrics": {
+        "workingSetBytes": {
+          "availability": "available",
+          "source": "Win32_Process.WorkingSetSize",
+          "semantics": "resident working set bytes"
+        },
+        "privateBytes": {
+          "availability": "available",
+          "source": "Win32_Process.PrivatePageCount",
+          "semantics": "private committed bytes"
+        },
+        "cpuTimeMs": {
+          "availability": "available",
+          "source": "Win32_Process.KernelModeTime+UserModeTime",
+          "semantics": "cumulative kernel and user CPU time"
+        }
+      }
+    }
+  },
+  "protocol": {
+    "warmups": 2,
+    "runs": 10,
+    "sampleIntervalMs": 1000,
+    "processTree": "pid-birth-image identity descendants; retained after reparent",
+    "percentile": "nearest-rank",
+    "median": "midpoint for even sample counts"
+  },
+  "scenario": {
+    "id": "logs-10k",
+    "fixture": "current",
+    "fixtureHash": "d4c2f858d717fabd2199759b524fe972d88d055a3593f745798e6ef09246e6c0",
+    "fixtureArtifacts": {
+      "aio-coding-hub.db": {
+        "bytes": 458752,
+        "sha256": "d16ccfe66f2b2093bbfdf08437fa886c6fd718099c84cefbc618f75cc6d119e1"
+      },
+      "settings.json": {
+        "bytes": 2563,
+        "sha256": "b6aae8bed69d185cf424de92d5367c142db4b13e5b10d5bf5da300d6cd0fde4a"
+      },
+      "request-logs-10000.jsonl": {
+        "bytes": 12064402,
+        "sha256": "9ec6b658f506bbda3f340c5ebdb38ef80271c33682077a08e39cf2aeaf60d8b2",
+        "rowCount": 10000
+      }
+    },
+    "durationMs": null,
+    "window": {
+      "width": 1500,
+      "height": 900,
+      "startMinimized": false
+    }
+  },
+  "warmupSummaries": [
+    {
+      "index": 0,
+      "exitCode": 0,
+      "durationMs": 1238.9328,
+      "warnings": [],
+      "failures": []
+    },
+    {
+      "index": 1,
+      "exitCode": 0,
+      "durationMs": 1161.0045000000002,
+      "warnings": [],
+      "failures": []
+    }
+  ],
+  "rawRuns": [
+    {
+      "runId": "logs-10k-run-01",
+      "scenario": "logs-10k",
+      "launchStartedUnixMs": 1784173812286,
+      "exitCode": 0,
+      "signal": null,
+      "durationMs": 1141.1471999999999,
+      "isolation": {
+        "home": "$RUN_HOME",
+        "appData": "$RUN_HOME/.aio-coding-hub",
+        "roamingAppData": "$RUN_HOME/AppData/Roaming",
+        "localAppData": "$RUN_HOME/AppData/Local",
+        "xdgConfigHome": "$RUN_HOME/.config",
+        "xdgDataHome": "$RUN_HOME/.local/share",
+        "xdgCacheHome": "$RUN_HOME/.cache",
+        "temp": "$RUN_HOME/tmp",
+        "codexHome": "$RUN_HOME/.codex",
+        "webviewData": "$RUN_HOME/.aio-benchmark/webview"
+      },
+      "cleanup": {
+        "terminated": [],
+        "skipped": [],
+        "errors": []
+      },
+      "milestones": [
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-01",
+          "scenario": "logs-10k",
+          "seq": 1,
+          "milestone": "process_entry",
+          "elapsedMs": 0.0448,
+          "wallClockUnixMs": 1784173812295,
+          "data": {
+            "appVersion": "0.60.13",
+            "pid": 42924
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-01",
+          "scenario": "logs-10k",
+          "seq": 2,
+          "milestone": "tauri_setup_started",
+          "elapsedMs": 245.6073,
+          "wallClockUnixMs": 1784173812541,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-01",
+          "scenario": "logs-10k",
+          "seq": 3,
+          "milestone": "tauri_setup_completed",
+          "elapsedMs": 253.8864,
+          "wallClockUnixMs": 1784173812549,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-01",
+          "scenario": "logs-10k",
+          "seq": 4,
+          "milestone": "startup_run_started",
+          "elapsedMs": 253.9322,
+          "wallClockUnixMs": 1784173812549,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-01",
+          "scenario": "logs-10k",
+          "seq": 5,
+          "milestone": "db_ready",
+          "elapsedMs": 259.7889,
+          "wallClockUnixMs": 1784173812555,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-01",
+          "scenario": "logs-10k",
+          "seq": 6,
+          "milestone": "settings_ready",
+          "elapsedMs": 260.7623,
+          "wallClockUnixMs": 1784173812556,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-01",
+          "scenario": "logs-10k",
+          "seq": 7,
+          "milestone": "window_visible",
+          "elapsedMs": 281.8201,
+          "wallClockUnixMs": 1784173812577,
+          "data": {
+            "logicalHeight": 900,
+            "logicalWidth": 1500,
+            "physicalHeight": 900,
+            "physicalWidth": 1500,
+            "scaleFactor": 1,
+            "startMinimized": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-01",
+          "scenario": "logs-10k",
+          "seq": 8,
+          "milestone": "gateway_bound",
+          "elapsedMs": 298.6264,
+          "wallClockUnixMs": 1784173812594,
+          "data": {
+            "listenAddr": "127.0.0.1:37124",
+            "port": 37124
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-01",
+          "scenario": "logs-10k",
+          "seq": 9,
+          "milestone": "gateway_ready",
+          "elapsedMs": 302.7485,
+          "wallClockUnixMs": 1784173812598,
+          "data": {
+            "port": 37124
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-01",
+          "scenario": "logs-10k",
+          "seq": 10,
+          "milestone": "startup_ready",
+          "elapsedMs": 303.3668,
+          "wallClockUnixMs": 1784173812599,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-01",
+          "scenario": "logs-10k",
+          "seq": 11,
+          "milestone": "first_interactive",
+          "elapsedMs": 395.05859999999996,
+          "wallClockUnixMs": 1784173812690,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-01",
+          "scenario": "logs-10k",
+          "seq": 12,
+          "milestone": "logs_dataset_ready",
+          "elapsedMs": 552.7895000000001,
+          "wallClockUnixMs": 1784173812848,
+          "data": {
+            "durationMs": 195.4000000059605,
+            "rowCount": 10000
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-01",
+          "scenario": "logs-10k",
+          "seq": 13,
+          "milestone": "logs_filter_painted",
+          "elapsedMs": 643.1002,
+          "wallClockUnixMs": 1784173812938,
+          "data": {
+            "durationMs": 84.59999999403954,
+            "filter": "RATE_LIMITED",
+            "matchCount": 568
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-01",
+          "scenario": "logs-10k",
+          "seq": 14,
+          "milestone": "logs_select_painted",
+          "elapsedMs": 661.4891,
+          "wallClockUnixMs": 1784173812957,
+          "data": {
+            "durationMs": 16,
+            "selectedLogId": 18
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-01",
+          "scenario": "logs-10k",
+          "seq": 15,
+          "milestone": "scenario_completed",
+          "elapsedMs": 663.0527000000001,
+          "wallClockUnixMs": 1784173812958,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-01",
+          "scenario": "logs-10k",
+          "seq": 16,
+          "milestone": "shutdown_started",
+          "elapsedMs": 663.1952,
+          "wallClockUnixMs": 1784173812958,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-01",
+          "scenario": "logs-10k",
+          "seq": 17,
+          "milestone": "shutdown_completed",
+          "elapsedMs": 664.2346,
+          "wallClockUnixMs": 1784173812960,
+          "data": {}
+        }
+      ],
+      "samples": [
+        {
+          "atMs": 418.15809999999965,
+          "atUnixMs": 1784173812707,
+          "processes": [
+            {
+              "pid": 15116,
+              "ppid": 54108,
+              "birthToken": "unix-ms:1784173812412",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 39182336,
+              "privateBytes": 14614528,
+              "cpuTimeMs": 78.125
+            },
+            {
+              "pid": 38320,
+              "ppid": 54108,
+              "birthToken": "unix-ms:1784173812322",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 10600448,
+              "privateBytes": 2564096,
+              "cpuTimeMs": 15.625
+            },
+            {
+              "pid": 42924,
+              "ppid": 4876,
+              "birthToken": "unix-ms:1784173812287",
+              "identityPrecision": "exact",
+              "imageName": "aio-coding-hub.exe",
+              "workingSetBytes": 37351424,
+              "privateBytes": 12824576,
+              "cpuTimeMs": 78.125
+            },
+            {
+              "pid": 44700,
+              "ppid": 54108,
+              "birthToken": "unix-ms:1784173812409",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 35954688,
+              "privateBytes": 41107456,
+              "cpuTimeMs": 156.25
+            },
+            {
+              "pid": 54108,
+              "ppid": 42924,
+              "birthToken": "unix-ms:1784173812313",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 124141568,
+              "privateBytes": 45551616,
+              "cpuTimeMs": 359.375
+            },
+            {
+              "pid": 57068,
+              "ppid": 54108,
+              "birthToken": "unix-ms:1784173812473",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 52674560,
+              "privateBytes": 25346048,
+              "cpuTimeMs": 78.125
+            },
+            {
+              "pid": 61288,
+              "ppid": 54108,
+              "birthToken": "unix-ms:1784173812428",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 20201472,
+              "privateBytes": 9490432,
+              "cpuTimeMs": 31.25
+            }
+          ],
+          "totals": {
+            "processCount": 7,
+            "workingSetBytes": 320106496,
+            "privateBytes": 151498752,
+            "cpuTimeMs": 796.875
+          }
+        }
+      ],
+      "stdout": "",
+      "stderr": "",
+      "warnings": [],
+      "failures": [],
+      "metrics": {
+        "tauriSetupCompletedMs": 253.8864,
+        "dbReadyMs": 259.7889,
+        "gatewayReadyMs": 302.7485,
+        "startupReadyMs": 303.3668,
+        "firstInteractiveMs": 395.05859999999996,
+        "shutdownCompletedMs": 664.2346,
+        "launchToProcessEntryMs": 9,
+        "launchToTauriSetupCompletedMs": 262.84159999999997,
+        "launchToDbReadyMs": 268.7441,
+        "launchToGatewayReadyMs": 311.70369999999997,
+        "launchToStartupReadyMs": 312.322,
+        "launchToFirstInteractiveMs": 404.01379999999995,
+        "launchToShutdownCompletedMs": 673.1898,
+        "windowPhysicalWidth": 1500,
+        "windowPhysicalHeight": 900,
+        "windowLogicalWidth": 1500,
+        "windowLogicalHeight": 900,
+        "windowScaleFactor": 1,
+        "logsDatasetReadyMs": 195.4000000059605,
+        "logsFilterPaintMs": 84.59999999403954,
+        "logsSelectPaintMs": 16,
+        "peakWorkingSetBytes": 320106496,
+        "medianWorkingSetBytes": 320106496,
+        "peakPrivateBytes": 151498752,
+        "cpuTimeDeltaMs": 0,
+        "maxProcessCount": 7
+      },
+      "index": 0
+    },
+    {
+      "runId": "logs-10k-run-02",
+      "scenario": "logs-10k",
+      "launchStartedUnixMs": 1784173813488,
+      "exitCode": 0,
+      "signal": null,
+      "durationMs": 1147.6076999999996,
+      "isolation": {
+        "home": "$RUN_HOME",
+        "appData": "$RUN_HOME/.aio-coding-hub",
+        "roamingAppData": "$RUN_HOME/AppData/Roaming",
+        "localAppData": "$RUN_HOME/AppData/Local",
+        "xdgConfigHome": "$RUN_HOME/.config",
+        "xdgDataHome": "$RUN_HOME/.local/share",
+        "xdgCacheHome": "$RUN_HOME/.cache",
+        "temp": "$RUN_HOME/tmp",
+        "codexHome": "$RUN_HOME/.codex",
+        "webviewData": "$RUN_HOME/.aio-benchmark/webview"
+      },
+      "cleanup": {
+        "terminated": [],
+        "skipped": [],
+        "errors": []
+      },
+      "milestones": [
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-02",
+          "scenario": "logs-10k",
+          "seq": 1,
+          "milestone": "process_entry",
+          "elapsedMs": 0.0427,
+          "wallClockUnixMs": 1784173813497,
+          "data": {
+            "appVersion": "0.60.13",
+            "pid": 59720
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-02",
+          "scenario": "logs-10k",
+          "seq": 2,
+          "milestone": "tauri_setup_started",
+          "elapsedMs": 230.8485,
+          "wallClockUnixMs": 1784173813728,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-02",
+          "scenario": "logs-10k",
+          "seq": 3,
+          "milestone": "tauri_setup_completed",
+          "elapsedMs": 238.03979999999999,
+          "wallClockUnixMs": 1784173813735,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-02",
+          "scenario": "logs-10k",
+          "seq": 4,
+          "milestone": "startup_run_started",
+          "elapsedMs": 238.0881,
+          "wallClockUnixMs": 1784173813735,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-02",
+          "scenario": "logs-10k",
+          "seq": 5,
+          "milestone": "db_ready",
+          "elapsedMs": 243.96380000000002,
+          "wallClockUnixMs": 1784173813741,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-02",
+          "scenario": "logs-10k",
+          "seq": 6,
+          "milestone": "settings_ready",
+          "elapsedMs": 244.6797,
+          "wallClockUnixMs": 1784173813742,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-02",
+          "scenario": "logs-10k",
+          "seq": 7,
+          "milestone": "window_visible",
+          "elapsedMs": 266.28770000000003,
+          "wallClockUnixMs": 1784173813763,
+          "data": {
+            "logicalHeight": 900,
+            "logicalWidth": 1500,
+            "physicalHeight": 900,
+            "physicalWidth": 1500,
+            "scaleFactor": 1,
+            "startMinimized": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-02",
+          "scenario": "logs-10k",
+          "seq": 8,
+          "milestone": "gateway_bound",
+          "elapsedMs": 280.5475,
+          "wallClockUnixMs": 1784173813778,
+          "data": {
+            "listenAddr": "127.0.0.1:37124",
+            "port": 37124
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-02",
+          "scenario": "logs-10k",
+          "seq": 9,
+          "milestone": "gateway_ready",
+          "elapsedMs": 284.09020000000004,
+          "wallClockUnixMs": 1784173813781,
+          "data": {
+            "port": 37124
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-02",
+          "scenario": "logs-10k",
+          "seq": 10,
+          "milestone": "startup_ready",
+          "elapsedMs": 284.70869999999996,
+          "wallClockUnixMs": 1784173813782,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-02",
+          "scenario": "logs-10k",
+          "seq": 11,
+          "milestone": "first_interactive",
+          "elapsedMs": 372.8468,
+          "wallClockUnixMs": 1784173813870,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-02",
+          "scenario": "logs-10k",
+          "seq": 12,
+          "milestone": "logs_dataset_ready",
+          "elapsedMs": 538.6260000000001,
+          "wallClockUnixMs": 1784173814036,
+          "data": {
+            "durationMs": 197.9000000059605,
+            "rowCount": 10000
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-02",
+          "scenario": "logs-10k",
+          "seq": 13,
+          "milestone": "logs_filter_painted",
+          "elapsedMs": 632.1242,
+          "wallClockUnixMs": 1784173814129,
+          "data": {
+            "durationMs": 87.10000002384186,
+            "filter": "RATE_LIMITED",
+            "matchCount": 568
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-02",
+          "scenario": "logs-10k",
+          "seq": 14,
+          "milestone": "logs_select_painted",
+          "elapsedMs": 648.8547,
+          "wallClockUnixMs": 1784173814146,
+          "data": {
+            "durationMs": 15.299999982118608,
+            "selectedLogId": 18
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-02",
+          "scenario": "logs-10k",
+          "seq": 15,
+          "milestone": "scenario_completed",
+          "elapsedMs": 650.2742999999999,
+          "wallClockUnixMs": 1784173814147,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-02",
+          "scenario": "logs-10k",
+          "seq": 16,
+          "milestone": "shutdown_started",
+          "elapsedMs": 650.4119000000001,
+          "wallClockUnixMs": 1784173814148,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-02",
+          "scenario": "logs-10k",
+          "seq": 17,
+          "milestone": "shutdown_completed",
+          "elapsedMs": 651.2614,
+          "wallClockUnixMs": 1784173814148,
+          "data": {}
+        }
+      ],
+      "samples": [
+        {
+          "atMs": 387.0478000000003,
+          "atUnixMs": 1784173813877,
+          "processes": [
+            {
+              "pid": 8332,
+              "ppid": 52476,
+              "birthToken": "unix-ms:1784173813607",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 39624704,
+              "privateBytes": 15216640,
+              "cpuTimeMs": 93.75
+            },
+            {
+              "pid": 35528,
+              "ppid": 52476,
+              "birthToken": "unix-ms:1784173813522",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 10592256,
+              "privateBytes": 2576384,
+              "cpuTimeMs": 0
+            },
+            {
+              "pid": 40728,
+              "ppid": 52476,
+              "birthToken": "unix-ms:1784173813622",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 20185088,
+              "privateBytes": 9486336,
+              "cpuTimeMs": 31.25
+            },
+            {
+              "pid": 49556,
+              "ppid": 52476,
+              "birthToken": "unix-ms:1784173813604",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 38957056,
+              "privateBytes": 42930176,
+              "cpuTimeMs": 156.25
+            },
+            {
+              "pid": 50164,
+              "ppid": 52476,
+              "birthToken": "unix-ms:1784173813664",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 49901568,
+              "privateBytes": 22511616,
+              "cpuTimeMs": 62.5
+            },
+            {
+              "pid": 52476,
+              "ppid": 59720,
+              "birthToken": "unix-ms:1784173813514",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 123863040,
+              "privateBytes": 45400064,
+              "cpuTimeMs": 500
+            },
+            {
+              "pid": 59720,
+              "ppid": 4876,
+              "birthToken": "unix-ms:1784173813489",
+              "identityPrecision": "exact",
+              "imageName": "aio-coding-hub.exe",
+              "workingSetBytes": 40964096,
+              "privateBytes": 17682432,
+              "cpuTimeMs": 46.875
+            }
+          ],
+          "totals": {
+            "processCount": 7,
+            "workingSetBytes": 324087808,
+            "privateBytes": 155803648,
+            "cpuTimeMs": 890.625
+          }
+        }
+      ],
+      "stdout": "",
+      "stderr": "",
+      "warnings": [],
+      "failures": [],
+      "metrics": {
+        "tauriSetupCompletedMs": 238.03979999999999,
+        "dbReadyMs": 243.96380000000002,
+        "gatewayReadyMs": 284.09020000000004,
+        "startupReadyMs": 284.70869999999996,
+        "firstInteractiveMs": 372.8468,
+        "shutdownCompletedMs": 651.2614,
+        "launchToProcessEntryMs": 9,
+        "launchToTauriSetupCompletedMs": 246.9971,
+        "launchToDbReadyMs": 252.92110000000002,
+        "launchToGatewayReadyMs": 293.0475,
+        "launchToStartupReadyMs": 293.66599999999994,
+        "launchToFirstInteractiveMs": 381.80409999999995,
+        "launchToShutdownCompletedMs": 660.2187,
+        "windowPhysicalWidth": 1500,
+        "windowPhysicalHeight": 900,
+        "windowLogicalWidth": 1500,
+        "windowLogicalHeight": 900,
+        "windowScaleFactor": 1,
+        "logsDatasetReadyMs": 197.9000000059605,
+        "logsFilterPaintMs": 87.10000002384186,
+        "logsSelectPaintMs": 15.299999982118608,
+        "peakWorkingSetBytes": 324087808,
+        "medianWorkingSetBytes": 324087808,
+        "peakPrivateBytes": 155803648,
+        "cpuTimeDeltaMs": 0,
+        "maxProcessCount": 7
+      },
+      "index": 1
+    },
+    {
+      "runId": "logs-10k-run-03",
+      "scenario": "logs-10k",
+      "launchStartedUnixMs": 1784173814695,
+      "exitCode": 0,
+      "signal": null,
+      "durationMs": 1161.4101,
+      "isolation": {
+        "home": "$RUN_HOME",
+        "appData": "$RUN_HOME/.aio-coding-hub",
+        "roamingAppData": "$RUN_HOME/AppData/Roaming",
+        "localAppData": "$RUN_HOME/AppData/Local",
+        "xdgConfigHome": "$RUN_HOME/.config",
+        "xdgDataHome": "$RUN_HOME/.local/share",
+        "xdgCacheHome": "$RUN_HOME/.cache",
+        "temp": "$RUN_HOME/tmp",
+        "codexHome": "$RUN_HOME/.codex",
+        "webviewData": "$RUN_HOME/.aio-benchmark/webview"
+      },
+      "cleanup": {
+        "terminated": [],
+        "skipped": [],
+        "errors": []
+      },
+      "milestones": [
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-03",
+          "scenario": "logs-10k",
+          "seq": 1,
+          "milestone": "process_entry",
+          "elapsedMs": 0.0427,
+          "wallClockUnixMs": 1784173814704,
+          "data": {
+            "appVersion": "0.60.13",
+            "pid": 3628
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-03",
+          "scenario": "logs-10k",
+          "seq": 2,
+          "milestone": "tauri_setup_started",
+          "elapsedMs": 234.7786,
+          "wallClockUnixMs": 1784173814939,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-03",
+          "scenario": "logs-10k",
+          "seq": 3,
+          "milestone": "tauri_setup_completed",
+          "elapsedMs": 243.9924,
+          "wallClockUnixMs": 1784173814948,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-03",
+          "scenario": "logs-10k",
+          "seq": 4,
+          "milestone": "startup_run_started",
+          "elapsedMs": 244.0497,
+          "wallClockUnixMs": 1784173814948,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-03",
+          "scenario": "logs-10k",
+          "seq": 5,
+          "milestone": "db_ready",
+          "elapsedMs": 250.29590000000002,
+          "wallClockUnixMs": 1784173814954,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-03",
+          "scenario": "logs-10k",
+          "seq": 6,
+          "milestone": "settings_ready",
+          "elapsedMs": 251.14360000000002,
+          "wallClockUnixMs": 1784173814955,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-03",
+          "scenario": "logs-10k",
+          "seq": 7,
+          "milestone": "window_visible",
+          "elapsedMs": 275.5036,
+          "wallClockUnixMs": 1784173814979,
+          "data": {
+            "logicalHeight": 900,
+            "logicalWidth": 1500,
+            "physicalHeight": 900,
+            "physicalWidth": 1500,
+            "scaleFactor": 1,
+            "startMinimized": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-03",
+          "scenario": "logs-10k",
+          "seq": 8,
+          "milestone": "gateway_bound",
+          "elapsedMs": 289.6173,
+          "wallClockUnixMs": 1784173814993,
+          "data": {
+            "listenAddr": "127.0.0.1:37124",
+            "port": 37124
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-03",
+          "scenario": "logs-10k",
+          "seq": 9,
+          "milestone": "gateway_ready",
+          "elapsedMs": 293.64869999999996,
+          "wallClockUnixMs": 1784173814997,
+          "data": {
+            "port": 37124
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-03",
+          "scenario": "logs-10k",
+          "seq": 10,
+          "milestone": "startup_ready",
+          "elapsedMs": 294.41,
+          "wallClockUnixMs": 1784173814998,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-03",
+          "scenario": "logs-10k",
+          "seq": 11,
+          "milestone": "first_interactive",
+          "elapsedMs": 382.0369,
+          "wallClockUnixMs": 1784173815086,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-03",
+          "scenario": "logs-10k",
+          "seq": 12,
+          "milestone": "logs_dataset_ready",
+          "elapsedMs": 546.389,
+          "wallClockUnixMs": 1784173815250,
+          "data": {
+            "durationMs": 198.30000001192093,
+            "rowCount": 10000
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-03",
+          "scenario": "logs-10k",
+          "seq": 13,
+          "milestone": "logs_filter_painted",
+          "elapsedMs": 653.9036,
+          "wallClockUnixMs": 1784173815358,
+          "data": {
+            "durationMs": 100.2000000178814,
+            "filter": "RATE_LIMITED",
+            "matchCount": 568
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-03",
+          "scenario": "logs-10k",
+          "seq": 14,
+          "milestone": "logs_select_painted",
+          "elapsedMs": 677.991,
+          "wallClockUnixMs": 1784173815382,
+          "data": {
+            "durationMs": 22.80000001192093,
+            "selectedLogId": 18
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-03",
+          "scenario": "logs-10k",
+          "seq": 15,
+          "milestone": "scenario_completed",
+          "elapsedMs": 679.3047,
+          "wallClockUnixMs": 1784173815383,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-03",
+          "scenario": "logs-10k",
+          "seq": 16,
+          "milestone": "shutdown_started",
+          "elapsedMs": 679.4618,
+          "wallClockUnixMs": 1784173815383,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-03",
+          "scenario": "logs-10k",
+          "seq": 17,
+          "milestone": "shutdown_completed",
+          "elapsedMs": 680.4396,
+          "wallClockUnixMs": 1784173815384,
+          "data": {}
+        }
+      ],
+      "samples": [
+        {
+          "atMs": 411.39879999999994,
+          "atUnixMs": 1784173815108,
+          "processes": [
+            {
+              "pid": 3628,
+              "ppid": 4876,
+              "birthToken": "unix-ms:1784173814696",
+              "identityPrecision": "exact",
+              "imageName": "aio-coding-hub.exe",
+              "workingSetBytes": 40751104,
+              "privateBytes": 17072128,
+              "cpuTimeMs": 62.5
+            },
+            {
+              "pid": 5960,
+              "ppid": 39652,
+              "birthToken": "unix-ms:1784173814811",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 38895616,
+              "privateBytes": 42958848,
+              "cpuTimeMs": 171.875
+            },
+            {
+              "pid": 12452,
+              "ppid": 39652,
+              "birthToken": "unix-ms:1784173814729",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 10592256,
+              "privateBytes": 2568192,
+              "cpuTimeMs": 15.625
+            },
+            {
+              "pid": 22660,
+              "ppid": 39652,
+              "birthToken": "unix-ms:1784173814814",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 39489536,
+              "privateBytes": 14970880,
+              "cpuTimeMs": 187.5
+            },
+            {
+              "pid": 39652,
+              "ppid": 3628,
+              "birthToken": "unix-ms:1784173814721",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 123441152,
+              "privateBytes": 44703744,
+              "cpuTimeMs": 500
+            },
+            {
+              "pid": 50416,
+              "ppid": 39652,
+              "birthToken": "unix-ms:1784173814874",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 49913856,
+              "privateBytes": 22507520,
+              "cpuTimeMs": 62.5
+            },
+            {
+              "pid": 58132,
+              "ppid": 39652,
+              "birthToken": "unix-ms:1784173814830",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 20176896,
+              "privateBytes": 9474048,
+              "cpuTimeMs": 31.25
+            }
+          ],
+          "totals": {
+            "processCount": 7,
+            "workingSetBytes": 323260416,
+            "privateBytes": 154255360,
+            "cpuTimeMs": 1031.25
+          }
+        }
+      ],
+      "stdout": "",
+      "stderr": "",
+      "warnings": [],
+      "failures": [],
+      "metrics": {
+        "tauriSetupCompletedMs": 243.9924,
+        "dbReadyMs": 250.29590000000002,
+        "gatewayReadyMs": 293.64869999999996,
+        "startupReadyMs": 294.41,
+        "firstInteractiveMs": 382.0369,
+        "shutdownCompletedMs": 680.4396,
+        "launchToProcessEntryMs": 9,
+        "launchToTauriSetupCompletedMs": 252.9497,
+        "launchToDbReadyMs": 259.2532,
+        "launchToGatewayReadyMs": 302.60599999999994,
+        "launchToStartupReadyMs": 303.3673,
+        "launchToFirstInteractiveMs": 390.9942,
+        "launchToShutdownCompletedMs": 689.3969000000001,
+        "windowPhysicalWidth": 1500,
+        "windowPhysicalHeight": 900,
+        "windowLogicalWidth": 1500,
+        "windowLogicalHeight": 900,
+        "windowScaleFactor": 1,
+        "logsDatasetReadyMs": 198.30000001192093,
+        "logsFilterPaintMs": 100.2000000178814,
+        "logsSelectPaintMs": 22.80000001192093,
+        "peakWorkingSetBytes": 323260416,
+        "medianWorkingSetBytes": 323260416,
+        "peakPrivateBytes": 154255360,
+        "cpuTimeDeltaMs": 0,
+        "maxProcessCount": 7
+      },
+      "index": 2
+    },
+    {
+      "runId": "logs-10k-run-04",
+      "scenario": "logs-10k",
+      "launchStartedUnixMs": 1784173815920,
+      "exitCode": 0,
+      "signal": null,
+      "durationMs": 1147.9431999999997,
+      "isolation": {
+        "home": "$RUN_HOME",
+        "appData": "$RUN_HOME/.aio-coding-hub",
+        "roamingAppData": "$RUN_HOME/AppData/Roaming",
+        "localAppData": "$RUN_HOME/AppData/Local",
+        "xdgConfigHome": "$RUN_HOME/.config",
+        "xdgDataHome": "$RUN_HOME/.local/share",
+        "xdgCacheHome": "$RUN_HOME/.cache",
+        "temp": "$RUN_HOME/tmp",
+        "codexHome": "$RUN_HOME/.codex",
+        "webviewData": "$RUN_HOME/.aio-benchmark/webview"
+      },
+      "cleanup": {
+        "terminated": [],
+        "skipped": [],
+        "errors": []
+      },
+      "milestones": [
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-04",
+          "scenario": "logs-10k",
+          "seq": 1,
+          "milestone": "process_entry",
+          "elapsedMs": 0.046400000000000004,
+          "wallClockUnixMs": 1784173815930,
+          "data": {
+            "appVersion": "0.60.13",
+            "pid": 54432
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-04",
+          "scenario": "logs-10k",
+          "seq": 2,
+          "milestone": "tauri_setup_started",
+          "elapsedMs": 232.28009999999998,
+          "wallClockUnixMs": 1784173816162,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-04",
+          "scenario": "logs-10k",
+          "seq": 3,
+          "milestone": "tauri_setup_completed",
+          "elapsedMs": 241.69129999999998,
+          "wallClockUnixMs": 1784173816171,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-04",
+          "scenario": "logs-10k",
+          "seq": 4,
+          "milestone": "startup_run_started",
+          "elapsedMs": 241.7396,
+          "wallClockUnixMs": 1784173816171,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-04",
+          "scenario": "logs-10k",
+          "seq": 5,
+          "milestone": "db_ready",
+          "elapsedMs": 247.7062,
+          "wallClockUnixMs": 1784173816177,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-04",
+          "scenario": "logs-10k",
+          "seq": 6,
+          "milestone": "settings_ready",
+          "elapsedMs": 248.3625,
+          "wallClockUnixMs": 1784173816178,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-04",
+          "scenario": "logs-10k",
+          "seq": 7,
+          "milestone": "window_visible",
+          "elapsedMs": 271.2899,
+          "wallClockUnixMs": 1784173816201,
+          "data": {
+            "logicalHeight": 900,
+            "logicalWidth": 1500,
+            "physicalHeight": 900,
+            "physicalWidth": 1500,
+            "scaleFactor": 1,
+            "startMinimized": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-04",
+          "scenario": "logs-10k",
+          "seq": 8,
+          "milestone": "gateway_bound",
+          "elapsedMs": 286.41339999999997,
+          "wallClockUnixMs": 1784173816216,
+          "data": {
+            "listenAddr": "127.0.0.1:37124",
+            "port": 37124
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-04",
+          "scenario": "logs-10k",
+          "seq": 9,
+          "milestone": "gateway_ready",
+          "elapsedMs": 289.7208,
+          "wallClockUnixMs": 1784173816219,
+          "data": {
+            "port": 37124
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-04",
+          "scenario": "logs-10k",
+          "seq": 10,
+          "milestone": "startup_ready",
+          "elapsedMs": 290.4022,
+          "wallClockUnixMs": 1784173816220,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-04",
+          "scenario": "logs-10k",
+          "seq": 11,
+          "milestone": "first_interactive",
+          "elapsedMs": 375.08619999999996,
+          "wallClockUnixMs": 1784173816305,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-04",
+          "scenario": "logs-10k",
+          "seq": 12,
+          "milestone": "logs_dataset_ready",
+          "elapsedMs": 534.7991,
+          "wallClockUnixMs": 1784173816465,
+          "data": {
+            "durationMs": 191.5999999940395,
+            "rowCount": 10000
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-04",
+          "scenario": "logs-10k",
+          "seq": 13,
+          "milestone": "logs_filter_painted",
+          "elapsedMs": 638.7588,
+          "wallClockUnixMs": 1784173816569,
+          "data": {
+            "durationMs": 97.69999998807909,
+            "filter": "RATE_LIMITED",
+            "matchCount": 568
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-04",
+          "scenario": "logs-10k",
+          "seq": 14,
+          "milestone": "logs_select_painted",
+          "elapsedMs": 663.08,
+          "wallClockUnixMs": 1784173816593,
+          "data": {
+            "durationMs": 23,
+            "selectedLogId": 18
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-04",
+          "scenario": "logs-10k",
+          "seq": 15,
+          "milestone": "scenario_completed",
+          "elapsedMs": 664.3418,
+          "wallClockUnixMs": 1784173816594,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-04",
+          "scenario": "logs-10k",
+          "seq": 16,
+          "milestone": "shutdown_started",
+          "elapsedMs": 664.4665,
+          "wallClockUnixMs": 1784173816594,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-04",
+          "scenario": "logs-10k",
+          "seq": 17,
+          "milestone": "shutdown_completed",
+          "elapsedMs": 665.4372,
+          "wallClockUnixMs": 1784173816595,
+          "data": {}
+        }
+      ],
+      "samples": [
+        {
+          "atMs": 382.27059999999983,
+          "atUnixMs": 1784173816305,
+          "processes": [
+            {
+              "pid": 4884,
+              "ppid": 38900,
+              "birthToken": "unix-ms:1784173816099",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 49852416,
+              "privateBytes": 22515712,
+              "cpuTimeMs": 46.875
+            },
+            {
+              "pid": 33044,
+              "ppid": 38900,
+              "birthToken": "unix-ms:1784173816055",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 20062208,
+              "privateBytes": 9474048,
+              "cpuTimeMs": 46.875
+            },
+            {
+              "pid": 38764,
+              "ppid": 38900,
+              "birthToken": "unix-ms:1784173815955",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 10592256,
+              "privateBytes": 2564096,
+              "cpuTimeMs": 0
+            },
+            {
+              "pid": 38900,
+              "ppid": 54432,
+              "birthToken": "unix-ms:1784173815947",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 123580416,
+              "privateBytes": 45084672,
+              "cpuTimeMs": 390.625
+            },
+            {
+              "pid": 45204,
+              "ppid": 38900,
+              "birthToken": "unix-ms:1784173816040",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 39342080,
+              "privateBytes": 14831616,
+              "cpuTimeMs": 62.5
+            },
+            {
+              "pid": 47556,
+              "ppid": 38900,
+              "birthToken": "unix-ms:1784173816037",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 38268928,
+              "privateBytes": 41902080,
+              "cpuTimeMs": 156.25
+            },
+            {
+              "pid": 54432,
+              "ppid": 4876,
+              "birthToken": "unix-ms:1784173815921",
+              "identityPrecision": "exact",
+              "imageName": "aio-coding-hub.exe",
+              "workingSetBytes": 35581952,
+              "privateBytes": 11177984,
+              "cpuTimeMs": 93.75
+            }
+          ],
+          "totals": {
+            "processCount": 7,
+            "workingSetBytes": 317280256,
+            "privateBytes": 147550208,
+            "cpuTimeMs": 796.875
+          }
+        }
+      ],
+      "stdout": "",
+      "stderr": "[0716/115016.712:ERROR:ui/gfx/win/window_impl.cc:172] Failed to unregister class Chrome_WidgetWin_0. Error = 1411\r\n",
+      "warnings": [],
+      "failures": [],
+      "metrics": {
+        "tauriSetupCompletedMs": 241.69129999999998,
+        "dbReadyMs": 247.7062,
+        "gatewayReadyMs": 289.7208,
+        "startupReadyMs": 290.4022,
+        "firstInteractiveMs": 375.08619999999996,
+        "shutdownCompletedMs": 665.4372,
+        "launchToProcessEntryMs": 10,
+        "launchToTauriSetupCompletedMs": 251.64489999999998,
+        "launchToDbReadyMs": 257.65979999999996,
+        "launchToGatewayReadyMs": 299.6744,
+        "launchToStartupReadyMs": 300.3558,
+        "launchToFirstInteractiveMs": 385.03979999999996,
+        "launchToShutdownCompletedMs": 675.3908,
+        "windowPhysicalWidth": 1500,
+        "windowPhysicalHeight": 900,
+        "windowLogicalWidth": 1500,
+        "windowLogicalHeight": 900,
+        "windowScaleFactor": 1,
+        "logsDatasetReadyMs": 191.5999999940395,
+        "logsFilterPaintMs": 97.69999998807909,
+        "logsSelectPaintMs": 23,
+        "peakWorkingSetBytes": 317280256,
+        "medianWorkingSetBytes": 317280256,
+        "peakPrivateBytes": 147550208,
+        "cpuTimeDeltaMs": 0,
+        "maxProcessCount": 7
+      },
+      "index": 3
+    },
+    {
+      "runId": "logs-10k-run-05",
+      "scenario": "logs-10k",
+      "launchStartedUnixMs": 1784173817127,
+      "exitCode": 0,
+      "signal": null,
+      "durationMs": 1203.5652999999993,
+      "isolation": {
+        "home": "$RUN_HOME",
+        "appData": "$RUN_HOME/.aio-coding-hub",
+        "roamingAppData": "$RUN_HOME/AppData/Roaming",
+        "localAppData": "$RUN_HOME/AppData/Local",
+        "xdgConfigHome": "$RUN_HOME/.config",
+        "xdgDataHome": "$RUN_HOME/.local/share",
+        "xdgCacheHome": "$RUN_HOME/.cache",
+        "temp": "$RUN_HOME/tmp",
+        "codexHome": "$RUN_HOME/.codex",
+        "webviewData": "$RUN_HOME/.aio-benchmark/webview"
+      },
+      "cleanup": {
+        "terminated": [],
+        "skipped": [],
+        "errors": []
+      },
+      "milestones": [
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-05",
+          "scenario": "logs-10k",
+          "seq": 1,
+          "milestone": "process_entry",
+          "elapsedMs": 0.0424,
+          "wallClockUnixMs": 1784173817136,
+          "data": {
+            "appVersion": "0.60.13",
+            "pid": 7572
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-05",
+          "scenario": "logs-10k",
+          "seq": 2,
+          "milestone": "tauri_setup_started",
+          "elapsedMs": 233.9617,
+          "wallClockUnixMs": 1784173817370,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-05",
+          "scenario": "logs-10k",
+          "seq": 3,
+          "milestone": "tauri_setup_completed",
+          "elapsedMs": 240.8465,
+          "wallClockUnixMs": 1784173817377,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-05",
+          "scenario": "logs-10k",
+          "seq": 4,
+          "milestone": "startup_run_started",
+          "elapsedMs": 240.8924,
+          "wallClockUnixMs": 1784173817377,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-05",
+          "scenario": "logs-10k",
+          "seq": 5,
+          "milestone": "db_ready",
+          "elapsedMs": 247.0149,
+          "wallClockUnixMs": 1784173817383,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-05",
+          "scenario": "logs-10k",
+          "seq": 6,
+          "milestone": "settings_ready",
+          "elapsedMs": 247.8301,
+          "wallClockUnixMs": 1784173817384,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-05",
+          "scenario": "logs-10k",
+          "seq": 7,
+          "milestone": "window_visible",
+          "elapsedMs": 271.4576,
+          "wallClockUnixMs": 1784173817408,
+          "data": {
+            "logicalHeight": 900,
+            "logicalWidth": 1500,
+            "physicalHeight": 900,
+            "physicalWidth": 1500,
+            "scaleFactor": 1,
+            "startMinimized": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-05",
+          "scenario": "logs-10k",
+          "seq": 8,
+          "milestone": "gateway_bound",
+          "elapsedMs": 287.61170000000004,
+          "wallClockUnixMs": 1784173817424,
+          "data": {
+            "listenAddr": "127.0.0.1:37124",
+            "port": 37124
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-05",
+          "scenario": "logs-10k",
+          "seq": 9,
+          "milestone": "gateway_ready",
+          "elapsedMs": 290.76279999999997,
+          "wallClockUnixMs": 1784173817427,
+          "data": {
+            "port": 37124
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-05",
+          "scenario": "logs-10k",
+          "seq": 10,
+          "milestone": "startup_ready",
+          "elapsedMs": 291.4879,
+          "wallClockUnixMs": 1784173817428,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-05",
+          "scenario": "logs-10k",
+          "seq": 11,
+          "milestone": "first_interactive",
+          "elapsedMs": 375.5174,
+          "wallClockUnixMs": 1784173817512,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-05",
+          "scenario": "logs-10k",
+          "seq": 12,
+          "milestone": "logs_dataset_ready",
+          "elapsedMs": 530.1698,
+          "wallClockUnixMs": 1784173817666,
+          "data": {
+            "durationMs": 186.19999998807907,
+            "rowCount": 10000
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-05",
+          "scenario": "logs-10k",
+          "seq": 13,
+          "milestone": "logs_filter_painted",
+          "elapsedMs": 710.4226,
+          "wallClockUnixMs": 1784173817847,
+          "data": {
+            "durationMs": 174.2999999821186,
+            "filter": "RATE_LIMITED",
+            "matchCount": 568
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-05",
+          "scenario": "logs-10k",
+          "seq": 14,
+          "milestone": "logs_select_painted",
+          "elapsedMs": 721.6831999999999,
+          "wallClockUnixMs": 1784173817858,
+          "data": {
+            "durationMs": 9.800000011920927,
+            "selectedLogId": 18
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-05",
+          "scenario": "logs-10k",
+          "seq": 15,
+          "milestone": "scenario_completed",
+          "elapsedMs": 723.1848,
+          "wallClockUnixMs": 1784173817859,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-05",
+          "scenario": "logs-10k",
+          "seq": 16,
+          "milestone": "shutdown_started",
+          "elapsedMs": 723.3372999999999,
+          "wallClockUnixMs": 1784173817859,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-05",
+          "scenario": "logs-10k",
+          "seq": 17,
+          "milestone": "shutdown_completed",
+          "elapsedMs": 724.3522,
+          "wallClockUnixMs": 1784173817860,
+          "data": {}
+        }
+      ],
+      "samples": [
+        {
+          "atMs": 389.7510999999995,
+          "atUnixMs": 1784173817519,
+          "processes": [
+            {
+              "pid": 7572,
+              "ppid": 4876,
+              "birthToken": "unix-ms:1784173817128",
+              "identityPrecision": "exact",
+              "imageName": "aio-coding-hub.exe",
+              "workingSetBytes": 36814848,
+              "privateBytes": 12963840,
+              "cpuTimeMs": 78.125
+            },
+            {
+              "pid": 19632,
+              "ppid": 45016,
+              "birthToken": "unix-ms:1784173817244",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 38375424,
+              "privateBytes": 41963520,
+              "cpuTimeMs": 171.875
+            },
+            {
+              "pid": 35016,
+              "ppid": 45016,
+              "birthToken": "unix-ms:1784173817162",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 10588160,
+              "privateBytes": 2572288,
+              "cpuTimeMs": 0
+            },
+            {
+              "pid": 44748,
+              "ppid": 45016,
+              "birthToken": "unix-ms:1784173817263",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 20168704,
+              "privateBytes": 9461760,
+              "cpuTimeMs": 62.5
+            },
+            {
+              "pid": 45016,
+              "ppid": 7572,
+              "birthToken": "unix-ms:1784173817153",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 123437056,
+              "privateBytes": 44871680,
+              "cpuTimeMs": 468.75
+            },
+            {
+              "pid": 57976,
+              "ppid": 45016,
+              "birthToken": "unix-ms:1784173817307",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 49881088,
+              "privateBytes": 22421504,
+              "cpuTimeMs": 62.5
+            },
+            {
+              "pid": 62664,
+              "ppid": 45016,
+              "birthToken": "unix-ms:1784173817247",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 39403520,
+              "privateBytes": 14872576,
+              "cpuTimeMs": 46.875
+            }
+          ],
+          "totals": {
+            "processCount": 7,
+            "workingSetBytes": 318668800,
+            "privateBytes": 149127168,
+            "cpuTimeMs": 890.625
+          }
+        }
+      ],
+      "stdout": "",
+      "stderr": "[0716/115017.973:ERROR:ui/gfx/win/window_impl.cc:172] Failed to unregister class Chrome_WidgetWin_0. Error = 1411\r\n",
+      "warnings": [],
+      "failures": [],
+      "metrics": {
+        "tauriSetupCompletedMs": 240.8465,
+        "dbReadyMs": 247.0149,
+        "gatewayReadyMs": 290.76279999999997,
+        "startupReadyMs": 291.4879,
+        "firstInteractiveMs": 375.5174,
+        "shutdownCompletedMs": 724.3522,
+        "launchToProcessEntryMs": 9,
+        "launchToTauriSetupCompletedMs": 249.8041,
+        "launchToDbReadyMs": 255.97250000000003,
+        "launchToGatewayReadyMs": 299.7204,
+        "launchToStartupReadyMs": 300.44550000000004,
+        "launchToFirstInteractiveMs": 384.475,
+        "launchToShutdownCompletedMs": 733.3098,
+        "windowPhysicalWidth": 1500,
+        "windowPhysicalHeight": 900,
+        "windowLogicalWidth": 1500,
+        "windowLogicalHeight": 900,
+        "windowScaleFactor": 1,
+        "logsDatasetReadyMs": 186.19999998807907,
+        "logsFilterPaintMs": 174.2999999821186,
+        "logsSelectPaintMs": 9.800000011920927,
+        "peakWorkingSetBytes": 318668800,
+        "medianWorkingSetBytes": 318668800,
+        "peakPrivateBytes": 149127168,
+        "cpuTimeDeltaMs": 0,
+        "maxProcessCount": 7
+      },
+      "index": 4
+    },
+    {
+      "runId": "logs-10k-run-06",
+      "scenario": "logs-10k",
+      "launchStartedUnixMs": 1784173818395,
+      "exitCode": 0,
+      "signal": null,
+      "durationMs": 1145.5892999999996,
+      "isolation": {
+        "home": "$RUN_HOME",
+        "appData": "$RUN_HOME/.aio-coding-hub",
+        "roamingAppData": "$RUN_HOME/AppData/Roaming",
+        "localAppData": "$RUN_HOME/AppData/Local",
+        "xdgConfigHome": "$RUN_HOME/.config",
+        "xdgDataHome": "$RUN_HOME/.local/share",
+        "xdgCacheHome": "$RUN_HOME/.cache",
+        "temp": "$RUN_HOME/tmp",
+        "codexHome": "$RUN_HOME/.codex",
+        "webviewData": "$RUN_HOME/.aio-benchmark/webview"
+      },
+      "cleanup": {
+        "terminated": [],
+        "skipped": [],
+        "errors": []
+      },
+      "milestones": [
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-06",
+          "scenario": "logs-10k",
+          "seq": 1,
+          "milestone": "process_entry",
+          "elapsedMs": 0.045599999999999995,
+          "wallClockUnixMs": 1784173818405,
+          "data": {
+            "appVersion": "0.60.13",
+            "pid": 4756
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-06",
+          "scenario": "logs-10k",
+          "seq": 2,
+          "milestone": "tauri_setup_started",
+          "elapsedMs": 234.8929,
+          "wallClockUnixMs": 1784173818640,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-06",
+          "scenario": "logs-10k",
+          "seq": 3,
+          "milestone": "tauri_setup_completed",
+          "elapsedMs": 241.9654,
+          "wallClockUnixMs": 1784173818647,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-06",
+          "scenario": "logs-10k",
+          "seq": 4,
+          "milestone": "startup_run_started",
+          "elapsedMs": 242.0103,
+          "wallClockUnixMs": 1784173818647,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-06",
+          "scenario": "logs-10k",
+          "seq": 5,
+          "milestone": "db_ready",
+          "elapsedMs": 252.1387,
+          "wallClockUnixMs": 1784173818657,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-06",
+          "scenario": "logs-10k",
+          "seq": 6,
+          "milestone": "settings_ready",
+          "elapsedMs": 252.9436,
+          "wallClockUnixMs": 1784173818658,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-06",
+          "scenario": "logs-10k",
+          "seq": 7,
+          "milestone": "window_visible",
+          "elapsedMs": 279.42650000000003,
+          "wallClockUnixMs": 1784173818685,
+          "data": {
+            "logicalHeight": 900,
+            "logicalWidth": 1500,
+            "physicalHeight": 900,
+            "physicalWidth": 1500,
+            "scaleFactor": 1,
+            "startMinimized": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-06",
+          "scenario": "logs-10k",
+          "seq": 8,
+          "milestone": "gateway_bound",
+          "elapsedMs": 293.9936,
+          "wallClockUnixMs": 1784173818699,
+          "data": {
+            "listenAddr": "127.0.0.1:37124",
+            "port": 37124
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-06",
+          "scenario": "logs-10k",
+          "seq": 9,
+          "milestone": "gateway_ready",
+          "elapsedMs": 297.2031,
+          "wallClockUnixMs": 1784173818702,
+          "data": {
+            "port": 37124
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-06",
+          "scenario": "logs-10k",
+          "seq": 10,
+          "milestone": "startup_ready",
+          "elapsedMs": 297.9467,
+          "wallClockUnixMs": 1784173818703,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-06",
+          "scenario": "logs-10k",
+          "seq": 11,
+          "milestone": "first_interactive",
+          "elapsedMs": 376.2364,
+          "wallClockUnixMs": 1784173818781,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-06",
+          "scenario": "logs-10k",
+          "seq": 12,
+          "milestone": "logs_dataset_ready",
+          "elapsedMs": 534.9229,
+          "wallClockUnixMs": 1784173818940,
+          "data": {
+            "durationMs": 194.30000001192093,
+            "rowCount": 10000
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-06",
+          "scenario": "logs-10k",
+          "seq": 13,
+          "milestone": "logs_filter_painted",
+          "elapsedMs": 622.0378,
+          "wallClockUnixMs": 1784173819027,
+          "data": {
+            "durationMs": 81.59999999403954,
+            "filter": "RATE_LIMITED",
+            "matchCount": 568
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-06",
+          "scenario": "logs-10k",
+          "seq": 14,
+          "milestone": "logs_select_painted",
+          "elapsedMs": 637.2955999999999,
+          "wallClockUnixMs": 1784173819043,
+          "data": {
+            "durationMs": 14,
+            "selectedLogId": 18
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-06",
+          "scenario": "logs-10k",
+          "seq": 15,
+          "milestone": "scenario_completed",
+          "elapsedMs": 638.6058999999999,
+          "wallClockUnixMs": 1784173819044,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-06",
+          "scenario": "logs-10k",
+          "seq": 16,
+          "milestone": "shutdown_started",
+          "elapsedMs": 638.7506,
+          "wallClockUnixMs": 1784173819044,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-06",
+          "scenario": "logs-10k",
+          "seq": 17,
+          "milestone": "shutdown_completed",
+          "elapsedMs": 639.6815,
+          "wallClockUnixMs": 1784173819045,
+          "data": {}
+        }
+      ],
+      "samples": [
+        {
+          "atMs": 380.4827000000005,
+          "atUnixMs": 1784173818778,
+          "processes": [
+            {
+              "pid": 4756,
+              "ppid": 4876,
+              "birthToken": "unix-ms:1784173818397",
+              "identityPrecision": "exact",
+              "imageName": "aio-coding-hub.exe",
+              "workingSetBytes": 37961728,
+              "privateBytes": 14942208,
+              "cpuTimeMs": 62.5
+            },
+            {
+              "pid": 23844,
+              "ppid": 4756,
+              "birthToken": "unix-ms:1784173818423",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 123293696,
+              "privateBytes": 44900352,
+              "cpuTimeMs": 531.25
+            },
+            {
+              "pid": 31432,
+              "ppid": 23844,
+              "birthToken": "unix-ms:1784173818518",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 39325696,
+              "privateBytes": 14815232,
+              "cpuTimeMs": 78.125
+            },
+            {
+              "pid": 43724,
+              "ppid": 23844,
+              "birthToken": "unix-ms:1784173818516",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 31580160,
+              "privateBytes": 14041088,
+              "cpuTimeMs": 140.625
+            },
+            {
+              "pid": 44744,
+              "ppid": 23844,
+              "birthToken": "unix-ms:1784173818432",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 10592256,
+              "privateBytes": 2568192,
+              "cpuTimeMs": 15.625
+            },
+            {
+              "pid": 44760,
+              "ppid": 23844,
+              "birthToken": "unix-ms:1784173818576",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 52670464,
+              "privateBytes": 25374720,
+              "cpuTimeMs": 46.875
+            },
+            {
+              "pid": 51984,
+              "ppid": 23844,
+              "birthToken": "unix-ms:1784173818533",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 20033536,
+              "privateBytes": 9457664,
+              "cpuTimeMs": 15.625
+            }
+          ],
+          "totals": {
+            "processCount": 7,
+            "workingSetBytes": 315457536,
+            "privateBytes": 126099456,
+            "cpuTimeMs": 890.625
+          }
+        }
+      ],
+      "stdout": "",
+      "stderr": "[0716/115019.160:ERROR:ui/gfx/win/window_impl.cc:172] Failed to unregister class Chrome_WidgetWin_0. Error = 1411\r\n",
+      "warnings": [],
+      "failures": [],
+      "metrics": {
+        "tauriSetupCompletedMs": 241.9654,
+        "dbReadyMs": 252.1387,
+        "gatewayReadyMs": 297.2031,
+        "startupReadyMs": 297.9467,
+        "firstInteractiveMs": 376.2364,
+        "shutdownCompletedMs": 639.6815,
+        "launchToProcessEntryMs": 10,
+        "launchToTauriSetupCompletedMs": 251.91979999999998,
+        "launchToDbReadyMs": 262.0931,
+        "launchToGatewayReadyMs": 307.1575,
+        "launchToStartupReadyMs": 307.90110000000004,
+        "launchToFirstInteractiveMs": 386.1908,
+        "launchToShutdownCompletedMs": 649.6359,
+        "windowPhysicalWidth": 1500,
+        "windowPhysicalHeight": 900,
+        "windowLogicalWidth": 1500,
+        "windowLogicalHeight": 900,
+        "windowScaleFactor": 1,
+        "logsDatasetReadyMs": 194.30000001192093,
+        "logsFilterPaintMs": 81.59999999403954,
+        "logsSelectPaintMs": 14,
+        "peakWorkingSetBytes": 315457536,
+        "medianWorkingSetBytes": 315457536,
+        "peakPrivateBytes": 126099456,
+        "cpuTimeDeltaMs": 0,
+        "maxProcessCount": 7
+      },
+      "index": 5
+    },
+    {
+      "runId": "logs-10k-run-07",
+      "scenario": "logs-10k",
+      "launchStartedUnixMs": 1784173819604,
+      "exitCode": 0,
+      "signal": null,
+      "durationMs": 1144.5342,
+      "isolation": {
+        "home": "$RUN_HOME",
+        "appData": "$RUN_HOME/.aio-coding-hub",
+        "roamingAppData": "$RUN_HOME/AppData/Roaming",
+        "localAppData": "$RUN_HOME/AppData/Local",
+        "xdgConfigHome": "$RUN_HOME/.config",
+        "xdgDataHome": "$RUN_HOME/.local/share",
+        "xdgCacheHome": "$RUN_HOME/.cache",
+        "temp": "$RUN_HOME/tmp",
+        "codexHome": "$RUN_HOME/.codex",
+        "webviewData": "$RUN_HOME/.aio-benchmark/webview"
+      },
+      "cleanup": {
+        "terminated": [],
+        "skipped": [],
+        "errors": []
+      },
+      "milestones": [
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-07",
+          "scenario": "logs-10k",
+          "seq": 1,
+          "milestone": "process_entry",
+          "elapsedMs": 0.0505,
+          "wallClockUnixMs": 1784173819613,
+          "data": {
+            "appVersion": "0.60.13",
+            "pid": 4976
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-07",
+          "scenario": "logs-10k",
+          "seq": 2,
+          "milestone": "tauri_setup_started",
+          "elapsedMs": 265.542,
+          "wallClockUnixMs": 1784173819879,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-07",
+          "scenario": "logs-10k",
+          "seq": 3,
+          "milestone": "tauri_setup_completed",
+          "elapsedMs": 273.74399999999997,
+          "wallClockUnixMs": 1784173819887,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-07",
+          "scenario": "logs-10k",
+          "seq": 4,
+          "milestone": "startup_run_started",
+          "elapsedMs": 273.7999,
+          "wallClockUnixMs": 1784173819887,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-07",
+          "scenario": "logs-10k",
+          "seq": 5,
+          "milestone": "db_ready",
+          "elapsedMs": 280.04810000000003,
+          "wallClockUnixMs": 1784173819893,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-07",
+          "scenario": "logs-10k",
+          "seq": 6,
+          "milestone": "settings_ready",
+          "elapsedMs": 280.6557,
+          "wallClockUnixMs": 1784173819894,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-07",
+          "scenario": "logs-10k",
+          "seq": 7,
+          "milestone": "window_visible",
+          "elapsedMs": 307.455,
+          "wallClockUnixMs": 1784173819921,
+          "data": {
+            "logicalHeight": 900,
+            "logicalWidth": 1500,
+            "physicalHeight": 900,
+            "physicalWidth": 1500,
+            "scaleFactor": 1,
+            "startMinimized": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-07",
+          "scenario": "logs-10k",
+          "seq": 8,
+          "milestone": "gateway_bound",
+          "elapsedMs": 323.8584,
+          "wallClockUnixMs": 1784173819937,
+          "data": {
+            "listenAddr": "127.0.0.1:37124",
+            "port": 37124
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-07",
+          "scenario": "logs-10k",
+          "seq": 9,
+          "milestone": "gateway_ready",
+          "elapsedMs": 327.0438,
+          "wallClockUnixMs": 1784173819940,
+          "data": {
+            "port": 37124
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-07",
+          "scenario": "logs-10k",
+          "seq": 10,
+          "milestone": "startup_ready",
+          "elapsedMs": 327.68,
+          "wallClockUnixMs": 1784173819941,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-07",
+          "scenario": "logs-10k",
+          "seq": 11,
+          "milestone": "first_interactive",
+          "elapsedMs": 408.4526,
+          "wallClockUnixMs": 1784173820022,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-07",
+          "scenario": "logs-10k",
+          "seq": 12,
+          "milestone": "logs_dataset_ready",
+          "elapsedMs": 569.0114,
+          "wallClockUnixMs": 1784173820182,
+          "data": {
+            "durationMs": 192.7000000178814,
+            "rowCount": 10000
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-07",
+          "scenario": "logs-10k",
+          "seq": 13,
+          "milestone": "logs_filter_painted",
+          "elapsedMs": 660.0348,
+          "wallClockUnixMs": 1784173820273,
+          "data": {
+            "durationMs": 85,
+            "filter": "RATE_LIMITED",
+            "matchCount": 568
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-07",
+          "scenario": "logs-10k",
+          "seq": 14,
+          "milestone": "logs_select_painted",
+          "elapsedMs": 678.3737,
+          "wallClockUnixMs": 1784173820292,
+          "data": {
+            "durationMs": 16.099999994039536,
+            "selectedLogId": 18
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-07",
+          "scenario": "logs-10k",
+          "seq": 15,
+          "milestone": "scenario_completed",
+          "elapsedMs": 679.7109,
+          "wallClockUnixMs": 1784173820293,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-07",
+          "scenario": "logs-10k",
+          "seq": 16,
+          "milestone": "shutdown_started",
+          "elapsedMs": 679.8189,
+          "wallClockUnixMs": 1784173820293,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-07",
+          "scenario": "logs-10k",
+          "seq": 17,
+          "milestone": "shutdown_completed",
+          "elapsedMs": 680.7787,
+          "wallClockUnixMs": 1784173820294,
+          "data": {}
+        }
+      ],
+      "samples": [
+        {
+          "atMs": 392.58230000000003,
+          "atUnixMs": 1784173819999,
+          "processes": [
+            {
+              "pid": 4976,
+              "ppid": 4876,
+              "birthToken": "unix-ms:1784173819605",
+              "identityPrecision": "exact",
+              "imageName": "aio-coding-hub.exe",
+              "workingSetBytes": 31543296,
+              "privateBytes": 10260480,
+              "cpuTimeMs": 31.25
+            },
+            {
+              "pid": 21748,
+              "ppid": 44676,
+              "birthToken": "unix-ms:1784173819813",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 46419968,
+              "privateBytes": 21704704,
+              "cpuTimeMs": 46.875
+            },
+            {
+              "pid": 37804,
+              "ppid": 44676,
+              "birthToken": "unix-ms:1784173819768",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 19709952,
+              "privateBytes": 9424896,
+              "cpuTimeMs": 31.25
+            },
+            {
+              "pid": 39904,
+              "ppid": 44676,
+              "birthToken": "unix-ms:1784173819752",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 38490112,
+              "privateBytes": 14544896,
+              "cpuTimeMs": 156.25
+            },
+            {
+              "pid": 40044,
+              "ppid": 44676,
+              "birthToken": "unix-ms:1784173819728",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 42954752,
+              "privateBytes": 52547584,
+              "cpuTimeMs": 140.625
+            },
+            {
+              "pid": 43224,
+              "ppid": 44676,
+              "birthToken": "unix-ms:1784173819641",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 10596352,
+              "privateBytes": 2568192,
+              "cpuTimeMs": 15.625
+            },
+            {
+              "pid": 44676,
+              "ppid": 4976,
+              "birthToken": "unix-ms:1784173819632",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 122302464,
+              "privateBytes": 44752896,
+              "cpuTimeMs": 453.125
+            }
+          ],
+          "totals": {
+            "processCount": 7,
+            "workingSetBytes": 312016896,
+            "privateBytes": 155803648,
+            "cpuTimeMs": 875
+          }
+        }
+      ],
+      "stdout": "",
+      "stderr": "",
+      "warnings": [],
+      "failures": [],
+      "metrics": {
+        "tauriSetupCompletedMs": 273.74399999999997,
+        "dbReadyMs": 280.04810000000003,
+        "gatewayReadyMs": 327.0438,
+        "startupReadyMs": 327.68,
+        "firstInteractiveMs": 408.4526,
+        "shutdownCompletedMs": 680.7787,
+        "launchToProcessEntryMs": 9,
+        "launchToTauriSetupCompletedMs": 282.6935,
+        "launchToDbReadyMs": 288.99760000000003,
+        "launchToGatewayReadyMs": 335.9933,
+        "launchToStartupReadyMs": 336.6295,
+        "launchToFirstInteractiveMs": 417.4021,
+        "launchToShutdownCompletedMs": 689.7281999999999,
+        "windowPhysicalWidth": 1500,
+        "windowPhysicalHeight": 900,
+        "windowLogicalWidth": 1500,
+        "windowLogicalHeight": 900,
+        "windowScaleFactor": 1,
+        "logsDatasetReadyMs": 192.7000000178814,
+        "logsFilterPaintMs": 85,
+        "logsSelectPaintMs": 16.099999994039536,
+        "peakWorkingSetBytes": 312016896,
+        "medianWorkingSetBytes": 312016896,
+        "peakPrivateBytes": 155803648,
+        "cpuTimeDeltaMs": 0,
+        "maxProcessCount": 7
+      },
+      "index": 6
+    },
+    {
+      "runId": "logs-10k-run-08",
+      "scenario": "logs-10k",
+      "launchStartedUnixMs": 1784173820809,
+      "exitCode": 0,
+      "signal": null,
+      "durationMs": 1176.891599999999,
+      "isolation": {
+        "home": "$RUN_HOME",
+        "appData": "$RUN_HOME/.aio-coding-hub",
+        "roamingAppData": "$RUN_HOME/AppData/Roaming",
+        "localAppData": "$RUN_HOME/AppData/Local",
+        "xdgConfigHome": "$RUN_HOME/.config",
+        "xdgDataHome": "$RUN_HOME/.local/share",
+        "xdgCacheHome": "$RUN_HOME/.cache",
+        "temp": "$RUN_HOME/tmp",
+        "codexHome": "$RUN_HOME/.codex",
+        "webviewData": "$RUN_HOME/.aio-benchmark/webview"
+      },
+      "cleanup": {
+        "terminated": [],
+        "skipped": [],
+        "errors": []
+      },
+      "milestones": [
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-08",
+          "scenario": "logs-10k",
+          "seq": 1,
+          "milestone": "process_entry",
+          "elapsedMs": 0.0441,
+          "wallClockUnixMs": 1784173820819,
+          "data": {
+            "appVersion": "0.60.13",
+            "pid": 61656
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-08",
+          "scenario": "logs-10k",
+          "seq": 2,
+          "milestone": "tauri_setup_started",
+          "elapsedMs": 258.2649,
+          "wallClockUnixMs": 1784173821078,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-08",
+          "scenario": "logs-10k",
+          "seq": 3,
+          "milestone": "tauri_setup_completed",
+          "elapsedMs": 265.5691,
+          "wallClockUnixMs": 1784173821085,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-08",
+          "scenario": "logs-10k",
+          "seq": 4,
+          "milestone": "startup_run_started",
+          "elapsedMs": 265.6182,
+          "wallClockUnixMs": 1784173821085,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-08",
+          "scenario": "logs-10k",
+          "seq": 5,
+          "milestone": "db_ready",
+          "elapsedMs": 271.3836,
+          "wallClockUnixMs": 1784173821091,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-08",
+          "scenario": "logs-10k",
+          "seq": 6,
+          "milestone": "settings_ready",
+          "elapsedMs": 272.0794,
+          "wallClockUnixMs": 1784173821091,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-08",
+          "scenario": "logs-10k",
+          "seq": 7,
+          "milestone": "window_visible",
+          "elapsedMs": 305.9515,
+          "wallClockUnixMs": 1784173821125,
+          "data": {
+            "logicalHeight": 900,
+            "logicalWidth": 1500,
+            "physicalHeight": 900,
+            "physicalWidth": 1500,
+            "scaleFactor": 1,
+            "startMinimized": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-08",
+          "scenario": "logs-10k",
+          "seq": 8,
+          "milestone": "gateway_bound",
+          "elapsedMs": 320.3175,
+          "wallClockUnixMs": 1784173821140,
+          "data": {
+            "listenAddr": "127.0.0.1:37124",
+            "port": 37124
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-08",
+          "scenario": "logs-10k",
+          "seq": 9,
+          "milestone": "gateway_ready",
+          "elapsedMs": 323.69160000000005,
+          "wallClockUnixMs": 1784173821143,
+          "data": {
+            "port": 37124
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-08",
+          "scenario": "logs-10k",
+          "seq": 10,
+          "milestone": "startup_ready",
+          "elapsedMs": 324.4152,
+          "wallClockUnixMs": 1784173821144,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-08",
+          "scenario": "logs-10k",
+          "seq": 11,
+          "milestone": "first_interactive",
+          "elapsedMs": 400.6195,
+          "wallClockUnixMs": 1784173821220,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-08",
+          "scenario": "logs-10k",
+          "seq": 12,
+          "milestone": "logs_dataset_ready",
+          "elapsedMs": 566.7025,
+          "wallClockUnixMs": 1784173821386,
+          "data": {
+            "durationMs": 198.2000000178814,
+            "rowCount": 10000
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-08",
+          "scenario": "logs-10k",
+          "seq": 13,
+          "milestone": "logs_filter_painted",
+          "elapsedMs": 657.8588,
+          "wallClockUnixMs": 1784173821477,
+          "data": {
+            "durationMs": 85.30000001192093,
+            "filter": "RATE_LIMITED",
+            "matchCount": 568
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-08",
+          "scenario": "logs-10k",
+          "seq": 14,
+          "milestone": "logs_select_painted",
+          "elapsedMs": 670.8226000000001,
+          "wallClockUnixMs": 1784173821490,
+          "data": {
+            "durationMs": 10.400000005960464,
+            "selectedLogId": 18
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-08",
+          "scenario": "logs-10k",
+          "seq": 15,
+          "milestone": "scenario_completed",
+          "elapsedMs": 672.3939,
+          "wallClockUnixMs": 1784173821492,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-08",
+          "scenario": "logs-10k",
+          "seq": 16,
+          "milestone": "shutdown_started",
+          "elapsedMs": 672.5261,
+          "wallClockUnixMs": 1784173821492,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-08",
+          "scenario": "logs-10k",
+          "seq": 17,
+          "milestone": "shutdown_completed",
+          "elapsedMs": 673.5658,
+          "wallClockUnixMs": 1784173821493,
+          "data": {}
+        }
+      ],
+      "samples": [
+        {
+          "atMs": 386.60519999999997,
+          "atUnixMs": 1784173821198,
+          "processes": [
+            {
+              "pid": 4028,
+              "ppid": 50740,
+              "birthToken": "unix-ms:1784173820952",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 38588416,
+              "privateBytes": 14655488,
+              "cpuTimeMs": 93.75
+            },
+            {
+              "pid": 32552,
+              "ppid": 50740,
+              "birthToken": "unix-ms:1784173820845",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 10604544,
+              "privateBytes": 2564096,
+              "cpuTimeMs": 0
+            },
+            {
+              "pid": 42420,
+              "ppid": 50740,
+              "birthToken": "unix-ms:1784173820968",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 19726336,
+              "privateBytes": 9449472,
+              "cpuTimeMs": 31.25
+            },
+            {
+              "pid": 50528,
+              "ppid": 50740,
+              "birthToken": "unix-ms:1784173820928",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 44232704,
+              "privateBytes": 52830208,
+              "cpuTimeMs": 156.25
+            },
+            {
+              "pid": 50740,
+              "ppid": 61656,
+              "birthToken": "unix-ms:1784173820836",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 121786368,
+              "privateBytes": 44306432,
+              "cpuTimeMs": 515.625
+            },
+            {
+              "pid": 56896,
+              "ppid": 50740,
+              "birthToken": "unix-ms:1784173821011",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 46411776,
+              "privateBytes": 21684224,
+              "cpuTimeMs": 46.875
+            },
+            {
+              "pid": 61656,
+              "ppid": 4876,
+              "birthToken": "unix-ms:1784173820811",
+              "identityPrecision": "exact",
+              "imageName": "aio-coding-hub.exe",
+              "workingSetBytes": 31522816,
+              "privateBytes": 10129408,
+              "cpuTimeMs": 62.5
+            }
+          ],
+          "totals": {
+            "processCount": 7,
+            "workingSetBytes": 312872960,
+            "privateBytes": 155619328,
+            "cpuTimeMs": 906.25
+          }
+        }
+      ],
+      "stdout": "",
+      "stderr": "[0716/115021.602:ERROR:ui/gfx/win/window_impl.cc:172] Failed to unregister class Chrome_WidgetWin_0. Error = 1411\r\n",
+      "warnings": [],
+      "failures": [],
+      "metrics": {
+        "tauriSetupCompletedMs": 265.5691,
+        "dbReadyMs": 271.3836,
+        "gatewayReadyMs": 323.69160000000005,
+        "startupReadyMs": 324.4152,
+        "firstInteractiveMs": 400.6195,
+        "shutdownCompletedMs": 673.5658,
+        "launchToProcessEntryMs": 10,
+        "launchToTauriSetupCompletedMs": 275.525,
+        "launchToDbReadyMs": 281.3395,
+        "launchToGatewayReadyMs": 333.64750000000004,
+        "launchToStartupReadyMs": 334.3711,
+        "launchToFirstInteractiveMs": 410.5754,
+        "launchToShutdownCompletedMs": 683.5217,
+        "windowPhysicalWidth": 1500,
+        "windowPhysicalHeight": 900,
+        "windowLogicalWidth": 1500,
+        "windowLogicalHeight": 900,
+        "windowScaleFactor": 1,
+        "logsDatasetReadyMs": 198.2000000178814,
+        "logsFilterPaintMs": 85.30000001192093,
+        "logsSelectPaintMs": 10.400000005960464,
+        "peakWorkingSetBytes": 312872960,
+        "medianWorkingSetBytes": 312872960,
+        "peakPrivateBytes": 155619328,
+        "cpuTimeDeltaMs": 0,
+        "maxProcessCount": 7
+      },
+      "index": 7
+    },
+    {
+      "runId": "logs-10k-run-09",
+      "scenario": "logs-10k",
+      "launchStartedUnixMs": 1784173822047,
+      "exitCode": 0,
+      "signal": null,
+      "durationMs": 1161.8180999999986,
+      "isolation": {
+        "home": "$RUN_HOME",
+        "appData": "$RUN_HOME/.aio-coding-hub",
+        "roamingAppData": "$RUN_HOME/AppData/Roaming",
+        "localAppData": "$RUN_HOME/AppData/Local",
+        "xdgConfigHome": "$RUN_HOME/.config",
+        "xdgDataHome": "$RUN_HOME/.local/share",
+        "xdgCacheHome": "$RUN_HOME/.cache",
+        "temp": "$RUN_HOME/tmp",
+        "codexHome": "$RUN_HOME/.codex",
+        "webviewData": "$RUN_HOME/.aio-benchmark/webview"
+      },
+      "cleanup": {
+        "terminated": [],
+        "skipped": [],
+        "errors": []
+      },
+      "milestones": [
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-09",
+          "scenario": "logs-10k",
+          "seq": 1,
+          "milestone": "process_entry",
+          "elapsedMs": 0.0428,
+          "wallClockUnixMs": 1784173822057,
+          "data": {
+            "appVersion": "0.60.13",
+            "pid": 58968
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-09",
+          "scenario": "logs-10k",
+          "seq": 2,
+          "milestone": "tauri_setup_started",
+          "elapsedMs": 240.1684,
+          "wallClockUnixMs": 1784173822297,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-09",
+          "scenario": "logs-10k",
+          "seq": 3,
+          "milestone": "tauri_setup_completed",
+          "elapsedMs": 248.0025,
+          "wallClockUnixMs": 1784173822305,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-09",
+          "scenario": "logs-10k",
+          "seq": 4,
+          "milestone": "startup_run_started",
+          "elapsedMs": 248.0559,
+          "wallClockUnixMs": 1784173822305,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-09",
+          "scenario": "logs-10k",
+          "seq": 5,
+          "milestone": "db_ready",
+          "elapsedMs": 253.9842,
+          "wallClockUnixMs": 1784173822311,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-09",
+          "scenario": "logs-10k",
+          "seq": 6,
+          "milestone": "settings_ready",
+          "elapsedMs": 254.81629999999998,
+          "wallClockUnixMs": 1784173822312,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-09",
+          "scenario": "logs-10k",
+          "seq": 7,
+          "milestone": "window_visible",
+          "elapsedMs": 276.5435,
+          "wallClockUnixMs": 1784173822333,
+          "data": {
+            "logicalHeight": 900,
+            "logicalWidth": 1500,
+            "physicalHeight": 900,
+            "physicalWidth": 1500,
+            "scaleFactor": 1,
+            "startMinimized": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-09",
+          "scenario": "logs-10k",
+          "seq": 8,
+          "milestone": "gateway_bound",
+          "elapsedMs": 292.2392,
+          "wallClockUnixMs": 1784173822349,
+          "data": {
+            "listenAddr": "127.0.0.1:37124",
+            "port": 37124
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-09",
+          "scenario": "logs-10k",
+          "seq": 9,
+          "milestone": "gateway_ready",
+          "elapsedMs": 295.9391,
+          "wallClockUnixMs": 1784173822353,
+          "data": {
+            "port": 37124
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-09",
+          "scenario": "logs-10k",
+          "seq": 10,
+          "milestone": "startup_ready",
+          "elapsedMs": 296.6097,
+          "wallClockUnixMs": 1784173822353,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-09",
+          "scenario": "logs-10k",
+          "seq": 11,
+          "milestone": "first_interactive",
+          "elapsedMs": 381.26890000000003,
+          "wallClockUnixMs": 1784173822438,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-09",
+          "scenario": "logs-10k",
+          "seq": 12,
+          "milestone": "logs_dataset_ready",
+          "elapsedMs": 542.6334,
+          "wallClockUnixMs": 1784173822599,
+          "data": {
+            "durationMs": 191.89999997615817,
+            "rowCount": 10000
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-09",
+          "scenario": "logs-10k",
+          "seq": 13,
+          "milestone": "logs_filter_painted",
+          "elapsedMs": 632.8886,
+          "wallClockUnixMs": 1784173822690,
+          "data": {
+            "durationMs": 84.5,
+            "filter": "RATE_LIMITED",
+            "matchCount": 568
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-09",
+          "scenario": "logs-10k",
+          "seq": 14,
+          "milestone": "logs_select_painted",
+          "elapsedMs": 651.8883,
+          "wallClockUnixMs": 1784173822709,
+          "data": {
+            "durationMs": 16.80000001192093,
+            "selectedLogId": 18
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-09",
+          "scenario": "logs-10k",
+          "seq": 15,
+          "milestone": "scenario_completed",
+          "elapsedMs": 653.1533000000001,
+          "wallClockUnixMs": 1784173822710,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-09",
+          "scenario": "logs-10k",
+          "seq": 16,
+          "milestone": "shutdown_started",
+          "elapsedMs": 653.2799,
+          "wallClockUnixMs": 1784173822710,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-09",
+          "scenario": "logs-10k",
+          "seq": 17,
+          "milestone": "shutdown_completed",
+          "elapsedMs": 654.1899,
+          "wallClockUnixMs": 1784173822711,
+          "data": {}
+        }
+      ],
+      "samples": [
+        {
+          "atMs": 390.8937999999998,
+          "atUnixMs": 1784173822440,
+          "processes": [
+            {
+              "pid": 7072,
+              "ppid": 57452,
+              "birthToken": "unix-ms:1784173822168",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 38379520,
+              "privateBytes": 41963520,
+              "cpuTimeMs": 125
+            },
+            {
+              "pid": 23716,
+              "ppid": 57452,
+              "birthToken": "unix-ms:1784173822230",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 52649984,
+              "privateBytes": 25354240,
+              "cpuTimeMs": 46.875
+            },
+            {
+              "pid": 26016,
+              "ppid": 57452,
+              "birthToken": "unix-ms:1784173822085",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 10592256,
+              "privateBytes": 2568192,
+              "cpuTimeMs": 0
+            },
+            {
+              "pid": 46880,
+              "ppid": 57452,
+              "birthToken": "unix-ms:1784173822170",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 39460864,
+              "privateBytes": 14938112,
+              "cpuTimeMs": 156.25
+            },
+            {
+              "pid": 57452,
+              "ppid": 58968,
+              "birthToken": "unix-ms:1784173822076",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 123613184,
+              "privateBytes": 45326336,
+              "cpuTimeMs": 421.875
+            },
+            {
+              "pid": 58968,
+              "ppid": 4876,
+              "birthToken": "unix-ms:1784173822048",
+              "identityPrecision": "exact",
+              "imageName": "aio-coding-hub.exe",
+              "workingSetBytes": 35717120,
+              "privateBytes": 11345920,
+              "cpuTimeMs": 31.25
+            },
+            {
+              "pid": 61296,
+              "ppid": 57452,
+              "birthToken": "unix-ms:1784173822186",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 20180992,
+              "privateBytes": 9494528,
+              "cpuTimeMs": 31.25
+            }
+          ],
+          "totals": {
+            "processCount": 7,
+            "workingSetBytes": 320593920,
+            "privateBytes": 150990848,
+            "cpuTimeMs": 812.5
+          }
+        }
+      ],
+      "stdout": "",
+      "stderr": "",
+      "warnings": [],
+      "failures": [],
+      "metrics": {
+        "tauriSetupCompletedMs": 248.0025,
+        "dbReadyMs": 253.9842,
+        "gatewayReadyMs": 295.9391,
+        "startupReadyMs": 296.6097,
+        "firstInteractiveMs": 381.26890000000003,
+        "shutdownCompletedMs": 654.1899,
+        "launchToProcessEntryMs": 10,
+        "launchToTauriSetupCompletedMs": 257.9597,
+        "launchToDbReadyMs": 263.9414,
+        "launchToGatewayReadyMs": 305.8963,
+        "launchToStartupReadyMs": 306.5669,
+        "launchToFirstInteractiveMs": 391.22610000000003,
+        "launchToShutdownCompletedMs": 664.1470999999999,
+        "windowPhysicalWidth": 1500,
+        "windowPhysicalHeight": 900,
+        "windowLogicalWidth": 1500,
+        "windowLogicalHeight": 900,
+        "windowScaleFactor": 1,
+        "logsDatasetReadyMs": 191.89999997615817,
+        "logsFilterPaintMs": 84.5,
+        "logsSelectPaintMs": 16.80000001192093,
+        "peakWorkingSetBytes": 320593920,
+        "medianWorkingSetBytes": 320593920,
+        "peakPrivateBytes": 150990848,
+        "cpuTimeDeltaMs": 0,
+        "maxProcessCount": 7
+      },
+      "index": 8
+    },
+    {
+      "runId": "logs-10k-run-10",
+      "scenario": "logs-10k",
+      "launchStartedUnixMs": 1784173823269,
+      "exitCode": 0,
+      "signal": null,
+      "durationMs": 1150.9218,
+      "isolation": {
+        "home": "$RUN_HOME",
+        "appData": "$RUN_HOME/.aio-coding-hub",
+        "roamingAppData": "$RUN_HOME/AppData/Roaming",
+        "localAppData": "$RUN_HOME/AppData/Local",
+        "xdgConfigHome": "$RUN_HOME/.config",
+        "xdgDataHome": "$RUN_HOME/.local/share",
+        "xdgCacheHome": "$RUN_HOME/.cache",
+        "temp": "$RUN_HOME/tmp",
+        "codexHome": "$RUN_HOME/.codex",
+        "webviewData": "$RUN_HOME/.aio-benchmark/webview"
+      },
+      "cleanup": {
+        "terminated": [],
+        "skipped": [],
+        "errors": []
+      },
+      "milestones": [
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-10",
+          "scenario": "logs-10k",
+          "seq": 1,
+          "milestone": "process_entry",
+          "elapsedMs": 0.0427,
+          "wallClockUnixMs": 1784173823279,
+          "data": {
+            "appVersion": "0.60.13",
+            "pid": 35144
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-10",
+          "scenario": "logs-10k",
+          "seq": 2,
+          "milestone": "tauri_setup_started",
+          "elapsedMs": 239.1465,
+          "wallClockUnixMs": 1784173823518,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-10",
+          "scenario": "logs-10k",
+          "seq": 3,
+          "milestone": "tauri_setup_completed",
+          "elapsedMs": 247.7089,
+          "wallClockUnixMs": 1784173823526,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-10",
+          "scenario": "logs-10k",
+          "seq": 4,
+          "milestone": "startup_run_started",
+          "elapsedMs": 247.7643,
+          "wallClockUnixMs": 1784173823526,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-10",
+          "scenario": "logs-10k",
+          "seq": 5,
+          "milestone": "db_ready",
+          "elapsedMs": 253.6177,
+          "wallClockUnixMs": 1784173823532,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-10",
+          "scenario": "logs-10k",
+          "seq": 6,
+          "milestone": "settings_ready",
+          "elapsedMs": 254.57970000000003,
+          "wallClockUnixMs": 1784173823533,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-10",
+          "scenario": "logs-10k",
+          "seq": 7,
+          "milestone": "window_visible",
+          "elapsedMs": 274.7476,
+          "wallClockUnixMs": 1784173823553,
+          "data": {
+            "logicalHeight": 900,
+            "logicalWidth": 1500,
+            "physicalHeight": 900,
+            "physicalWidth": 1500,
+            "scaleFactor": 1,
+            "startMinimized": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-10",
+          "scenario": "logs-10k",
+          "seq": 8,
+          "milestone": "gateway_bound",
+          "elapsedMs": 293.1841,
+          "wallClockUnixMs": 1784173823572,
+          "data": {
+            "listenAddr": "127.0.0.1:37124",
+            "port": 37124
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-10",
+          "scenario": "logs-10k",
+          "seq": 9,
+          "milestone": "gateway_ready",
+          "elapsedMs": 296.2912,
+          "wallClockUnixMs": 1784173823575,
+          "data": {
+            "port": 37124
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-10",
+          "scenario": "logs-10k",
+          "seq": 10,
+          "milestone": "startup_ready",
+          "elapsedMs": 296.9853,
+          "wallClockUnixMs": 1784173823576,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-10",
+          "scenario": "logs-10k",
+          "seq": 11,
+          "milestone": "first_interactive",
+          "elapsedMs": 386.47700000000003,
+          "wallClockUnixMs": 1784173823665,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-10",
+          "scenario": "logs-10k",
+          "seq": 12,
+          "milestone": "logs_dataset_ready",
+          "elapsedMs": 541.5978,
+          "wallClockUnixMs": 1784173823820,
+          "data": {
+            "durationMs": 192.2000000178814,
+            "rowCount": 10000
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-10",
+          "scenario": "logs-10k",
+          "seq": 13,
+          "milestone": "logs_filter_painted",
+          "elapsedMs": 631.9863,
+          "wallClockUnixMs": 1784173823911,
+          "data": {
+            "durationMs": 84.90000000596046,
+            "filter": "RATE_LIMITED",
+            "matchCount": 568
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-10",
+          "scenario": "logs-10k",
+          "seq": 14,
+          "milestone": "logs_select_painted",
+          "elapsedMs": 645.0588,
+          "wallClockUnixMs": 1784173823924,
+          "data": {
+            "durationMs": 11,
+            "selectedLogId": 18
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-10",
+          "scenario": "logs-10k",
+          "seq": 15,
+          "milestone": "scenario_completed",
+          "elapsedMs": 646.7456999999999,
+          "wallClockUnixMs": 1784173823925,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-10",
+          "scenario": "logs-10k",
+          "seq": 16,
+          "milestone": "shutdown_started",
+          "elapsedMs": 646.8731,
+          "wallClockUnixMs": 1784173823925,
+          "data": {}
+        },
+        {
+          "schemaVersion": 1,
+          "runId": "logs-10k-run-10",
+          "scenario": "logs-10k",
+          "seq": 17,
+          "milestone": "shutdown_completed",
+          "elapsedMs": 647.9216,
+          "wallClockUnixMs": 1784173823926,
+          "data": {}
+        }
+      ],
+      "samples": [
+        {
+          "atMs": 355.1347999999998,
+          "atUnixMs": 1784173823627,
+          "processes": [
+            {
+              "pid": 21732,
+              "ppid": 35436,
+              "birthToken": "unix-ms:1784173823407",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 19714048,
+              "privateBytes": 9416704,
+              "cpuTimeMs": 62.5
+            },
+            {
+              "pid": 25192,
+              "ppid": 35436,
+              "birthToken": "unix-ms:1784173823396",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 38563840,
+              "privateBytes": 14774272,
+              "cpuTimeMs": 78.125
+            },
+            {
+              "pid": 35144,
+              "ppid": 4876,
+              "birthToken": "unix-ms:1784173823271",
+              "identityPrecision": "exact",
+              "imageName": "aio-coding-hub.exe",
+              "workingSetBytes": 23339008,
+              "privateBytes": 4018176,
+              "cpuTimeMs": 15.625
+            },
+            {
+              "pid": 35436,
+              "ppid": 35144,
+              "birthToken": "unix-ms:1784173823296",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 122195968,
+              "privateBytes": 45330432,
+              "cpuTimeMs": 437.5
+            },
+            {
+              "pid": 42820,
+              "ppid": 35436,
+              "birthToken": "unix-ms:1784173823304",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 10592256,
+              "privateBytes": 2560000,
+              "cpuTimeMs": 0
+            },
+            {
+              "pid": 53420,
+              "ppid": 35436,
+              "birthToken": "unix-ms:1784173823453",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 46342144,
+              "privateBytes": 21700608,
+              "cpuTimeMs": 62.5
+            },
+            {
+              "pid": 55592,
+              "ppid": 35436,
+              "birthToken": "unix-ms:1784173823396",
+              "identityPrecision": "exact",
+              "imageName": "msedgewebview2.exe",
+              "workingSetBytes": 30191616,
+              "privateBytes": 13680640,
+              "cpuTimeMs": 109.375
+            }
+          ],
+          "totals": {
+            "processCount": 7,
+            "workingSetBytes": 290938880,
+            "privateBytes": 111480832,
+            "cpuTimeMs": 765.625
+          }
+        }
+      ],
+      "stdout": "",
+      "stderr": "[0716/115024.038:ERROR:ui/gfx/win/window_impl.cc:172] Failed to unregister class Chrome_WidgetWin_0. Error = 1411\r\n",
+      "warnings": [],
+      "failures": [],
+      "metrics": {
+        "tauriSetupCompletedMs": 247.7089,
+        "dbReadyMs": 253.6177,
+        "gatewayReadyMs": 296.2912,
+        "startupReadyMs": 296.9853,
+        "firstInteractiveMs": 386.47700000000003,
+        "shutdownCompletedMs": 647.9216,
+        "launchToProcessEntryMs": 10,
+        "launchToTauriSetupCompletedMs": 257.66619999999995,
+        "launchToDbReadyMs": 263.575,
+        "launchToGatewayReadyMs": 306.2485,
+        "launchToStartupReadyMs": 306.94259999999997,
+        "launchToFirstInteractiveMs": 396.4343,
+        "launchToShutdownCompletedMs": 657.8789,
+        "windowPhysicalWidth": 1500,
+        "windowPhysicalHeight": 900,
+        "windowLogicalWidth": 1500,
+        "windowLogicalHeight": 900,
+        "windowScaleFactor": 1,
+        "logsDatasetReadyMs": 192.2000000178814,
+        "logsFilterPaintMs": 84.90000000596046,
+        "logsSelectPaintMs": 11,
+        "peakWorkingSetBytes": 290938880,
+        "medianWorkingSetBytes": 290938880,
+        "peakPrivateBytes": 111480832,
+        "cpuTimeDeltaMs": 0,
+        "maxProcessCount": 7
+      },
+      "index": 9
+    }
+  ],
+  "aggregates": {
+    "cpuTimeDeltaMs": {
+      "min": 0,
+      "max": 0,
+      "median": 0,
+      "p95": 0,
+      "samples": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "dbReadyMs": {
+      "min": 243.96380000000002,
+      "max": 280.04810000000003,
+      "median": 252.8782,
+      "p95": 280.04810000000003,
+      "samples": [
+        259.7889,
+        243.96380000000002,
+        250.29590000000002,
+        247.7062,
+        247.0149,
+        252.1387,
+        280.04810000000003,
+        271.3836,
+        253.9842,
+        253.6177
+      ]
+    },
+    "firstInteractiveMs": {
+      "min": 372.8468,
+      "max": 408.4526,
+      "median": 381.65290000000005,
+      "p95": 408.4526,
+      "samples": [
+        395.05859999999996,
+        372.8468,
+        382.0369,
+        375.08619999999996,
+        375.5174,
+        376.2364,
+        408.4526,
+        400.6195,
+        381.26890000000003,
+        386.47700000000003
+      ]
+    },
+    "gatewayReadyMs": {
+      "min": 284.09020000000004,
+      "max": 327.0438,
+      "median": 296.11514999999997,
+      "p95": 327.0438,
+      "samples": [
+        302.7485,
+        284.09020000000004,
+        293.64869999999996,
+        289.7208,
+        290.76279999999997,
+        297.2031,
+        327.0438,
+        323.69160000000005,
+        295.9391,
+        296.2912
+      ]
+    },
+    "launchToDbReadyMs": {
+      "min": 252.92110000000002,
+      "max": 288.99760000000003,
+      "median": 262.83405,
+      "p95": 288.99760000000003,
+      "samples": [
+        268.7441,
+        252.92110000000002,
+        259.2532,
+        257.65979999999996,
+        255.97250000000003,
+        262.0931,
+        288.99760000000003,
+        281.3395,
+        263.9414,
+        263.575
+      ]
+    },
+    "launchToFirstInteractiveMs": {
+      "min": 381.80409999999995,
+      "max": 417.4021,
+      "median": 391.11015,
+      "p95": 417.4021,
+      "samples": [
+        404.01379999999995,
+        381.80409999999995,
+        390.9942,
+        385.03979999999996,
+        384.475,
+        386.1908,
+        417.4021,
+        410.5754,
+        391.22610000000003,
+        396.4343
+      ]
+    },
+    "launchToGatewayReadyMs": {
+      "min": 293.0475,
+      "max": 335.9933,
+      "median": 306.0724,
+      "p95": 335.9933,
+      "samples": [
+        311.70369999999997,
+        293.0475,
+        302.60599999999994,
+        299.6744,
+        299.7204,
+        307.1575,
+        335.9933,
+        333.64750000000004,
+        305.8963,
+        306.2485
+      ]
+    },
+    "launchToProcessEntryMs": {
+      "min": 9,
+      "max": 10,
+      "median": 9.5,
+      "p95": 10,
+      "samples": [
+        9,
+        9,
+        9,
+        10,
+        9,
+        10,
+        9,
+        10,
+        10,
+        10
+      ]
+    },
+    "launchToShutdownCompletedMs": {
+      "min": 649.6359,
+      "max": 733.3098,
+      "median": 674.2903,
+      "p95": 733.3098,
+      "samples": [
+        673.1898,
+        660.2187,
+        689.3969000000001,
+        675.3908,
+        733.3098,
+        649.6359,
+        689.7281999999999,
+        683.5217,
+        664.1470999999999,
+        657.8789
+      ]
+    },
+    "launchToStartupReadyMs": {
+      "min": 293.66599999999994,
+      "max": 336.6295,
+      "median": 306.75474999999994,
+      "p95": 336.6295,
+      "samples": [
+        312.322,
+        293.66599999999994,
+        303.3673,
+        300.3558,
+        300.44550000000004,
+        307.90110000000004,
+        336.6295,
+        334.3711,
+        306.5669,
+        306.94259999999997
+      ]
+    },
+    "launchToTauriSetupCompletedMs": {
+      "min": 246.9971,
+      "max": 282.6935,
+      "median": 255.30794999999998,
+      "p95": 282.6935,
+      "samples": [
+        262.84159999999997,
+        246.9971,
+        252.9497,
+        251.64489999999998,
+        249.8041,
+        251.91979999999998,
+        282.6935,
+        275.525,
+        257.9597,
+        257.66619999999995
+      ]
+    },
+    "logsDatasetReadyMs": {
+      "min": 186.19999998807907,
+      "max": 198.30000001192093,
+      "median": 193.50000001490116,
+      "p95": 198.30000001192093,
+      "samples": [
+        195.4000000059605,
+        197.9000000059605,
+        198.30000001192093,
+        191.5999999940395,
+        186.19999998807907,
+        194.30000001192093,
+        192.7000000178814,
+        198.2000000178814,
+        191.89999997615817,
+        192.2000000178814
+      ]
+    },
+    "logsFilterPaintMs": {
+      "min": 81.59999999403954,
+      "max": 174.2999999821186,
+      "median": 85.15000000596046,
+      "p95": 174.2999999821186,
+      "samples": [
+        84.59999999403954,
+        87.10000002384186,
+        100.2000000178814,
+        97.69999998807909,
+        174.2999999821186,
+        81.59999999403954,
+        85,
+        85.30000001192093,
+        84.5,
+        84.90000000596046
+      ]
+    },
+    "logsSelectPaintMs": {
+      "min": 9.800000011920927,
+      "max": 23,
+      "median": 15.649999991059303,
+      "p95": 23,
+      "samples": [
+        16,
+        15.299999982118608,
+        22.80000001192093,
+        23,
+        9.800000011920927,
+        14,
+        16.099999994039536,
+        10.400000005960464,
+        16.80000001192093,
+        11
+      ]
+    },
+    "maxProcessCount": {
+      "min": 7,
+      "max": 7,
+      "median": 7,
+      "p95": 7,
+      "samples": [
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7
+      ]
+    },
+    "medianWorkingSetBytes": {
+      "min": 290938880,
+      "max": 324087808,
+      "median": 317974528,
+      "p95": 324087808,
+      "samples": [
+        320106496,
+        324087808,
+        323260416,
+        317280256,
+        318668800,
+        315457536,
+        312016896,
+        312872960,
+        320593920,
+        290938880
+      ]
+    },
+    "peakPrivateBytes": {
+      "min": 111480832,
+      "max": 155803648,
+      "median": 151244800,
+      "p95": 155803648,
+      "samples": [
+        151498752,
+        155803648,
+        154255360,
+        147550208,
+        149127168,
+        126099456,
+        155803648,
+        155619328,
+        150990848,
+        111480832
+      ]
+    },
+    "peakWorkingSetBytes": {
+      "min": 290938880,
+      "max": 324087808,
+      "median": 317974528,
+      "p95": 324087808,
+      "samples": [
+        320106496,
+        324087808,
+        323260416,
+        317280256,
+        318668800,
+        315457536,
+        312016896,
+        312872960,
+        320593920,
+        290938880
+      ]
+    },
+    "shutdownCompletedMs": {
+      "min": 639.6815,
+      "max": 724.3522,
+      "median": 664.8359,
+      "p95": 724.3522,
+      "samples": [
+        664.2346,
+        651.2614,
+        680.4396,
+        665.4372,
+        724.3522,
+        639.6815,
+        680.7787,
+        673.5658,
+        654.1899,
+        647.9216
+      ]
+    },
+    "startupReadyMs": {
+      "min": 284.70869999999996,
+      "max": 327.68,
+      "median": 296.7975,
+      "p95": 327.68,
+      "samples": [
+        303.3668,
+        284.70869999999996,
+        294.41,
+        290.4022,
+        291.4879,
+        297.9467,
+        327.68,
+        324.4152,
+        296.6097,
+        296.9853
+      ]
+    },
+    "tauriSetupCompletedMs": {
+      "min": 238.03979999999999,
+      "max": 273.74399999999997,
+      "median": 245.85065,
+      "p95": 273.74399999999997,
+      "samples": [
+        253.8864,
+        238.03979999999999,
+        243.9924,
+        241.69129999999998,
+        240.8465,
+        241.9654,
+        273.74399999999997,
+        265.5691,
+        248.0025,
+        247.7089
+      ]
+    },
+    "windowLogicalHeight": {
+      "min": 900,
+      "max": 900,
+      "median": 900,
+      "p95": 900,
+      "samples": [
+        900,
+        900,
+        900,
+        900,
+        900,
+        900,
+        900,
+        900,
+        900,
+        900
+      ]
+    },
+    "windowLogicalWidth": {
+      "min": 1500,
+      "max": 1500,
+      "median": 1500,
+      "p95": 1500,
+      "samples": [
+        1500,
+        1500,
+        1500,
+        1500,
+        1500,
+        1500,
+        1500,
+        1500,
+        1500,
+        1500
+      ]
+    },
+    "windowPhysicalHeight": {
+      "min": 900,
+      "max": 900,
+      "median": 900,
+      "p95": 900,
+      "samples": [
+        900,
+        900,
+        900,
+        900,
+        900,
+        900,
+        900,
+        900,
+        900,
+        900
+      ]
+    },
+    "windowPhysicalWidth": {
+      "min": 1500,
+      "max": 1500,
+      "median": 1500,
+      "p95": 1500,
+      "samples": [
+        1500,
+        1500,
+        1500,
+        1500,
+        1500,
+        1500,
+        1500,
+        1500,
+        1500,
+        1500
+      ]
+    },
+    "windowScaleFactor": {
+      "min": 1,
+      "max": 1,
+      "median": 1,
+      "p95": 1,
+      "samples": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  "warnings": [],
+  "failures": [],
+  "pendingPlatforms": [
+    "darwin",
+    "linux"
+  ]
+}

@@ -1,0 +1,6 @@
+{
+  "expectedDatabaseState": "absent",
+  "instruction": "copy this directory into a runner-owned temporary home before startup",
+  "kind": "empty-home",
+  "schemaVersion": 1
+}

@@ -35,6 +35,8 @@ docs/*
 !docs/release-homebrew.md
 !docs/plugins/
 !docs/plugins/**
+!docs/egui-migration/
+!docs/egui-migration/**
 docs/superpowers/
 .vscode/
 *CLAUDE.md

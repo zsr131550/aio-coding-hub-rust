@@ -1,0 +1,4 @@
+[[permission]]
+identifier = "allow-commands"
+description = "Allows the isolated benchmark renderer to report protocol milestones and execute fixed benchmark workloads."
+commands.allow = ["record", "request_logs", "run_gateway_load", "finish"]

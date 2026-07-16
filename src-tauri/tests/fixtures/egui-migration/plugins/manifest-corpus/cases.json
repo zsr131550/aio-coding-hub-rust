@@ -1,0 +1,47 @@
+{
+  "cases": [
+    {
+      "expectedCode": null,
+      "expectedStage": "valid",
+      "id": "valid-v1",
+      "path": "valid-v1.json"
+    },
+    {
+      "expectedCode": "PLUGIN_INVALID_MANIFEST",
+      "expectedStage": "parse",
+      "id": "malformed-json",
+      "path": "malformed-json.json"
+    },
+    {
+      "expectedCode": "PLUGIN_MISSING_MAIN",
+      "expectedStage": "runtime",
+      "id": "missing-main",
+      "path": "missing-main.json"
+    },
+    {
+      "expectedCode": "PLUGIN_INCOMPATIBLE_API",
+      "expectedStage": "compatibility",
+      "id": "api-v2",
+      "path": "api-v2.json"
+    },
+    {
+      "expectedCode": "PLUGIN_UNKNOWN_HOOK",
+      "expectedStage": "contributions",
+      "id": "unknown-hook",
+      "path": "unknown-hook.json"
+    },
+    {
+      "expectedCode": "PLUGIN_UNKNOWN_UI_SLOT",
+      "expectedStage": "contributions",
+      "id": "unknown-slot",
+      "path": "unknown-slot.json"
+    },
+    {
+      "expectedCode": "PLUGIN_UNSUPPORTED_RUNTIME",
+      "expectedStage": "parse",
+      "id": "legacy-wasm-runtime",
+      "path": "legacy-wasm-runtime.json"
+    }
+  ],
+  "schemaVersion": 1
+}

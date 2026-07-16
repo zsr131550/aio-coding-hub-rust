@@ -1,0 +1,74 @@
+{
+  "activationEvents": [
+    "onStartup",
+    "onCommand:fixture.inspect",
+    "onGatewayHook:gateway.request.beforeSend"
+  ],
+  "apiVersion": "1.0.0",
+  "capabilities": [
+    "commands.execute",
+    "gateway.hooks",
+    "storage.plugin"
+  ],
+  "configSchema": {
+    "properties": {
+      "enabled": {
+        "default": true,
+        "type": "boolean"
+      }
+    },
+    "type": "object"
+  },
+  "configVersion": 1,
+  "contributes": {
+    "commands": [
+      {
+        "command": "fixture.inspect",
+        "title": "Inspect fixture"
+      }
+    ],
+    "gatewayHooks": [
+      {
+        "failurePolicy": "fail-open",
+        "name": "gateway.request.beforeSend",
+        "priority": 10,
+        "timeoutMs": 5000
+      }
+    ],
+    "ui": {
+      "settings.sections": [
+        {
+          "id": "fixture.settings",
+          "schema": {
+            "fields": [
+              {
+                "key": "enabled",
+                "label": "Enabled",
+                "type": "boolean"
+              }
+            ],
+            "type": "section"
+          },
+          "title": "Fixture settings"
+        }
+      ]
+    }
+  },
+  "description": "Synthetic Plugin API v1 fixture without user data or credentials.",
+  "hostCompatibility": {
+    "app": ">=0.60.0 <1.0.0",
+    "platforms": [
+      "windows",
+      "macos",
+      "linux"
+    ],
+    "pluginApi": "^1.0.0"
+  },
+  "id": "fixture.compatibility-panel",
+  "name": "Compatibility Panel Fixture",
+  "runtime": {
+    "kind": "extensionHost",
+    "language": "typescript"
+  },
+  "version": "1.0.0"
+}

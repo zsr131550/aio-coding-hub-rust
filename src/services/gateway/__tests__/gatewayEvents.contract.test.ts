@@ -5,6 +5,8 @@ import logFixture from "../__fixtures__/gatewayEvents/log.json";
 import requestFixture from "../__fixtures__/gatewayEvents/request.json";
 import requestSignalFixture from "../__fixtures__/gatewayEvents/request_signal.json";
 import requestStartFixture from "../__fixtures__/gatewayEvents/request_start.json";
+import statusFixture from "../__fixtures__/gatewayEvents/status.json";
+import type { GatewayStatus } from "../../../generated/bindings";
 import {
   isGatewayCircuitEvent,
   isGatewayLogEvent,
@@ -20,6 +22,16 @@ import {
 // A normalizer rejecting a fixture means the frontend guards drifted from
 // what the backend actually emits.
 describe("gateway event payload contract (shared fixtures)", () => {
+  it("accepts the gateway:status fixture", () => {
+    const status: GatewayStatus = statusFixture;
+    expect(status).toEqual({
+      running: true,
+      port: 37123,
+      base_url: "http://127.0.0.1:37123",
+      listen_addr: "127.0.0.1:37123",
+    });
+  });
+
   it("accepts the gateway:request fixture", () => {
     const normalized = normalizeGatewayRequestEvent(requestFixture);
     expect(normalized).not.toBeNull();

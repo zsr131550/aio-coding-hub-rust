@@ -15,9 +15,15 @@
  */
 
 import { spawn } from "node:child_process";
-import { existsSync, mkdirSync, writeFileSync } from "node:fs";
-import { dirname, resolve } from "node:path";
+import { createHash } from "node:crypto";
+import { existsSync, mkdirSync, renameSync, rmSync, writeFileSync } from "node:fs";
+import { dirname, isAbsolute, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+  collectReleaseBuildInputs,
+  releaseBuildManifestPath,
+  writeReleaseBuildManifest,
+} from "./egui-baseline/release-provenance.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const projectRoot = resolve(__dirname, "..");
@@ -40,8 +46,6 @@ function isCiEnv() {
 }
 
 function ensureLocalBuildOverlayFileExists() {
-  if (existsSync(overlayPath)) return;
-
   mkdirSync(localDir, { recursive: true });
 
   const overlay = {
@@ -50,8 +54,13 @@ function ensureLocalBuildOverlayFileExists() {
     },
   };
 
-  writeFileSync(overlayPath, JSON.stringify(overlay, null, 2) + "\n", "utf8");
-  console.log(`[tauri:build] Created local overlay: ${overlayPath}`);
+  const contents = JSON.stringify(overlay, null, 2) + "\n";
+  writeFileSync(overlayPath, contents, "utf8");
+  console.log(`[tauri:build] Wrote canonical local overlay: ${overlayPath}`);
+  return {
+    path: ".local/tauri.build.local.json",
+    sha256: createHash("sha256").update(contents).digest("hex"),
+  };
 }
 
 function resolveCliOptionValue(args, optionNames) {
@@ -109,7 +118,91 @@ function appendDefaultBundlesArg(tauriArgs, userArgs) {
   tauriArgs.push("--bundles", defaultBundles);
 }
 
-function run() {
+function expectedReleaseExecutable(userArgs) {
+  const target = resolveCliOptionValue(userArgs, ["--target", "-t"]);
+  const cargoTargetDirValue = process.env.CARGO_TARGET_DIR;
+  const cargoTargetDir = cargoTargetDirValue
+    ? isAbsolute(cargoTargetDirValue)
+      ? resolve(cargoTargetDirValue)
+      : resolve(projectRoot, "src-tauri", cargoTargetDirValue)
+    : resolve(projectRoot, "src-tauri", "target");
+  const profile = hasCliOption(userArgs, ["--debug", "-d"])
+    ? "debug"
+    : (resolveCliOptionValue(userArgs, ["--profile"]) ?? "release");
+  const windowsTarget = target?.includes("windows") ?? process.platform === "win32";
+  return resolve(
+    cargoTargetDir,
+    ...(target ? [target] : []),
+    profile,
+    `aio-coding-hub${windowsTarget ? ".exe" : ""}`
+  );
+}
+
+function resolvedBuildProfile(userArgs) {
+  return hasCliOption(userArgs, ["--debug", "-d"])
+    ? "debug"
+    : (resolveCliOptionValue(userArgs, ["--profile"]) ?? "release");
+}
+
+function resolvedBuildTarget(userArgs) {
+  return resolveCliOptionValue(userArgs, ["--target", "-t"]) ?? resolveHostTarget();
+}
+
+function canonicalBuildConfiguration(userArgs, configOverlay) {
+  const target = resolvedBuildTarget(userArgs);
+  const profile = resolvedBuildProfile(userArgs);
+  const expectedBundles = target ? (DEFAULT_BUNDLES_BY_TARGET[target] ?? null) : null;
+  let argumentsAreCanonical = true;
+  for (let index = 0; index < userArgs.length; index += 1) {
+    const current = userArgs[index];
+    if (["--target", "-t", "--bundles", "-b"].includes(current)) {
+      index += 1;
+      if (userArgs[index] == null) argumentsAreCanonical = false;
+    } else if (
+      !current.startsWith("--target=") &&
+      !current.startsWith("-t=") &&
+      !current.startsWith("--bundles=") &&
+      !current.startsWith("-b=")
+    ) {
+      argumentsAreCanonical = false;
+    }
+  }
+  const requestedBundles = resolveCliOptionValue(userArgs, ["--bundles", "-b"]) ?? expectedBundles;
+  return {
+    formalCompatible:
+      argumentsAreCanonical &&
+      profile === "release" &&
+      target === resolveHostTarget() &&
+      requestedBundles === expectedBundles,
+    bundles: requestedBundles,
+    configOverlay,
+  };
+}
+
+function quarantineBuildOutput(target) {
+  const backup = `${target}.aio-build-backup-${process.pid}`;
+  if (existsSync(backup)) {
+    throw new Error(`stale build-output backup already exists: ${backup}`);
+  }
+  if (!existsSync(target)) return { target, backup, moved: false };
+  renameSync(target, backup);
+  return { target, backup, moved: true };
+}
+
+function restoreBuildOutputs(outputs) {
+  for (const output of [...outputs].reverse()) {
+    rmSync(output.target, { recursive: true, force: true });
+    if (output.moved) renameSync(output.backup, output.target);
+  }
+}
+
+function discardBuildOutputBackups(outputs) {
+  for (const output of outputs) {
+    if (output.moved) rmSync(output.backup, { recursive: true, force: true });
+  }
+}
+
+async function run() {
   const userArgs = process.argv.slice(2);
 
   // pnpm passes a literal `--` separator to the underlying command, and if the script
@@ -127,8 +220,9 @@ function run() {
   const shouldDisableUpdaterArtifacts = !isCiEnv() && !hasSigningKey;
 
   const tauriArgs = ["build"];
+  let configOverlay = null;
   if (shouldDisableUpdaterArtifacts) {
-    ensureLocalBuildOverlayFileExists();
+    configOverlay = ensureLocalBuildOverlayFileExists();
     console.log(
       "[tauri:build] TAURI_SIGNING_PRIVATE_KEY not set; disabling bundle.createUpdaterArtifacts for local build."
     );
@@ -136,6 +230,35 @@ function run() {
   }
   appendDefaultBundlesArg(tauriArgs, userArgs);
   tauriArgs.push(...userArgs);
+  const expectedExecutable = expectedReleaseExecutable(userArgs);
+  const buildProfile = resolvedBuildProfile(userArgs);
+  const buildTarget = resolvedBuildTarget(userArgs) ?? "unknown-host-target";
+  const buildConfiguration = canonicalBuildConfiguration(userArgs, configOverlay);
+  let buildInputs;
+  try {
+    buildInputs = await collectReleaseBuildInputs({
+      repositoryRoot: projectRoot,
+      profile: buildProfile,
+      target: buildTarget,
+      buildConfiguration,
+    });
+  } catch (error) {
+    console.error(`[tauri:build] failed to capture build inputs: ${error?.message ?? error}`);
+    process.exitCode = 1;
+    return;
+  }
+  const quarantinedOutputs = [];
+  try {
+    quarantinedOutputs.push(quarantineBuildOutput(expectedExecutable));
+    quarantinedOutputs.push(quarantineBuildOutput(releaseBuildManifestPath(expectedExecutable)));
+    quarantinedOutputs.push(quarantineBuildOutput(resolve(dirname(expectedExecutable), "bundle")));
+  } catch (error) {
+    restoreBuildOutputs(quarantinedOutputs);
+    console.error(
+      `[tauri:build] failed to prepare clean release outputs: ${error?.message ?? error}`
+    );
+    process.exit(1);
+  }
 
   const child = spawn("tauri", tauriArgs, {
     cwd: projectRoot,
@@ -144,18 +267,57 @@ function run() {
     env: process.env,
   });
 
-  child.on("exit", (code, signal) => {
-    if (signal) {
-      console.error(`[tauri:build] exited with signal: ${signal}`);
-      process.exit(1);
-    }
-    process.exit(code ?? 1);
+  let spawnError = null;
+  child.once("error", (error) => {
+    spawnError = error;
   });
 
-  child.on("error", (err) => {
-    console.error(`[tauri:build] failed to spawn tauri: ${err?.message ?? err}`);
-    process.exit(1);
+  // Wait for stdio to close before finalizing the wrapper. Calling process.exit()
+  // from the earlier `exit` event can race the package runner on Windows and make
+  // a failed build appear successful.
+  child.once("close", async (code, signal) => {
+    if (spawnError) {
+      restoreBuildOutputs(quarantinedOutputs);
+      console.error(`[tauri:build] failed to spawn tauri: ${spawnError?.message ?? spawnError}`);
+      process.exitCode = 1;
+      return;
+    }
+    if (signal) {
+      restoreBuildOutputs(quarantinedOutputs);
+      console.error(`[tauri:build] exited with signal: ${signal}`);
+      process.exitCode = 1;
+      return;
+    }
+    if (code !== 0) {
+      restoreBuildOutputs(quarantinedOutputs);
+      process.exitCode = typeof code === "number" && code > 0 ? code : 1;
+      return;
+    }
+    if (!existsSync(expectedExecutable)) {
+      restoreBuildOutputs(quarantinedOutputs);
+      console.error(`[tauri:build] release executable was not produced: ${expectedExecutable}`);
+      process.exitCode = 1;
+      return;
+    }
+    try {
+      const manifest = await writeReleaseBuildManifest({
+        repositoryRoot: projectRoot,
+        executable: expectedExecutable,
+        buildInputs,
+      });
+      console.log(
+        `[tauri:build] Wrote release provenance: ${expectedExecutable}.build-provenance.json (${manifest.installers.length} installer artifact(s))`
+      );
+      discardBuildOutputBackups(quarantinedOutputs);
+    } catch (error) {
+      restoreBuildOutputs(quarantinedOutputs);
+      console.error(`[tauri:build] failed to write release provenance: ${error?.message ?? error}`);
+      process.exitCode = 1;
+    }
   });
 }
 
-run();
+run().catch((error) => {
+  console.error(`[tauri:build] unexpected failure: ${error?.message ?? error}`);
+  process.exitCode = 1;
+});

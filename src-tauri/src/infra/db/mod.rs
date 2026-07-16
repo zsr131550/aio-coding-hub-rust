@@ -14,7 +14,10 @@ use std::env;
 use std::path::PathBuf;
 use std::time::Duration;
 
-const DB_FILE_NAME: &str = "aio-coding-hub.db";
+pub(crate) const DB_FILE_NAME: &str = "aio-coding-hub.db";
+pub(crate) const MIN_SUPPORTED_SCHEMA_VERSION: i64 = migrations::MIN_SUPPORTED_SCHEMA_VERSION;
+pub(crate) const LATEST_SCHEMA_VERSION: i64 = migrations::LATEST_SCHEMA_VERSION;
+pub(crate) const MAX_COMPAT_SCHEMA_VERSION: i64 = migrations::MAX_COMPAT_SCHEMA_VERSION;
 const BUSY_TIMEOUT_DEFAULT: Duration = Duration::from_millis(2000);
 const POOL_MAX_SIZE_DEFAULT: u32 = 8;
 const POOL_MIN_IDLE_DEFAULT: u32 = 1;

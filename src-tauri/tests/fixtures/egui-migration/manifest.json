@@ -1,0 +1,222 @@
+{
+  "artifacts": {
+    "data/fresh/fixture.json": {
+      "bytes": 176,
+      "kind": "file",
+      "sha256": "b9e66afa562518df37220026d0471411e72ad4e97f483b96589d6472d25a8d32"
+    },
+    "data/sqlite-current/aio-coding-hub.db": {
+      "bytes": 458752,
+      "kind": "sqlite",
+      "sha256": "d16ccfe66f2b2093bbfdf08437fa886c6fd718099c84cefbc618f75cc6d119e1",
+      "sqlite": {
+        "normalizedSchemaSha256": "06d3cb112a93f620d05376ee57ca8a940b83a0ad3ad08938c085539ec348d9fc",
+        "rowCounts": {
+          "claude_model_validation_runs": 0,
+          "default_route_providers": 0,
+          "mcp_servers": 0,
+          "model_prices": 0,
+          "plugin_audit_logs": 0,
+          "plugin_configs": 0,
+          "plugin_hook_execution_reports": 0,
+          "plugin_market_sources": 0,
+          "plugin_permissions": 0,
+          "plugin_runtime_failures": 0,
+          "plugin_versions": 0,
+          "plugins": 0,
+          "prompts": 0,
+          "provider_circuit_breakers": 0,
+          "provider_extension_values": 0,
+          "provider_oauth_limit_snapshots": 0,
+          "provider_pool_order": 0,
+          "providers": 0,
+          "request_logs": 0,
+          "schema_migrations": 1,
+          "skill_repos": 3,
+          "skills": 0,
+          "sort_mode_active": 0,
+          "sort_mode_providers": 0,
+          "sort_modes": 0,
+          "workspace_active": 3,
+          "workspace_mcp_enabled": 0,
+          "workspace_skill_enabled": 0,
+          "workspaces": 3
+        },
+        "schemaPath": "data/sqlite-current/schema.json",
+        "userVersion": 35
+      }
+    },
+    "data/sqlite-current/schema.json": {
+      "bytes": 27648,
+      "kind": "file",
+      "sha256": "06d3cb112a93f620d05376ee57ca8a940b83a0ad3ad08938c085539ec348d9fc"
+    },
+    "data/sqlite-v25/aio-coding-hub.db": {
+      "bytes": 241664,
+      "kind": "sqlite",
+      "sha256": "a97e70a3fa66c9ce7d0638eb45c4ab97408b5706d76478c0a7c871272c44caa2",
+      "sqlite": {
+        "normalizedSchemaSha256": "d36c74e550cdb73512305d9017ce87cce4b6f5b42140c842d06468a109473dec",
+        "rowCounts": {
+          "claude_model_validation_runs": 0,
+          "mcp_servers": 0,
+          "model_prices": 0,
+          "prompts": 0,
+          "provider_circuit_breakers": 0,
+          "providers": 0,
+          "request_attempt_logs": 0,
+          "request_logs": 0,
+          "schema_migrations": 25,
+          "skill_repos": 3,
+          "skills": 0,
+          "sort_mode_active": 0,
+          "sort_mode_providers": 0,
+          "sort_modes": 0
+        },
+        "schemaPath": "data/sqlite-v25/schema.json",
+        "userVersion": 25
+      }
+    },
+    "data/sqlite-v25/schema.json": {
+      "bytes": 13479,
+      "kind": "file",
+      "sha256": "d36c74e550cdb73512305d9017ce87cce4b6f5b42140c842d06468a109473dec"
+    },
+    "plugins/manifest-corpus/api-v2.json": {
+      "bytes": 1579,
+      "kind": "file",
+      "sha256": "24eca9901788025dd4fb16023ccad535651b1e24524eb15599a207bfd366ba39"
+    },
+    "plugins/manifest-corpus/cases.json": {
+      "bytes": 1131,
+      "kind": "file",
+      "sha256": "9e1f7edf1ed80ce989c9da4b538377b3280a2f12d1ce74c64146c328d0b0e74b"
+    },
+    "plugins/manifest-corpus/legacy-wasm-runtime.json": {
+      "bytes": 1540,
+      "kind": "file",
+      "sha256": "187076f5575af0f45b3259be7f2b39f7b1ca7c0a1bdefa57e3b9201296161ba7"
+    },
+    "plugins/manifest-corpus/malformed-json.json": {
+      "bytes": 27,
+      "kind": "file",
+      "sha256": "9eb79c0c7dd25770a59f44ed559d5843449d61718f302f833140dc10bc0885e0"
+    },
+    "plugins/manifest-corpus/missing-main.json": {
+      "bytes": 1548,
+      "kind": "file",
+      "sha256": "c43460fb58f0565e815794abbb6164d3638dcde9ac3e04a749fec542e7386b09"
+    },
+    "plugins/manifest-corpus/unknown-hook.json": {
+      "bytes": 1576,
+      "kind": "file",
+      "sha256": "8a3416a266316b6ca5a1e9acaf3ae7638810fd849c566941014258a6be563248"
+    },
+    "plugins/manifest-corpus/unknown-slot.json": {
+      "bytes": 1582,
+      "kind": "file",
+      "sha256": "eb3f779df6c0c8e0639cfe79411012deacfb9686ffdf05c246971555c4635c85"
+    },
+    "plugins/manifest-corpus/valid-v1.json": {
+      "bytes": 1579,
+      "kind": "file",
+      "sha256": "dd3056b1ebd58394705860d35e9f30d5bb8cbaa63821df069c691c8e60338364"
+    },
+    "plugins/plugin-api-v1/representative/config.json": {
+      "bytes": 22,
+      "kind": "file",
+      "sha256": "aa014142a0168313a765dd1211c4c605eb3f15107ab0e1a27ec472170a5fbeca"
+    },
+    "plugins/plugin-api-v1/representative/contributions.json": {
+      "bytes": 622,
+      "kind": "file",
+      "sha256": "1606c9d7cc69149dadb8f8a321206ca12ed47f9c3bf12f518886a9ae7219f2d9"
+    },
+    "plugins/plugin-api-v1/representative/plugin.json": {
+      "bytes": 1579,
+      "kind": "file",
+      "sha256": "dd3056b1ebd58394705860d35e9f30d5bb8cbaa63821df069c691c8e60338364"
+    },
+    "plugins/transcripts/invalid-handshake.jsonl": {
+      "bytes": 488,
+      "kind": "jsonl",
+      "sha256": "6eb880c47fa986ad34ceacb426535847ee7b93988d8518516530744d3917c728"
+    },
+    "plugins/transcripts/valid-lifecycle.jsonl": {
+      "bytes": 1745,
+      "kind": "jsonl",
+      "sha256": "30a5f78ea3a71d075b3e8bdf2e4d06e45fba1e2b9fd022c6716223824392099f"
+    },
+    "README.md": {
+      "bytes": 589,
+      "kind": "file",
+      "sha256": "b7d6382764250d197ded713f54c0e1e7ceae6abab8e5dc1f93254d8cd51adf75"
+    },
+    "request-logs/metadata.json": {
+      "bytes": 250,
+      "kind": "file",
+      "sha256": "5fbae1b16b3c48a95661d0018cb4c22c8814926c7f12e0846b553cdd1f51a985"
+    },
+    "request-logs/request-logs-10000.jsonl": {
+      "bytes": 12064402,
+      "kind": "jsonl",
+      "sha256": "9ec6b658f506bbda3f340c5ebdb38ef80271c33682077a08e39cf2aeaf60d8b2"
+    },
+    "settings/settings-current.json": {
+      "bytes": 2563,
+      "kind": "file",
+      "sha256": "b6aae8bed69d185cf424de92d5367c142db4b13e5b10d5bf5da300d6cd0fde4a"
+    },
+    "updater/invalid/cases.json": {
+      "bytes": 387,
+      "kind": "file",
+      "sha256": "b24e8523067d77154560a6c80bd84e64b59e07b32ff686c16e158f94bbf74de8"
+    },
+    "updater/invalid/invalid-signature.json": {
+      "bytes": 1938,
+      "kind": "file",
+      "sha256": "ef149962b7cec09e2af4baee92d30b90f636c231ef64414459b1aa9c01ebac10"
+    },
+    "updater/invalid/missing-platform.json": {
+      "bytes": 1787,
+      "kind": "file",
+      "sha256": "88ab111fc4c34e6136fcaf3a8108399af9d95c7f814af25aa13f4218db693f3f"
+    },
+    "updater/invalid/truncated.json": {
+      "bytes": 22,
+      "kind": "file",
+      "sha256": "781012382d606a5a0b6c98a4e2d01674492c6f66ac33ad787ef3faa96ecb14a5"
+    },
+    "updater/valid/fixture-asset.bin": {
+      "bytes": 61,
+      "kind": "file",
+      "sha256": "1f973f7c05de5a3d298e70e1f54fbf55657b50dda802dac189211b3ee410f148"
+    },
+    "updater/valid/fixture-asset.bin.sig": {
+      "bytes": 405,
+      "kind": "file",
+      "sha256": "eb1050a1af9a23162ca4b81b798a0b4ae20de930cd7896d67ff79f64a2a51dd5"
+    },
+    "updater/valid/latest.json": {
+      "bytes": 2332,
+      "kind": "file",
+      "sha256": "5ada8ba064fc15211444c33d7805a411f098e13eca29a0ef66e7c2f09582ad16"
+    },
+    "updater/valid/test-public-key.txt": {
+      "bytes": 153,
+      "kind": "file",
+      "sha256": "c3eb9061f48cc5eb6dd073bab5c637e071c139a07f93f4c7e9e3d5b1175d2725"
+    }
+  },
+  "fixedEpochMs": 1700000000000,
+  "generatedBy": "scripts/egui-fixtures.mjs",
+  "schemaVersion": 1,
+  "sourceVersion": "0.60.13",
+  "sqliteV25Provenance": {
+    "commit": "5e399f7c25c33a13f3e91d8a05a9973270d00728",
+    "migrationClockEpochSeconds": 1700000000,
+    "sourceBlob": "6dce028754f13dec607e108b7a9e04da82e4d0f7",
+    "sourcePath": "src-tauri/src/infra/db.rs",
+    "sourceSchemaVersion": 25
+  }
+}

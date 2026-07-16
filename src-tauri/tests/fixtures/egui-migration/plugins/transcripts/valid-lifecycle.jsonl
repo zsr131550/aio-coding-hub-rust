@@ -1,0 +1,13 @@
+{"direction":"worker-to-host","message":{"jsonrpc":"2.0","method":"extension.ready","params":{"workerVersion":1}}}
+{"direction":"host-to-worker","message":{"jsonrpc":"2.0","id":1,"method":"extension.handshake","params":{"pluginId":"fixture.compatibility-panel","version":"1.0.0","apiVersion":"1.0.0","contributionHash":"03ebd7a25255c34fe6f38d284bf9a6d818838c78841903885d61a19b6e6b7335"}}}
+{"direction":"worker-to-host","message":{"jsonrpc":"2.0","id":1,"result":{"pluginId":"fixture.compatibility-panel","version":"1.0.0","apiVersion":"1.0.0","workerVersion":1}}}
+{"direction":"host-to-worker","message":{"jsonrpc":"2.0","id":2,"method":"extension.activate","params":null}}
+{"direction":"worker-to-host","message":{"jsonrpc":"2.0","id":2,"result":{"activated":true}}}
+{"direction":"host-to-worker","message":{"jsonrpc":"2.0","id":3,"method":"commands.execute","params":{"command":"fixture.inspect","args":{"source":"fixture"}}}}
+{"direction":"worker-to-host","message":{"jsonrpc":"2.0","id":1,"method":"host.call","params":{"method":"storage.get","params":{"key":"fixture"}}}}
+{"direction":"host-to-worker","message":{"jsonrpc":"2.0","id":1,"result":{"value":null}}}
+{"direction":"worker-to-host","message":{"jsonrpc":"2.0","id":3,"result":{"inspected":true}}}
+{"direction":"host-to-worker","message":{"jsonrpc":"2.0","id":4,"method":"gatewayHooks.execute","params":{"hook":"gateway.request.beforeSend","context":{"traceId":"fixture-trace"}}}}
+{"direction":"worker-to-host","message":{"jsonrpc":"2.0","id":4,"result":{"action":"pass"}}}
+{"direction":"host-to-worker","message":{"jsonrpc":"2.0","id":5,"method":"extension.deactivate","params":null}}
+{"direction":"worker-to-host","message":{"jsonrpc":"2.0","id":5,"result":{"deactivated":true}}}

@@ -56,10 +56,11 @@ function buildAppUpdateCheckTask(): BackgroundTaskDefinition {
   };
 }
 
-export function useAppBackgroundTasks() {
+export function useAppBackgroundTasks(enabled = true) {
   const documentVisible = useDocumentVisibility();
 
   useEffect(() => {
+    if (!enabled) return;
     const unregisterCliProxyTask = registerBackgroundTask(buildCliProxyConsistencyTask());
     const unregisterUpdateTask = registerBackgroundTask(buildAppUpdateCheckTask());
 
@@ -69,9 +70,10 @@ export function useAppBackgroundTasks() {
       unregisterCliProxyTask();
       unregisterUpdateTask();
     };
-  }, []);
+  }, [enabled]);
 
   useEffect(() => {
+    if (!enabled) return;
     setBackgroundTaskSchedulerForeground(documentVisible);
-  }, [documentVisible]);
+  }, [documentVisible, enabled]);
 }

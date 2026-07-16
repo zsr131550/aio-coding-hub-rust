@@ -4,6 +4,7 @@ use super::resident;
 use tauri_plugin_dialog::DialogExt;
 
 pub(crate) fn setup(app: &mut tauri::App<tauri::Wry>) -> Result<(), Box<dyn std::error::Error>> {
+    crate::benchmark::milestone("tauri_setup_started", serde_json::json!({}));
     crate::app::logging::init(app.handle());
     guard_restart_storm(app);
     crate::app::heartbeat_watchdog::install(app.handle());
@@ -11,6 +12,7 @@ pub(crate) fn setup(app: &mut tauri::App<tauri::Wry>) -> Result<(), Box<dyn std:
     init_desktop_integrations(app);
     init_main_window_chrome(app);
     log_dev_diagnostics(app);
+    crate::benchmark::milestone("tauri_setup_completed", serde_json::json!({}));
     crate::app::startup_tasks::spawn(app.handle().clone());
     Ok(())
 }

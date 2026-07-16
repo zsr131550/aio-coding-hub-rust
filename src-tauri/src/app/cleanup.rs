@@ -60,6 +60,7 @@ pub(crate) async fn cleanup_before_exit(app: &tauri::AppHandle) {
         Ordering::Acquire,
     ) {
         Ok(_) => {
+            crate::benchmark::milestone("shutdown_started", serde_json::json!({}));
             dispose_extension_hosts_best_effort(app).await;
             stop_gateway_best_effort(app).await;
             restore_cli_proxy_keep_state_best_effort(
@@ -87,6 +88,7 @@ pub(crate) async fn cleanup_before_exit(app: &tauri::AppHandle) {
             }
 
             CLEANUP_STATE.store(CLEANUP_STATE_DONE, Ordering::Release);
+            crate::benchmark::milestone("shutdown_completed", serde_json::json!({}));
             notify.notify_waiters();
         }
         Err(state) => {

@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "routes": [
+    { "id": "home", "kind": "index", "path": "/", "samplePath": "/" },
+    {
+      "id": "providers",
+      "kind": "page",
+      "path": "/providers",
+      "samplePath": "/providers"
+    },
+    {
+      "id": "sessions",
+      "kind": "page",
+      "path": "/sessions",
+      "samplePath": "/sessions"
+    },
+    {
+      "id": "sessions-project",
+      "kind": "page",
+      "path": "/sessions/:source/:projectId",
+      "samplePath": "/sessions/claude/project-1"
+    },
+    {
+      "id": "sessions-messages",
+      "kind": "page",
+      "path": "/sessions/:source/:projectId/session/*",
+      "samplePath": "/sessions/claude/project-1/session/session-1"
+    },
+    {
+      "id": "workspaces",
+      "kind": "page",
+      "path": "/workspaces",
+      "samplePath": "/workspaces"
+    },
+    { "id": "prompts", "kind": "page", "path": "/prompts", "samplePath": "/prompts" },
+    { "id": "mcp", "kind": "page", "path": "/mcp", "samplePath": "/mcp" },
+    { "id": "plugins", "kind": "page", "path": "/plugins", "samplePath": "/plugins" },
+    { "id": "logs", "kind": "page", "path": "/logs", "samplePath": "/logs" },
+    { "id": "console", "kind": "page", "path": "/console", "samplePath": "/console" },
+    { "id": "usage", "kind": "page", "path": "/usage", "samplePath": "/usage" },
+    {
+      "id": "settings",
+      "kind": "page",
+      "path": "/settings/*",
+      "samplePath": "/settings/general"
+    },
+    {
+      "id": "cli-manager",
+      "kind": "page",
+      "path": "/cli-manager",
+      "samplePath": "/cli-manager"
+    },
+    { "id": "skills", "kind": "page", "path": "/skills", "samplePath": "/skills" },
+    {
+      "id": "skills-market",
+      "kind": "page",
+      "path": "/skills/market",
+      "samplePath": "/skills/market"
+    },
+    {
+      "id": "fallback",
+      "kind": "fallback",
+      "path": "*",
+      "samplePath": "/missing",
+      "redirectTo": "/"
+    }
+  ],
+  "globalSurfaces": [
+    "app-layout",
+    "startup-banner",
+    "sidebar-navigation",
+    "toast-notice",
+    "update-dialog",
+    "window-tray-lifecycle"
+  ]
+}

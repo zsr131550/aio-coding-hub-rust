@@ -6,10 +6,9 @@
 
 use super::*;
 
-#[cfg(test)]
-const HANDWRITTEN_RUNTIME_ONLY_COMMANDS: &[&str] = &["desktop_updater_download_and_install"];
-#[cfg(test)]
-const HANDWRITTEN_RUNTIME_ONLY_REASON: &str =
+pub(crate) const HANDWRITTEN_RUNTIME_ONLY_COMMANDS: &[&str] =
+    &["desktop_updater_download_and_install"];
+pub(crate) const HANDWRITTEN_RUNTIME_ONLY_REASON: &str =
     "Requires a Tauri Channel callback, so this desktop updater path stays as the single handwritten desktop IPC exception.";
 
 macro_rules! generated_command_registry {
@@ -294,8 +293,7 @@ pub(crate) fn export_typescript_bindings(output_path: &str) -> Result<(), String
     Ok(())
 }
 
-#[cfg(test)]
-fn generated_command_names() -> &'static [&'static str] {
+pub(crate) fn generated_command_names() -> &'static [&'static str] {
     macro_rules! collect_names {
         ($($name:ident => $path:path),+ $(,)?) => {
             &[$(stringify!($name),)*]

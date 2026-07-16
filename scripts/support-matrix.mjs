@@ -290,6 +290,30 @@ function buildDesktopCiMatrix() {
   }));
 }
 
+function buildSupportContract() {
+  return {
+    schemaVersion: 1,
+    officialTargets: OFFICIAL_RELEASE_TARGETS.map((item) => ({
+      id: item.id,
+      osFamily: item.osFamily,
+      runner: item.runner,
+      target: item.target,
+      bundles: item.bundles,
+      updaterPlatform: item.updaterPlatform,
+      stableLabel: item.stableLabel,
+      stableAssetKind: item.stableAssetKind,
+      packageScript: item.packageScript,
+      latestAssetName: item.latestAssetName,
+      latestSignatureName: item.latestSignatureName,
+    })),
+    localBuildOnlyTargets: LOCAL_BUILD_ONLY_TARGETS.map((item) => ({
+      id: item.id,
+      packageScript: item.packageScript,
+      packageCommand: item.packageCommand,
+    })),
+  };
+}
+
 function parseArgs(rawArgs) {
   const args = new Map();
 
@@ -837,6 +861,10 @@ function printDesktopCiMatrix() {
   process.stdout.write(JSON.stringify(buildDesktopCiMatrix()));
 }
 
+function printSupportContract() {
+  process.stdout.write(JSON.stringify(buildSupportContract()));
+}
+
 function printReadmeBlock(args) {
   const locale = requireArg(args, "locale");
   const section = requireArg(args, "section");
@@ -848,7 +876,7 @@ function printReadmeBlock(args) {
 
 function printUsageAndExit() {
   logger.error(
-    "Usage: node scripts/support-matrix.mjs <build-matrix|ci-matrix|check|prepare-stable-assets|generate-latest-json|homebrew-cask|readme-block> [--key value]"
+    "Usage: node scripts/support-matrix.mjs <build-matrix|ci-matrix|contract|check|prepare-stable-assets|generate-latest-json|homebrew-cask|readme-block> [--key value]"
   );
   process.exit(1);
 }
@@ -867,6 +895,9 @@ function main() {
       return;
     case "ci-matrix":
       printDesktopCiMatrix();
+      return;
+    case "contract":
+      printSupportContract();
       return;
     case "check":
       runSupportMatrixCheck();

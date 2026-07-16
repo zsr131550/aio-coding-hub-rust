@@ -1,0 +1,6 @@
+{
+  "running": true,
+  "port": 37123,
+  "base_url": "http://127.0.0.1:37123",
+  "listen_addr": "127.0.0.1:37123"
+}

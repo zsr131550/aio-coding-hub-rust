@@ -4,13 +4,26 @@ use rusqlite::params;
 use support::SkillTestFixture;
 
 #[cfg(unix)]
-fn symlink_file(src: &std::path::Path, dst: &std::path::Path) -> std::io::Result<()> {
-    std::os::unix::fs::symlink(src, dst)
+fn create_link_fixture(
+    home: &std::path::Path,
+    ssot_dir: &std::path::Path,
+) -> std::io::Result<std::path::PathBuf> {
+    let external_file = home.join("external.txt");
+    std::fs::write(&external_file, "external\n")?;
+    std::os::unix::fs::symlink(&external_file, ssot_dir.join("linked.txt"))?;
+    Ok("linked.txt".into())
 }
 
 #[cfg(windows)]
-fn symlink_file(src: &std::path::Path, dst: &std::path::Path) -> std::io::Result<()> {
-    std::os::windows::fs::symlink_file(src, dst)
+fn create_link_fixture(
+    home: &std::path::Path,
+    ssot_dir: &std::path::Path,
+) -> std::io::Result<std::path::PathBuf> {
+    let external_dir = home.join("external-dir");
+    std::fs::create_dir_all(&external_dir)?;
+    std::fs::write(external_dir.join("external.txt"), "external\n")?;
+    junction::create(&external_dir, ssot_dir.join("linked-dir"))?;
+    Ok(std::path::PathBuf::from("linked-dir").join("external.txt"))
 }
 
 #[test]
@@ -73,16 +86,15 @@ fn return_to_local_moves_skill_out_of_managed_registry_and_keeps_local_dir() {
 }
 
 #[test]
-fn return_to_local_resolves_symlink_entries_inside_ssot_dir() {
+fn return_to_local_resolves_link_entries_inside_ssot_dir() {
     let app = support::TestApp::new();
     let handle = app.handle();
 
     aio_coding_hub_lib::test_support::init_db(&handle).expect("init db");
     let fix = SkillTestFixture::new(&app, &handle, "codex", "Codex Return Symlink");
 
-    let external_file = app.home_dir().join("external.txt");
-    std::fs::write(&external_file, "external\n").expect("write external file");
-    symlink_file(&external_file, &fix.ssot_skill_dir.join("linked.txt")).expect("create symlink");
+    let copied_relative = create_link_fixture(app.home_dir(), &fix.ssot_skill_dir)
+        .expect("create platform link fixture");
 
     let ok = aio_coding_hub_lib::test_support::skill_return_to_local(
         &handle,
@@ -99,7 +111,7 @@ fn return_to_local_resolves_symlink_entries_inside_ssot_dir() {
         "local skill dir should exist after returning"
     );
 
-    let copied_file = local_dir.join("linked.txt");
+    let copied_file = local_dir.join(copied_relative);
     assert!(
         copied_file.exists(),
         "symlink target content should be copied"

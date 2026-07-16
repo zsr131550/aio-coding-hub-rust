@@ -1,7 +1,7 @@
 //! Usage: Data reset / disk usage related Tauri commands.
 
 use crate::app_state::{ensure_db_ready, prepare_db_reset, DbInitState};
-use crate::shared::ipc_confirm::RiskyIpcConfirm;
+use crate::shared::ipc_confirm::{RiskyIpcConfirm, RISKY_APP_DATA_RESET};
 use crate::{app_paths, blocking, data_management};
 
 #[tauri::command]
@@ -63,7 +63,7 @@ pub(crate) async fn app_data_reset(
     db_state: tauri::State<'_, DbInitState>,
     confirm: Option<RiskyIpcConfirm>,
 ) -> Result<bool, String> {
-    RiskyIpcConfirm::require(confirm, "app_data_reset", "app_data")?;
+    RISKY_APP_DATA_RESET.require(confirm, "app_data")?;
     // Stop the gateway and keep lifecycle starts out until destructive file
     // deletion is complete, so background writers cannot recreate SQLite files.
     let _gateway_lifecycle = crate::app::gateway_lifecycle_lock::lock().await;

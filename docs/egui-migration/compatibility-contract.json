@@ -1,0 +1,661 @@
+{
+  "appIdentity": {
+    "databaseFileName": "aio-coding-hub.db",
+    "dotdirName": ".aio-coding-hub",
+    "identifier": "io.aio.codinghub",
+    "productName": "AIO Coding Hub",
+    "settingsFileName": "settings.json"
+  },
+  "artifactHashes": {
+    "docs/plugins/plugin-api-v1-contract.json": "794c1d40fdf2da1446443bdc048b070dd22d9a5cca7e2858a2e9335c53ade8f2",
+    "src-tauri/tauri.conf.json": "b0d7cf13c9dc5ffc9f36ce684490b1ee9d1c69d05af03fd4936917b498f6ae13",
+    "src-tauri/tests/fixtures/egui-migration/data/fresh/fixture.json": "b9e66afa562518df37220026d0471411e72ad4e97f483b96589d6472d25a8d32",
+    "src-tauri/tests/fixtures/egui-migration/data/sqlite-current/aio-coding-hub.db": "d16ccfe66f2b2093bbfdf08437fa886c6fd718099c84cefbc618f75cc6d119e1",
+    "src-tauri/tests/fixtures/egui-migration/data/sqlite-current/schema.json": "06d3cb112a93f620d05376ee57ca8a940b83a0ad3ad08938c085539ec348d9fc",
+    "src-tauri/tests/fixtures/egui-migration/data/sqlite-v25/aio-coding-hub.db": "a97e70a3fa66c9ce7d0638eb45c4ab97408b5706d76478c0a7c871272c44caa2",
+    "src-tauri/tests/fixtures/egui-migration/data/sqlite-v25/schema.json": "d36c74e550cdb73512305d9017ce87cce4b6f5b42140c842d06468a109473dec",
+    "src-tauri/tests/fixtures/egui-migration/manifest.json": "e47ef9368787f84858377fc414b81b3e8857be3f3b9113f53a5d9b465b6108c2",
+    "src-tauri/tests/fixtures/egui-migration/plugins/manifest-corpus/api-v2.json": "24eca9901788025dd4fb16023ccad535651b1e24524eb15599a207bfd366ba39",
+    "src-tauri/tests/fixtures/egui-migration/plugins/manifest-corpus/cases.json": "9e1f7edf1ed80ce989c9da4b538377b3280a2f12d1ce74c64146c328d0b0e74b",
+    "src-tauri/tests/fixtures/egui-migration/plugins/manifest-corpus/legacy-wasm-runtime.json": "187076f5575af0f45b3259be7f2b39f7b1ca7c0a1bdefa57e3b9201296161ba7",
+    "src-tauri/tests/fixtures/egui-migration/plugins/manifest-corpus/malformed-json.json": "9eb79c0c7dd25770a59f44ed559d5843449d61718f302f833140dc10bc0885e0",
+    "src-tauri/tests/fixtures/egui-migration/plugins/manifest-corpus/missing-main.json": "c43460fb58f0565e815794abbb6164d3638dcde9ac3e04a749fec542e7386b09",
+    "src-tauri/tests/fixtures/egui-migration/plugins/manifest-corpus/unknown-hook.json": "8a3416a266316b6ca5a1e9acaf3ae7638810fd849c566941014258a6be563248",
+    "src-tauri/tests/fixtures/egui-migration/plugins/manifest-corpus/unknown-slot.json": "eb3f779df6c0c8e0639cfe79411012deacfb9686ffdf05c246971555c4635c85",
+    "src-tauri/tests/fixtures/egui-migration/plugins/manifest-corpus/valid-v1.json": "dd3056b1ebd58394705860d35e9f30d5bb8cbaa63821df069c691c8e60338364",
+    "src-tauri/tests/fixtures/egui-migration/plugins/plugin-api-v1/representative/config.json": "aa014142a0168313a765dd1211c4c605eb3f15107ab0e1a27ec472170a5fbeca",
+    "src-tauri/tests/fixtures/egui-migration/plugins/plugin-api-v1/representative/contributions.json": "1606c9d7cc69149dadb8f8a321206ca12ed47f9c3bf12f518886a9ae7219f2d9",
+    "src-tauri/tests/fixtures/egui-migration/plugins/plugin-api-v1/representative/plugin.json": "dd3056b1ebd58394705860d35e9f30d5bb8cbaa63821df069c691c8e60338364",
+    "src-tauri/tests/fixtures/egui-migration/plugins/transcripts/invalid-handshake.jsonl": "6eb880c47fa986ad34ceacb426535847ee7b93988d8518516530744d3917c728",
+    "src-tauri/tests/fixtures/egui-migration/plugins/transcripts/valid-lifecycle.jsonl": "30a5f78ea3a71d075b3e8bdf2e4d06e45fba1e2b9fd022c6716223824392099f",
+    "src-tauri/tests/fixtures/egui-migration/README.md": "b7d6382764250d197ded713f54c0e1e7ceae6abab8e5dc1f93254d8cd51adf75",
+    "src-tauri/tests/fixtures/egui-migration/request-logs/metadata.json": "5fbae1b16b3c48a95661d0018cb4c22c8814926c7f12e0846b553cdd1f51a985",
+    "src-tauri/tests/fixtures/egui-migration/request-logs/request-logs-10000.jsonl": "9ec6b658f506bbda3f340c5ebdb38ef80271c33682077a08e39cf2aeaf60d8b2",
+    "src-tauri/tests/fixtures/egui-migration/settings/settings-current.json": "b6aae8bed69d185cf424de92d5367c142db4b13e5b10d5bf5da300d6cd0fde4a",
+    "src-tauri/tests/fixtures/egui-migration/updater/invalid/cases.json": "b24e8523067d77154560a6c80bd84e64b59e07b32ff686c16e158f94bbf74de8",
+    "src-tauri/tests/fixtures/egui-migration/updater/invalid/invalid-signature.json": "ef149962b7cec09e2af4baee92d30b90f636c231ef64414459b1aa9c01ebac10",
+    "src-tauri/tests/fixtures/egui-migration/updater/invalid/missing-platform.json": "88ab111fc4c34e6136fcaf3a8108399af9d95c7f814af25aa13f4218db693f3f",
+    "src-tauri/tests/fixtures/egui-migration/updater/invalid/truncated.json": "781012382d606a5a0b6c98a4e2d01674492c6f66ac33ad787ef3faa96ecb14a5",
+    "src-tauri/tests/fixtures/egui-migration/updater/valid/fixture-asset.bin": "1f973f7c05de5a3d298e70e1f54fbf55657b50dda802dac189211b3ee410f148",
+    "src-tauri/tests/fixtures/egui-migration/updater/valid/fixture-asset.bin.sig": "eb1050a1af9a23162ca4b81b798a0b4ae20de930cd7896d67ff79f64a2a51dd5",
+    "src-tauri/tests/fixtures/egui-migration/updater/valid/latest.json": "5ada8ba064fc15211444c33d7805a411f098e13eca29a0ef66e7c2f09582ad16",
+    "src-tauri/tests/fixtures/egui-migration/updater/valid/test-public-key.txt": "c3eb9061f48cc5eb6dd073bab5c637e071c139a07f93f4c7e9e3d5b1175d2725",
+    "src/app/app-routes.contract.json": "345653ab1a5ac0daab199397ff1eda58e346040d176ebfdae067c3b5d9533588",
+    "src/generated/bindings.ts": "69f39f2b9887f3594a1cb523c890574938192746ff0db60c258422799fe517b7",
+    "src/services/app/__fixtures__/heartbeat.json": "41e4d2c2bc6b4d22cd30afeb9314d14319131317ebfab44d70790f5bef8c14f0",
+    "src/services/app/__fixtures__/notice.json": "415cf26c0a9c2c61dd75d794c1cc743dd2e849f60042d9dae4ae6e1bc2492897",
+    "src/services/app/__fixtures__/startupStatus/ready.json": "aa09c46f17aa580c9cb0042db8b69ca8c101a1ae58fa84fe54b5a002a6fdaf3a",
+    "src/services/gateway/__fixtures__/gatewayEvents/attempt.json": "72fdb9a054d4ad6e100062a07a157dc9b5ea68bd55b54ca692a311e84ce47f5c",
+    "src/services/gateway/__fixtures__/gatewayEvents/circuit.json": "2b9ba8d6f736dd9ef5c7911d574748fd4924ac4f99e880014805227807d7674a",
+    "src/services/gateway/__fixtures__/gatewayEvents/log.json": "46e426861027df0d4d72cd57eed68f3f82ab5da35530d4f08120fde5cee0a8f6",
+    "src/services/gateway/__fixtures__/gatewayEvents/request_signal.json": "25a6874d9dfd35732176affb33a96626c7e7b39801d35c3d6f26babd8095a7f6",
+    "src/services/gateway/__fixtures__/gatewayEvents/request_start.json": "ed997aa0509886bb02d31a07a5429aceaa3bed10e205c8e65dd64b57cdb50950",
+    "src/services/gateway/__fixtures__/gatewayEvents/request.json": "1bfc7e87f636e49be04bff4b41bf05ab73181941ff5ac4387aba916a251b4105",
+    "src/services/gateway/__fixtures__/gatewayEvents/status.json": "3f3f57b07d7be6d8b37f2502dd32a4d3b44fadf68ee73799848bb629d17b5525"
+  },
+  "data": {
+    "configBundleSchemaVersions": [
+      1,
+      2
+    ],
+    "databaseFileName": "aio-coding-hub.db",
+    "dotdirName": ".aio-coding-hub",
+    "settingsFileName": "settings.json",
+    "settingsSchemaVersion": 34,
+    "sqlite": {
+      "current": 35,
+      "maximumCompatible": 35,
+      "minimum": 25
+    }
+  },
+  "events": [
+    {
+      "coalescing": "latest-wins",
+      "delivery": "snapshot",
+      "fixturePath": "src/services/gateway/__fixtures__/gatewayEvents/status.json",
+      "id": "gateway-status",
+      "name": "gateway:status",
+      "payloadType": "GatewayStatus",
+      "resyncCommand": "gateway_status"
+    },
+    {
+      "coalescing": "none",
+      "delivery": "realtime",
+      "fixturePath": "src/services/gateway/__fixtures__/gatewayEvents/request_start.json",
+      "id": "gateway-request-start",
+      "name": "gateway:request_start",
+      "payloadType": "GatewayRequestStartEvent",
+      "resyncCommand": "request_logs_list"
+    },
+    {
+      "coalescing": "none",
+      "delivery": "realtime",
+      "fixturePath": "src/services/gateway/__fixtures__/gatewayEvents/attempt.json",
+      "id": "gateway-attempt",
+      "name": "gateway:attempt",
+      "payloadType": "GatewayAttemptEvent",
+      "resyncCommand": "request_logs_list"
+    },
+    {
+      "coalescing": "none",
+      "delivery": "durable-projection",
+      "fixturePath": "src/services/gateway/__fixtures__/gatewayEvents/request.json",
+      "id": "gateway-request",
+      "name": "gateway:request",
+      "payloadType": "GatewayRequestEvent",
+      "resyncCommand": "request_logs_list"
+    },
+    {
+      "coalescing": "same-trace-phase-latest-wins",
+      "delivery": "realtime",
+      "fixturePath": "src/services/gateway/__fixtures__/gatewayEvents/request_signal.json",
+      "id": "gateway-request-signal",
+      "name": "gateway:request_signal",
+      "payloadType": "GatewayRequestSignalEvent",
+      "resyncCommand": null
+    },
+    {
+      "coalescing": "none",
+      "delivery": "best-effort",
+      "fixturePath": "src/services/gateway/__fixtures__/gatewayEvents/log.json",
+      "id": "gateway-log",
+      "name": "gateway:log",
+      "payloadType": "GatewayLogEvent",
+      "resyncCommand": null
+    },
+    {
+      "coalescing": "provider-latest-wins",
+      "delivery": "realtime",
+      "fixturePath": "src/services/gateway/__fixtures__/gatewayEvents/circuit.json",
+      "id": "gateway-circuit",
+      "name": "gateway:circuit",
+      "payloadType": "GatewayCircuitEvent",
+      "resyncCommand": "gateway_circuit_status"
+    },
+    {
+      "coalescing": "latest-wins",
+      "delivery": "snapshot",
+      "fixturePath": "src/services/app/__fixtures__/startupStatus/ready.json",
+      "id": "app-startup-status",
+      "name": "app:startup_status",
+      "payloadType": "AppStartupStatus",
+      "resyncCommand": "app_startup_status_get"
+    },
+    {
+      "coalescing": "latest-wins",
+      "delivery": "watchdog-signal",
+      "fixturePath": "src/services/app/__fixtures__/heartbeat.json",
+      "id": "app-heartbeat",
+      "name": "app:heartbeat",
+      "payloadType": "HeartbeatPayload",
+      "resyncCommand": null
+    },
+    {
+      "coalescing": "none",
+      "delivery": "best-effort",
+      "fixturePath": "src/services/app/__fixtures__/notice.json",
+      "id": "app-notice",
+      "name": "notice:notify",
+      "payloadType": "NoticeEventPayload",
+      "resyncCommand": null
+    }
+  ],
+  "globalSurfaces": [
+    "app-layout",
+    "startup-banner",
+    "sidebar-navigation",
+    "toast-notice",
+    "update-dialog",
+    "window-tray-lifecycle"
+  ],
+  "ipc": {
+    "bindingsPath": "src/generated/bindings.ts",
+    "confirmErrorCodes": [
+      "SEC_CONFIRM_REQUIRED",
+      "SEC_CONFIRM_ACTION_MISMATCH",
+      "SEC_CONFIRM_RESOURCE_MISMATCH",
+      "SEC_CONFIRM_TTL_INVALID",
+      "SEC_CONFIRM_ISSUED_AT_INVALID",
+      "SEC_CONFIRM_NONCE_INVALID",
+      "SEC_CONFIRM_EXPIRED"
+    ],
+    "confirmLimits": {
+      "maxFutureSkewMs": 30000,
+      "maxNonceLen": 128,
+      "maxTtlMs": 300000,
+      "minNonceLen": 16
+    },
+    "generatedCommandCount": 195,
+    "generatedCommands": [
+      "settings_get",
+      "settings_set",
+      "settings_gateway_rectifier_set",
+      "settings_circuit_breaker_notice_set",
+      "settings_codex_session_id_completion_set",
+      "config_export",
+      "config_import",
+      "app_about_get",
+      "app_data_dir_get",
+      "app_exit",
+      "app_restart",
+      "app_heartbeat_pong",
+      "app_startup_status_get",
+      "app_startup_retry",
+      "app_frontend_error_report",
+      "app_memory_diagnostics_get",
+      "desktop_clipboard_write_text",
+      "desktop_dialog_open",
+      "desktop_dialog_save",
+      "desktop_notification_is_permission_granted",
+      "desktop_notification_notify",
+      "desktop_notification_play_sound",
+      "desktop_notification_request_permission",
+      "desktop_opener_open_path",
+      "desktop_opener_open_url",
+      "desktop_opener_reveal_item_in_dir",
+      "desktop_updater_check",
+      "desktop_window_set_theme",
+      "notice_send",
+      "cli_manager_claude_info_get",
+      "cli_manager_codex_info_get",
+      "cli_manager_codex_model_catalog_get",
+      "cli_manager_codex_config_get",
+      "cli_manager_codex_config_set",
+      "cli_manager_codex_config_toml_get",
+      "cli_manager_codex_config_toml_validate",
+      "cli_manager_codex_config_toml_set",
+      "cli_manager_gemini_info_get",
+      "cli_manager_gemini_config_get",
+      "cli_manager_gemini_config_set",
+      "cli_manager_claude_env_set",
+      "cli_manager_claude_settings_get",
+      "cli_manager_claude_settings_set",
+      "cli_manager_claude_hooks_get",
+      "cli_manager_claude_hooks_set",
+      "cli_check_latest_version",
+      "cli_update",
+      "gateway_start",
+      "gateway_stop",
+      "gateway_status",
+      "gateway_check_port_available",
+      "gateway_sessions_list",
+      "gateway_circuit_status",
+      "gateway_circuit_reset_provider",
+      "gateway_circuit_reset_cli",
+      "gateway_upstream_proxy_validate",
+      "gateway_upstream_proxy_test",
+      "gateway_upstream_proxy_detect_ip",
+      "wsl_detect",
+      "wsl_host_address_get",
+      "wsl_config_status_get",
+      "wsl_configure_clients",
+      "cli_sessions_projects_list",
+      "cli_sessions_sessions_list",
+      "cli_sessions_messages_get",
+      "cli_sessions_session_delete",
+      "providers_list",
+      "provider_upsert",
+      "provider_duplicate",
+      "provider_set_enabled",
+      "provider_delete",
+      "providers_reorder",
+      "default_route_providers_list",
+      "default_route_providers_set_order",
+      "provider_claude_terminal_launch_command",
+      "provider_copy_api_key_to_clipboard",
+      "base_url_ping_ms",
+      "provider_test_availability",
+      "provider_oauth_start_flow",
+      "provider_oauth_start_device_flow",
+      "provider_oauth_poll_device_flow",
+      "provider_oauth_cancel_device_flow",
+      "provider_oauth_refresh",
+      "provider_oauth_disconnect",
+      "provider_oauth_status",
+      "provider_oauth_fetch_limits",
+      "provider_oauth_reset_codex_quota",
+      "claude_provider_validate_model",
+      "claude_validation_history_list",
+      "claude_validation_history_clear_provider",
+      "sort_modes_list",
+      "sort_mode_create",
+      "sort_mode_rename",
+      "sort_mode_delete",
+      "sort_mode_active_list",
+      "sort_mode_active_set",
+      "sort_mode_providers_list",
+      "sort_mode_providers_set_order",
+      "sort_mode_provider_set_enabled",
+      "model_prices_list",
+      "model_price_upsert",
+      "model_prices_sync_basellm",
+      "model_price_aliases_get",
+      "model_price_aliases_set",
+      "prompts_list",
+      "prompts_list_summary",
+      "prompts_default_sync_from_files",
+      "prompt_upsert",
+      "prompt_set_enabled",
+      "prompt_delete",
+      "mcp_servers_list",
+      "mcp_server_upsert",
+      "mcp_server_set_enabled",
+      "mcp_server_delete",
+      "mcp_parse_json",
+      "mcp_import_servers",
+      "mcp_import_from_workspace_cli",
+      "skill_repos_list",
+      "skill_repo_upsert",
+      "skill_repo_delete",
+      "skills_installed_list",
+      "skills_discover_available",
+      "skill_repo_discover_available",
+      "skill_install",
+      "skill_install_to_local",
+      "skill_set_enabled",
+      "skill_uninstall",
+      "skill_return_to_local",
+      "skills_local_list",
+      "skill_local_delete",
+      "skill_import_local",
+      "skills_import_local_batch",
+      "skills_paths_get",
+      "skill_check_updates",
+      "skill_update",
+      "plugin_list",
+      "plugin_get",
+      "plugin_active_contributions",
+      "plugin_execute_command",
+      "plugin_preview_from_file",
+      "plugin_preview_update_from_file",
+      "plugin_preview_remote_update",
+      "plugin_install_from_file",
+      "plugin_update_from_file",
+      "plugin_rollback",
+      "plugin_parse_market_index",
+      "plugin_install_remote",
+      "plugin_update_remote",
+      "plugin_install_official",
+      "plugin_quarantine_revoked",
+      "plugin_enable",
+      "plugin_disable",
+      "plugin_uninstall",
+      "plugin_save_config",
+      "plugin_grant_permissions",
+      "plugin_revoke_permission",
+      "plugin_list_audit_logs",
+      "plugin_list_runtime_reports",
+      "plugin_list_extension_runtime_reports",
+      "plugin_export_replay_fixture",
+      "request_logs_list",
+      "request_logs_list_all",
+      "request_logs_list_after_id",
+      "request_logs_list_after_id_all",
+      "request_log_get",
+      "request_log_get_by_trace_id",
+      "request_attempt_logs_by_trace_id",
+      "active_request_logs_snapshot",
+      "cli_sessions_folder_lookup_by_ids",
+      "db_disk_usage_get",
+      "db_compact",
+      "request_logs_clear_all",
+      "app_data_reset",
+      "usage_summary",
+      "usage_summary_v2",
+      "usage_leaderboard_provider",
+      "usage_leaderboard_day",
+      "usage_leaderboard_v2",
+      "usage_leaderboard_csv_export",
+      "usage_hourly_series",
+      "usage_day_detail_v1",
+      "usage_folder_options_v1",
+      "usage_provider_cache_rate_trend_v1",
+      "env_conflicts_check",
+      "cli_proxy_status_all",
+      "cli_proxy_set_enabled",
+      "cli_proxy_sync_enabled",
+      "cli_proxy_rebind_codex_home",
+      "provider_limit_usage_v1",
+      "workspaces_list",
+      "workspace_create",
+      "workspace_rename",
+      "workspace_delete",
+      "workspace_preview",
+      "workspace_apply"
+    ],
+    "riskyOperations": [
+      {
+        "action": "config_import",
+        "command": "config_import",
+        "resourceTemplate": "{filePath}"
+      },
+      {
+        "action": "app_data_reset",
+        "command": "app_data_reset",
+        "resourceTemplate": "app_data"
+      },
+      {
+        "action": "desktop_updater_download_and_install",
+        "command": "desktop_updater_download_and_install",
+        "resourceTemplate": "updater:{resourceId}"
+      },
+      {
+        "action": "skill_local_delete",
+        "command": "skill_local_delete",
+        "resourceTemplate": "workspace:{workspaceId}:skill-local:{dirName}"
+      },
+      {
+        "action": "provider_copy_api_key_to_clipboard",
+        "command": "provider_copy_api_key_to_clipboard",
+        "resourceTemplate": "provider:{providerId}:api_key"
+      },
+      {
+        "action": "provider_oauth_reset_codex_quota",
+        "command": "provider_oauth_reset_codex_quota",
+        "resourceTemplate": "provider:{providerId}:codex_reset_credit"
+      }
+    ],
+    "runtimeCommandCount": 196,
+    "runtimeOnlyCommands": [
+      {
+        "name": "desktop_updater_download_and_install",
+        "reason": "Requires a Tauri Channel callback, so this desktop updater path stays as the single handwritten desktop IPC exception."
+      }
+    ]
+  },
+  "plugins": {
+    "activeUiContributionSlots": [
+      "providers.editor.sections",
+      "settings.sections",
+      "logs.detail.tabs"
+    ],
+    "apiVersion": "1.0.0",
+    "contractPath": "docs/plugins/plugin-api-v1-contract.json",
+    "extensionHost": {
+      "configArgument": "--extension-host-config",
+      "methods": [
+        "extension.handshake",
+        "extension.activate",
+        "extension.deactivate",
+        "commands.execute",
+        "gatewayHooks.execute"
+      ],
+      "notifications": [
+        "extension.ready",
+        "host.call"
+      ],
+      "runtime": "rquickjs",
+      "transport": "json-rpc-2.0-jsonl-stdio",
+      "workerArgument": "--extension-host-worker",
+      "workerVersion": 1
+    },
+    "manifestOnlyUiContributionSlots": [
+      "app.sidebar.items",
+      "home.overview.cards",
+      "providers.editor.fields",
+      "providers.card.badges",
+      "providers.card.actions",
+      "logs.detail.actions",
+      "usage.panels",
+      "plugins.detail.panels"
+    ],
+    "manifestVersion": "1.0.0",
+    "runtimes": {
+      "extensionHost": {
+        "allowedMainExtensions": [
+          ".js",
+          ".cjs"
+        ],
+        "language": "typescript",
+        "lifecycle": {
+          "activation": "host-managed worker activation from manifest main",
+          "dispose": "host disposes worker state when plugin snapshot changes, disables, updates, or uninstalls",
+          "failurePolicy": "fail-open by default",
+          "hookTimeoutMs": 5000
+        },
+        "mainOutput": "bundled JavaScript or CommonJS file",
+        "requiresMain": true,
+        "status": "contract"
+      }
+    },
+    "uiContributionSlots": [
+      "app.sidebar.items",
+      "home.overview.cards",
+      "providers.editor.sections",
+      "providers.editor.fields",
+      "providers.card.badges",
+      "providers.card.actions",
+      "settings.sections",
+      "logs.detail.tabs",
+      "logs.detail.actions",
+      "usage.panels",
+      "plugins.detail.panels"
+    ]
+  },
+  "release": {
+    "officialTargets": [
+      {
+        "bundles": "msi",
+        "id": "windows-x64",
+        "latestAssetName": "aio-coding-hub-win64.msi",
+        "latestSignatureName": "aio-coding-hub-win64.msi.sig",
+        "osFamily": "windows",
+        "packageScript": "tauri:build:win:x64",
+        "runner": "windows-latest",
+        "stableAssetKind": "msi",
+        "stableLabel": "win64",
+        "target": "x86_64-pc-windows-msvc",
+        "updaterPlatform": "windows-x86_64"
+      },
+      {
+        "bundles": "app",
+        "id": "macos-x64",
+        "latestAssetName": "aio-coding-hub-macos-intel.tar.gz",
+        "latestSignatureName": "aio-coding-hub-macos-intel.tar.gz.sig",
+        "osFamily": "macos",
+        "packageScript": "tauri:build:mac:x64",
+        "runner": "macos-latest",
+        "stableAssetKind": "tarball",
+        "stableLabel": "macos-intel",
+        "target": "x86_64-apple-darwin",
+        "updaterPlatform": "darwin-x86_64"
+      },
+      {
+        "bundles": "app",
+        "id": "macos-arm64",
+        "latestAssetName": "aio-coding-hub-macos-arm.tar.gz",
+        "latestSignatureName": "aio-coding-hub-macos-arm.tar.gz.sig",
+        "osFamily": "macos",
+        "packageScript": "tauri:build:mac:arm64",
+        "runner": "macos-latest",
+        "stableAssetKind": "tarball",
+        "stableLabel": "macos-arm",
+        "target": "aarch64-apple-darwin",
+        "updaterPlatform": "darwin-aarch64"
+      },
+      {
+        "bundles": "deb,appimage",
+        "id": "linux-x64",
+        "latestAssetName": "aio-coding-hub-linux-amd64.AppImage",
+        "latestSignatureName": "aio-coding-hub-linux-amd64.AppImage.sig",
+        "osFamily": "linux",
+        "packageScript": "tauri:build:linux:x64",
+        "runner": "ubuntu-22.04",
+        "stableAssetKind": "appimage",
+        "stableLabel": "linux-amd64",
+        "target": "x86_64-unknown-linux-gnu",
+        "updaterPlatform": "linux-x86_64"
+      }
+    ],
+    "updaterEndpoint": "https://github.com/dyndynjyxa/aio-coding-hub/releases/latest/download/latest.json",
+    "updaterPublicKeySha256": "b75f3e11f3a84cfa2f6ae586a64ad54f0677d2775eeb6ab4ec24b8f154d7f502",
+    "windowsInstallMode": "passive"
+  },
+  "routes": [
+    {
+      "id": "home",
+      "kind": "index",
+      "path": "/",
+      "samplePath": "/"
+    },
+    {
+      "id": "providers",
+      "kind": "page",
+      "path": "/providers",
+      "samplePath": "/providers"
+    },
+    {
+      "id": "sessions",
+      "kind": "page",
+      "path": "/sessions",
+      "samplePath": "/sessions"
+    },
+    {
+      "id": "sessions-project",
+      "kind": "page",
+      "path": "/sessions/:source/:projectId",
+      "samplePath": "/sessions/claude/project-1"
+    },
+    {
+      "id": "sessions-messages",
+      "kind": "page",
+      "path": "/sessions/:source/:projectId/session/*",
+      "samplePath": "/sessions/claude/project-1/session/session-1"
+    },
+    {
+      "id": "workspaces",
+      "kind": "page",
+      "path": "/workspaces",
+      "samplePath": "/workspaces"
+    },
+    {
+      "id": "prompts",
+      "kind": "page",
+      "path": "/prompts",
+      "samplePath": "/prompts"
+    },
+    {
+      "id": "mcp",
+      "kind": "page",
+      "path": "/mcp",
+      "samplePath": "/mcp"
+    },
+    {
+      "id": "plugins",
+      "kind": "page",
+      "path": "/plugins",
+      "samplePath": "/plugins"
+    },
+    {
+      "id": "logs",
+      "kind": "page",
+      "path": "/logs",
+      "samplePath": "/logs"
+    },
+    {
+      "id": "console",
+      "kind": "page",
+      "path": "/console",
+      "samplePath": "/console"
+    },
+    {
+      "id": "usage",
+      "kind": "page",
+      "path": "/usage",
+      "samplePath": "/usage"
+    },
+    {
+      "id": "settings",
+      "kind": "page",
+      "path": "/settings/*",
+      "samplePath": "/settings/general"
+    },
+    {
+      "id": "cli-manager",
+      "kind": "page",
+      "path": "/cli-manager",
+      "samplePath": "/cli-manager"
+    },
+    {
+      "id": "skills",
+      "kind": "page",
+      "path": "/skills",
+      "samplePath": "/skills"
+    },
+    {
+      "id": "skills-market",
+      "kind": "page",
+      "path": "/skills/market",
+      "samplePath": "/skills/market"
+    },
+    {
+      "id": "fallback",
+      "kind": "fallback",
+      "path": "*",
+      "redirectTo": "/",
+      "samplePath": "/missing"
+    }
+  ],
+  "schemaVersion": 1,
+  "sourceVersion": "0.60.13"
+}

@@ -37,4 +37,14 @@ describe("hooks/useStartupTask", () => {
       );
     });
   });
+
+  it("does not run the task when disabled", async () => {
+    const task = vi.fn().mockResolvedValue("ok");
+
+    renderHook(() => useStartupTask(task, "network", "Network sync failed", false));
+
+    await Promise.resolve();
+    expect(task).not.toHaveBeenCalled();
+    expect(mockLogToConsole).not.toHaveBeenCalled();
+  });
 });

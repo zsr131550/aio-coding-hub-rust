@@ -682,10 +682,10 @@ impl Drop for WindowsJob {
 
 #[cfg(test)]
 mod tests {
-    use super::{
-        fetch_model_catalog, parse_model, parse_next_cursor, read_bounded_line,
-        run_protocol_with_timeout, StdoutBudget,
-    };
+    #[cfg(unix)]
+    use super::{fetch_model_catalog, run_protocol_with_timeout};
+    use super::{parse_model, parse_next_cursor, read_bounded_line, StdoutBudget};
+    #[cfg(unix)]
     use crate::cli_manager::CodexLaunchSpec;
     use serde_json::json;
     use std::io::{BufReader, Cursor};

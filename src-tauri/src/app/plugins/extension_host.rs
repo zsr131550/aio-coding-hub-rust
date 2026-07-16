@@ -8,12 +8,12 @@ use super::extension_host_worker::{
 };
 use super::privacy_redaction_service::PrivacyRedactionService;
 use crate::db;
+use crate::domain::plugins::extension_host_contribution_hash;
 use crate::infra::plugins::{repository, runtime_reports};
 use crate::plugins::PluginManifest;
 use crate::shared::error::{AppError, AppResult};
 use rand::RngCore;
 use serde_json::{json, Value};
-use sha2::Digest;
 use std::collections::BTreeSet;
 use std::fs::OpenOptions;
 use std::io::Write;
@@ -133,7 +133,7 @@ impl ExtensionHostInstance {
         call_timeout: Duration,
         host_handler: Option<Arc<dyn ExtensionHostMethodHandler>>,
     ) -> AppResult<Self> {
-        let contribution_hash = contribution_hash(&manifest);
+        let contribution_hash = extension_host_contribution_hash(&manifest);
         let startup_timeout = DEFAULT_EXTENSION_HOST_START_TIMEOUT;
         let config_file = write_worker_config(
             &plugin_root,
@@ -143,8 +143,8 @@ impl ExtensionHostInstance {
         )?;
         #[cfg(not(test))]
         let args = vec![
-            "--extension-host-worker".to_string(),
-            "--extension-host-config".to_string(),
+            crate::EXTENSION_HOST_WORKER_ARGUMENT.to_string(),
+            super::extension_host_worker::EXTENSION_HOST_CONFIG_ARGUMENT.to_string(),
             config_file.path().display().to_string(),
         ];
         #[cfg(test)]
@@ -154,7 +154,7 @@ impl ExtensionHostInstance {
                 .to_string(),
             "--nocapture".to_string(),
             "--".to_string(),
-            "--extension-host-config".to_string(),
+            super::extension_host_worker::EXTENSION_HOST_CONFIG_ARGUMENT.to_string(),
             config_file.path().display().to_string(),
         ];
         let max_line_bytes = default_extension_host_max_line_bytes();
@@ -165,7 +165,7 @@ impl ExtensionHostInstance {
             hook_timeout: call_timeout,
             idle_recycle: DEFAULT_EXTENSION_HOST_IDLE_RECYCLE,
             max_line_bytes,
-            ready_method: "extension.ready".to_string(),
+            ready_method: super::extension_host_worker::EXTENSION_READY_NOTIFICATION.to_string(),
             allow_startup_noise: cfg!(test),
             host_handler,
         })
@@ -185,12 +185,12 @@ impl ExtensionHostInstance {
     async fn handshake(&mut self) -> AppResult<()> {
         self.runtime
             .call_method_with_timeout(
-                "extension.handshake",
+                super::extension_host_worker::EXTENSION_HANDSHAKE_METHOD,
                 json!({
                     "pluginId": self.manifest.id,
                     "version": self.manifest.version,
                     "apiVersion": self.manifest.api_version,
-                    "contributionHash": contribution_hash(&self.manifest),
+                    "contributionHash": extension_host_contribution_hash(&self.manifest),
                 }),
                 self.startup_timeout,
             )
@@ -202,7 +202,11 @@ impl ExtensionHostInstance {
     #[allow(dead_code)]
     pub(crate) async fn activate(&mut self) -> AppResult<()> {
         self.runtime
-            .call_method_with_timeout("extension.activate", Value::Null, self.startup_timeout)
+            .call_method_with_timeout(
+                super::extension_host_worker::EXTENSION_ACTIVATE_METHOD,
+                Value::Null,
+                self.startup_timeout,
+            )
             .await
             .map(|_| ())
             .map_err(map_extension_host_process_error)
@@ -224,7 +228,7 @@ impl ExtensionHostInstance {
         self.activate().await?;
         self.runtime
             .call_method(
-                "commands.execute",
+                super::extension_host_worker::COMMANDS_EXECUTE_METHOD,
                 json!({
                     "command": command,
                     "args": args,
@@ -253,7 +257,7 @@ impl ExtensionHostInstance {
         self.activate().await?;
         self.runtime
             .call_method(
-                "gatewayHooks.execute",
+                super::extension_host_worker::GATEWAY_HOOKS_EXECUTE_METHOD,
                 json!({
                     "hook": hook,
                     "context": context,
@@ -271,7 +275,7 @@ impl ExtensionHostInstance {
     ) -> AppResult<Value> {
         self.runtime
             .call_method(
-                "commands.execute",
+                super::extension_host_worker::COMMANDS_EXECUTE_METHOD,
                 json!({
                     "command": command,
                     "args": args,
@@ -290,7 +294,11 @@ impl ExtensionHostInstance {
     pub(crate) async fn dispose(&mut self) {
         let _ = self
             .runtime
-            .call_method_with_timeout("extension.deactivate", Value::Null, self.startup_timeout)
+            .call_method_with_timeout(
+                super::extension_host_worker::EXTENSION_DEACTIVATE_METHOD,
+                Value::Null,
+                self.startup_timeout,
+            )
             .await;
         self.runtime.shutdown().await;
     }
@@ -600,19 +608,6 @@ fn write_worker_config(
         )
     })?;
     Ok(ExtensionHostConfigFile { path })
-}
-
-fn contribution_hash(manifest: &PluginManifest) -> String {
-    let bytes = serde_json::to_vec(&json!({
-        "runtime": manifest.runtime,
-        "main": manifest.main,
-        "activationEvents": manifest.activation_events,
-        "contributes": manifest.contributes,
-        "capabilities": manifest.capabilities,
-        "permissions": manifest.permissions,
-    }))
-    .unwrap_or_default();
-    format!("{:x}", sha2::Sha256::digest(bytes))
 }
 
 #[cfg(test)]

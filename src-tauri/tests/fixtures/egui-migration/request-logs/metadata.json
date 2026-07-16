@@ -1,0 +1,8 @@
+{
+  "fixedEpochMs": 1700000000000,
+  "rowCount": 10000,
+  "schemaVersion": 1,
+  "sha256": "9ec6b658f506bbda3f340c5ebdb38ef80271c33682077a08e39cf2aeaf60d8b2",
+  "source": "scripts/egui-fixtures.mjs deterministic formula",
+  "uniqueSessionCount": 12
+}

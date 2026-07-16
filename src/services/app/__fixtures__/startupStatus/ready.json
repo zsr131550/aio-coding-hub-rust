@@ -1,0 +1,7 @@
+{
+  "running": false,
+  "currentStage": "ready",
+  "failedStage": null,
+  "errorMessage": null,
+  "canRetry": false
+}

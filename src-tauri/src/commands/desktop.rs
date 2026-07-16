@@ -19,7 +19,7 @@ use tauri_plugin_opener::OpenerExt;
 use tauri_plugin_updater::{Update, UpdaterExt};
 use tokio::sync::oneshot;
 
-use crate::shared::ipc_confirm::RiskyIpcConfirm;
+use crate::shared::ipc_confirm::{RiskyIpcConfirm, RISKY_DESKTOP_UPDATER_INSTALL};
 
 #[derive(Debug, Clone, Copy, serde::Deserialize, specta::Type)]
 #[serde(rename_all = "snake_case")]
@@ -685,11 +685,7 @@ pub(crate) async fn desktop_updater_download_and_install(
     timeout: Option<u64>,
     confirm: Option<RiskyIpcConfirm>,
 ) -> Result<bool, String> {
-    RiskyIpcConfirm::require(
-        confirm,
-        "desktop_updater_download_and_install",
-        format!("updater:{rid}"),
-    )?;
+    RISKY_DESKTOP_UPDATER_INSTALL.require(confirm, format!("updater:{rid}"))?;
     let update = app
         .resources_table()
         .get::<Update>(rid)

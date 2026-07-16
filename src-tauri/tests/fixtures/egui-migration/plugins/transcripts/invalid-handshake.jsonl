@@ -1,0 +1,2 @@
+{"direction":"host-to-worker","message":{"jsonrpc":"2.0","id":1,"method":"extension.handshake","params":{"pluginId":"fixture.invalid-handshake","version":"1.0.0","apiVersion":"1.0.0","contributionHash":"03ebd7a25255c34fe6f38d284bf9a6d818838c78841903885d61a19b6e6b7335"}}}
+{"direction":"worker-to-host","message":{"jsonrpc":"2.0","id":1,"error":{"code":-32000,"message":"extension host handshake metadata did not match manifest","data":{"code":"PLUGIN_EXTENSION_HOST_HANDSHAKE_FAILED"}}}}
