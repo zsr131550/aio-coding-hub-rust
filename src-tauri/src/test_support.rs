@@ -474,6 +474,15 @@ pub fn settings_get_json<R: tauri::Runtime>(
     serialize_json(settings)
 }
 
+pub fn settings_get_json_with_unavailable_legacy_path<R: tauri::Runtime>(
+    app: &tauri::AppHandle<R>,
+) -> crate::shared::error::AppResult<serde_json::Value> {
+    let settings = crate::settings::read_with_legacy_path_resolver(app, || {
+        Err("test-injected legacy settings path resolution failure".into())
+    })?;
+    serialize_json(settings)
+}
+
 /// Update application settings from a JSON Value and return the persisted result.
 ///
 /// Use the real write helper so tests observe the same sanitization and cache updates

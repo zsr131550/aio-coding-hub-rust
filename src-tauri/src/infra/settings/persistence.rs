@@ -162,6 +162,17 @@ pub(crate) fn canonical_settings_json(settings: &AppSettings) -> AppResult<serde
 }
 
 pub fn read<R: tauri::Runtime>(app: &tauri::AppHandle<R>) -> AppResult<AppSettings> {
+    read_with_legacy_path_resolver(app, || legacy_settings_path(app))
+}
+
+pub(crate) fn read_with_legacy_path_resolver<R, F>(
+    app: &tauri::AppHandle<R>,
+    resolve_legacy_path: F,
+) -> AppResult<AppSettings>
+where
+    R: tauri::Runtime,
+    F: FnOnce() -> AppResult<PathBuf>,
+{
     let cache = SETTINGS_CACHE.get_or_init(|| RwLock::new(None));
     let paths = app_paths::get(app)?;
     let path = settings_path(&paths);
@@ -180,7 +191,7 @@ pub fn read<R: tauri::Runtime>(app: &tauri::AppHandle<R>) -> AppResult<AppSettin
     if !settings_file_exists {
         // A transient resolver failure must not create a current settings file:
         // that would permanently suppress a later retry of the legacy migration.
-        let legacy_path = match legacy_settings_path(app) {
+        let legacy_path = match resolve_legacy_path() {
             Ok(path) => path,
             Err(err) => {
                 tracing::debug!(

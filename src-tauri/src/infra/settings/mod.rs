@@ -16,6 +16,7 @@ pub use defaults::{
     DEFAULT_UPSTREAM_STREAM_IDLE_TIMEOUT_SECONDS, MAX_GATEWAY_PORT,
     MIN_UPSTREAM_STREAM_IDLE_TIMEOUT_SECONDS, SCHEMA_VERSION,
 };
+pub(crate) use persistence::read_with_legacy_path_resolver;
 pub(crate) use persistence::validate_bounds;
 #[cfg(test)]
 pub(crate) use persistence::{canonical_settings_json, parse_settings_json};

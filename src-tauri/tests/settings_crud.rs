@@ -48,7 +48,8 @@ fn settings_read_defaults_without_legacy_path_does_not_persist_or_cache_them() {
     let settings_path = app_data_dir.join("settings.json");
 
     let mut settings =
-        aio_coding_hub_lib::test_support::settings_get_json(&handle).expect("read defaults");
+        aio_coding_hub_lib::test_support::settings_get_json_with_unavailable_legacy_path(&handle)
+            .expect("read defaults without a legacy path");
     assert!(
         !settings_path.exists(),
         "unresolved legacy path must not create a current settings file"
