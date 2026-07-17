@@ -143,6 +143,19 @@ fn build_oauth_authorize_url(
     authorize_url
 }
 
+async fn open_oauth_authorize_url_with(
+    platform: &dyn aio_platform::PlatformServices,
+    authorize_url: String,
+) -> Result<(), String> {
+    let request = aio_platform::OpenUrlRequest::from_oauth(authorize_url)
+        .map_err(|error| format!("failed to open OAuth authorize URL: {}", error.message()))?;
+    platform
+        .opener()
+        .open_url(request)
+        .await
+        .map_err(|error| format!("failed to open OAuth authorize URL: {}", error.message()))
+}
+
 fn parse_codex_device_interval(value: Option<&serde_json::Value>) -> u64 {
     let parsed = match value {
         Some(serde_json::Value::Number(number)) => number.as_u64(),
@@ -233,6 +246,7 @@ pub(crate) async fn provider_oauth_start_flow(
     cli_key: String,
     provider_id: i64,
 ) -> Result<ProviderOAuthStartFlowResult, String> {
+    let platform = db_state.context().platform().clone();
     let db = ensure_db_ready(app.clone(), db_state.inner()).await?;
     let provider_cli_key = blocking::run("provider_oauth_start_flow_load_provider_cli_key", {
         let db = db.clone();
@@ -297,8 +311,7 @@ pub(crate) async fn provider_oauth_start_flow(
     );
 
     // 6. Open browser
-    tauri_plugin_opener::open_url(&authorize_url, None::<&str>)
-        .map_err(|e| format!("failed to open OAuth authorize URL: {e}"))?;
+    open_oauth_authorize_url_with(platform.as_ref(), authorize_url).await?;
 
     // 7. Wait for callback (300s timeout), but abort if a newer flow cancels us.
     let callback = tokio::select! {
@@ -904,6 +917,33 @@ pub(super) fn should_retry_oauth_limits_after_refresh(err: &str) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use aio_platform::fakes::{FakePlatformServices, PlatformCall};
+    use aio_platform::{PlatformError, PlatformOperation};
+
+    #[tokio::test]
+    async fn oauth_opener_error_keeps_oauth_specific_prefix() {
+        let platform = FakePlatformServices::new();
+        platform
+            .opener_fake()
+            .script_open_url_result(Err(PlatformError::new(
+                "OPENER_BACKEND_FAILED",
+                PlatformOperation::OpenerOpenUrl,
+                "backend detail",
+            )));
+        let authorize_url = format!("https://example.com/{}", "x".repeat(3_000));
+
+        assert_eq!(
+            open_oauth_authorize_url_with(&platform, authorize_url.clone())
+                .await
+                .unwrap_err(),
+            "failed to open OAuth authorize URL: backend detail"
+        );
+        let records = platform.journal().snapshot();
+        assert!(matches!(
+            &records[0].call,
+            PlatformCall::OpenerOpenUrl { request } if request.url() == authorize_url
+        ));
+    }
 
     #[test]
     fn build_oauth_authorize_url_keeps_extra_params_without_forcing_prompt_login() {

@@ -70,12 +70,13 @@ pub(crate) async fn config_import(
         return Err("SEC_INVALID_INPUT: file_path is required".to_string());
     }
     RISKY_CONFIG_IMPORT.require(confirm, file_path.clone())?;
+    let platform = db_state.context().platform().clone();
     #[cfg(windows)]
     let app_for_wsl = app.clone();
     let db = ensure_db_ready(app.clone(), db_state.inner()).await?;
     let result = blocking::run("config_import", move || {
         let bundle = read_config_import_bundle(&file_path)?;
-        config_migrate::config_import(&app, &db, bundle)
+        config_migrate::config_import(&app, &db, platform.autostart(), bundle)
     })
     .await
     .map_err(|err| -> String { err.into() })?;

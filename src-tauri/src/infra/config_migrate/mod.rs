@@ -271,6 +271,7 @@ pub fn config_export<R: tauri::Runtime>(
 pub fn config_import<R: tauri::Runtime>(
     app: &tauri::AppHandle<R>,
     db: &db::Db,
+    autostart: &dyn aio_platform::AutostartService,
     bundle: ConfigBundle,
 ) -> AppResult<ConfigImportResult> {
     let bundle_schema_version = bundle.schema_version;
@@ -345,7 +346,7 @@ pub fn config_import<R: tauri::Runtime>(
     };
 
     settings_to_write.auto_start = crate::app::autostart::reconcile_auto_start(
-        app,
+        autostart,
         previous_settings.auto_start,
         settings_to_write.auto_start,
         true,
@@ -355,6 +356,7 @@ pub fn config_import<R: tauri::Runtime>(
         rollback::rollback_after_failed_import(
             app,
             db,
+            autostart,
             &previous_settings,
             runtime_backups,
             skill_fs_guard.as_mut(),
@@ -367,6 +369,7 @@ pub fn config_import<R: tauri::Runtime>(
         rollback::rollback_after_failed_import(
             app,
             db,
+            autostart,
             &previous_settings,
             runtime_backups,
             skill_fs_guard.as_mut(),
@@ -378,6 +381,7 @@ pub fn config_import<R: tauri::Runtime>(
         rollback::rollback_after_failed_import(
             app,
             db,
+            autostart,
             &previous_settings,
             runtime_backups,
             skill_fs_guard.as_mut(),

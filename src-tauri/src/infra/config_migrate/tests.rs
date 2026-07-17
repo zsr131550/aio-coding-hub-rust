@@ -2,6 +2,7 @@ use super::skill_fs::{
     cli_skills_root, export_skill_dir_files, ssot_skills_root, write_skill_files_to_dir,
 };
 use super::*;
+use aio_platform::fakes::FakePlatformServices;
 use base64::engine::general_purpose::STANDARD as BASE64_STANDARD;
 use base64::Engine;
 use rusqlite::{params, Connection};
@@ -50,6 +51,7 @@ struct ConfigMigrateTestApp {
     home: tempfile::TempDir,
     app: tauri::App<tauri::test::MockRuntime>,
     db: crate::db::Db,
+    platform: FakePlatformServices,
 }
 
 impl ConfigMigrateTestApp {
@@ -76,11 +78,22 @@ impl ConfigMigrateTestApp {
             home,
             app,
             db,
+            platform: FakePlatformServices::new(),
         }
     }
 
     fn handle(&self) -> tauri::AppHandle<tauri::test::MockRuntime> {
         self.app.handle().clone()
+    }
+
+    fn import(&self, bundle: ConfigBundle) -> crate::shared::error::AppResult<ConfigImportResult> {
+        self.platform.autostart_fake().script_result(Ok(()));
+        config_import(
+            &self.handle(),
+            &self.db,
+            self.platform.autostart_fake(),
+            bundle,
+        )
     }
 }
 
@@ -149,11 +162,10 @@ fn validate_bundle_schema_version_rejects_mismatch() {
 fn config_import_rejects_invalid_workspace_boundary_values() {
     {
         let test_app = ConfigMigrateTestApp::new();
-        let app = test_app.handle();
         let mut bundle = make_test_bundle(CONFIG_BUNDLE_SCHEMA_VERSION);
         bundle.workspaces[0].name = "x".repeat(129);
 
-        let Err(err) = config_import(&app, &test_app.db, bundle) else {
+        let Err(err) = test_app.import(bundle) else {
             panic!("oversized workspace name should fail");
         };
         assert!(err.to_string().contains("workspace name is too long"));
@@ -161,11 +173,10 @@ fn config_import_rejects_invalid_workspace_boundary_values() {
 
     {
         let test_app = ConfigMigrateTestApp::new();
-        let app = test_app.handle();
         let mut bundle = make_test_bundle(CONFIG_BUNDLE_SCHEMA_VERSION);
         bundle.workspaces[0].cli_key = "opencode".to_string();
 
-        let Err(err) = config_import(&app, &test_app.db, bundle) else {
+        let Err(err) = test_app.import(bundle) else {
             panic!("invalid workspace cli key should fail");
         };
         assert!(err.to_string().contains("unknown cli_key=opencode"));
@@ -448,7 +459,7 @@ fn config_import_v2_restores_full_prompt_and_skill_payload() {
         ..make_test_bundle(CONFIG_BUNDLE_SCHEMA_VERSION)
     };
 
-    let result = config_import(&app, &test_app.db, bundle).expect("config import");
+    let result = test_app.import(bundle).expect("config import");
     assert_eq!(result.providers_imported, 1);
     assert_eq!(result.prompts_imported, 2);
     assert_eq!(result.installed_skills_imported, 1);
@@ -555,7 +566,7 @@ VALUES (?1, ?2, 1, 1)
         ..make_test_bundle(CONFIG_BUNDLE_SCHEMA_VERSION_V1)
     };
 
-    let result = config_import(&app, &test_app.db, bundle).expect("config import");
+    let result = test_app.import(bundle).expect("config import");
     assert_eq!(result.prompts_imported, 1);
     assert_eq!(result.installed_skills_imported, 0);
     assert_eq!(result.local_skills_imported, 0);
@@ -586,11 +597,10 @@ WHERE s.skill_key = 'existing-skill'
 #[test]
 fn config_import_v2_rejects_missing_installed_skills_payload() {
     let test_app = ConfigMigrateTestApp::new();
-    let app = test_app.handle();
     let mut bundle = make_test_bundle(CONFIG_BUNDLE_SCHEMA_VERSION);
     bundle.installed_skills = None;
 
-    let Err(err) = config_import(&app, &test_app.db, bundle) else {
+    let Err(err) = test_app.import(bundle) else {
         panic!("missing installed_skills");
     };
     assert!(err
@@ -601,11 +611,10 @@ fn config_import_v2_rejects_missing_installed_skills_payload() {
 #[test]
 fn config_import_v2_rejects_missing_local_skills_payload() {
     let test_app = ConfigMigrateTestApp::new();
-    let app = test_app.handle();
     let mut bundle = make_test_bundle(CONFIG_BUNDLE_SCHEMA_VERSION);
     bundle.local_skills = None;
 
-    let Err(err) = config_import(&app, &test_app.db, bundle) else {
+    let Err(err) = test_app.import(bundle) else {
         panic!("missing local_skills");
     };
     assert!(err

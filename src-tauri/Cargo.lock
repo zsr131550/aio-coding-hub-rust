@@ -41,6 +41,7 @@ version = "0.60.13"
 dependencies = [
  "aio-contract",
  "aio-core",
+ "aio-platform",
  "axum",
  "base64 0.22.1",
  "bytes",
@@ -104,10 +105,22 @@ name = "aio-core"
 version = "0.60.13"
 dependencies = [
  "aio-contract",
+ "aio-platform",
  "serde_json",
  "tempfile",
  "thiserror 2.0.18",
  "tokio",
+]
+
+[[package]]
+name = "aio-platform"
+version = "0.60.13"
+dependencies = [
+ "serde",
+ "serde_json",
+ "specta",
+ "thiserror 2.0.18",
+ "url",
 ]
 
 [[package]]

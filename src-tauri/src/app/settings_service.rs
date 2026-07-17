@@ -598,6 +598,7 @@ pub(crate) async fn settings_set_impl(
     } = update;
 
     let app_for_work = app.clone();
+    let platform = db_state.context().platform().clone();
     let (previous_settings, candidate_settings) = blocking::run(
         "settings_set",
         move || -> crate::shared::error::AppResult<(
@@ -742,7 +743,7 @@ pub(crate) async fn settings_set_impl(
             let circuit_breaker_open_duration_minutes = circuit_breaker_open_duration_minutes
                 .unwrap_or(previous.circuit_breaker_open_duration_minutes);
             let next_auto_start = crate::app::autostart::reconcile_auto_start(
-                &app_for_work,
+                platform.autostart(),
                 previous.auto_start,
                 auto_start,
                 false,

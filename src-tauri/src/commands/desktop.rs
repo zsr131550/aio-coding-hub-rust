@@ -4,34 +4,20 @@
 //! handwritten IPC family so the renderer does not call plugin commands
 //! directly.
 
-use crate::shared::blocking;
-use std::borrow::Cow;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
+use std::sync::Arc;
+use std::time::Duration;
 
+use aio_platform::{
+    DesktopDialogOpenRequest, DesktopDialogSaveRequest, DesktopNotificationPayload,
+    DesktopNotificationPermissionState, DesktopOpenPathRequest, DesktopOpenUrlRequest,
+    DesktopRevealItemRequest, DesktopUpdaterMetadata,
+};
 use serde::Serialize;
 use tauri::ipc::Channel;
 use tauri::{ResourceId, WebviewWindow};
-use tauri_plugin_clipboard_manager::ClipboardExt;
-use tauri_plugin_dialog::{DialogExt, FileAccessMode, FilePath, PickerMode};
-use tauri_plugin_notification::NotificationExt;
-use tauri_plugin_opener::OpenerExt;
-use tokio::sync::oneshot;
 
 use crate::shared::ipc_confirm::{RiskyIpcConfirm, RISKY_DESKTOP_UPDATER_INSTALL};
-
-const UPDATE_CHANNEL_DISABLED_CODE: &str = "UPDATE_CHANNEL_DISABLED";
-
-fn update_channel_disabled_error() -> String {
-    format!("{UPDATE_CHANNEL_DISABLED_CODE}: update channel is disabled")
-}
-
-fn reject_disabled_updater_install(
-    rid: ResourceId,
-    confirm: Option<RiskyIpcConfirm>,
-) -> Result<bool, String> {
-    RISKY_DESKTOP_UPDATER_INSTALL.require(confirm, format!("updater:{rid}"))?;
-    Err(update_channel_disabled_error())
-}
 
 #[derive(Debug, Clone, Copy, serde::Deserialize, specta::Type)]
 #[serde(rename_all = "snake_case")]
@@ -51,43 +37,6 @@ impl DesktopThemeMode {
     }
 }
 
-#[derive(Debug, Clone, serde::Deserialize, specta::Type)]
-pub(crate) struct DesktopNotificationPayload {
-    pub(crate) title: String,
-    pub(crate) body: String,
-    pub(crate) sound: Option<String>,
-}
-
-#[derive(Debug, Clone, Copy, Serialize, specta::Type)]
-#[serde(rename_all = "kebab-case")]
-pub(crate) enum DesktopNotificationPermissionState {
-    Granted,
-    Denied,
-    Prompt,
-    PromptWithRationale,
-}
-
-impl From<tauri::plugin::PermissionState> for DesktopNotificationPermissionState {
-    fn from(value: tauri::plugin::PermissionState) -> Self {
-        match value {
-            tauri::plugin::PermissionState::Granted => Self::Granted,
-            tauri::plugin::PermissionState::Denied => Self::Denied,
-            tauri::plugin::PermissionState::Prompt => Self::Prompt,
-            tauri::plugin::PermissionState::PromptWithRationale => Self::PromptWithRationale,
-        }
-    }
-}
-
-#[derive(Debug, Clone, Serialize, specta::Type)]
-#[serde(rename_all = "camelCase")]
-pub(crate) struct DesktopUpdaterMetadata {
-    rid: u32,
-    current_version: String,
-    version: String,
-    date: Option<String>,
-    body: Option<String>,
-}
-
 #[derive(Debug, Clone, Serialize)]
 #[serde(tag = "event", content = "data")]
 #[allow(dead_code)] // Retained for the runtime-only Channel IPC compatibility surface.
@@ -103,284 +52,9 @@ pub(crate) enum DesktopUpdaterDownloadEvent {
     Finished,
 }
 
-#[derive(Debug, Clone, serde::Deserialize, specta::Type)]
-#[serde(rename_all = "camelCase")]
-pub(crate) struct DesktopDialogFilter {
-    name: String,
-    extensions: Vec<String>,
-}
-
-#[derive(Debug, Clone, serde::Deserialize, specta::Type)]
-#[serde(rename_all = "lowercase")]
-pub(crate) enum DesktopDialogPickerMode {
-    Document,
-    Media,
-    Image,
-    Video,
-}
-
-impl From<DesktopDialogPickerMode> for PickerMode {
-    fn from(value: DesktopDialogPickerMode) -> Self {
-        match value {
-            DesktopDialogPickerMode::Document => PickerMode::Document,
-            DesktopDialogPickerMode::Media => PickerMode::Media,
-            DesktopDialogPickerMode::Image => PickerMode::Image,
-            DesktopDialogPickerMode::Video => PickerMode::Video,
-        }
-    }
-}
-
-#[derive(Debug, Clone, serde::Deserialize, specta::Type)]
-#[serde(rename_all = "lowercase")]
-pub(crate) enum DesktopDialogFileAccessMode {
-    Copy,
-    Scoped,
-}
-
-impl From<DesktopDialogFileAccessMode> for FileAccessMode {
-    fn from(value: DesktopDialogFileAccessMode) -> Self {
-        match value {
-            DesktopDialogFileAccessMode::Copy => FileAccessMode::Copy,
-            DesktopDialogFileAccessMode::Scoped => FileAccessMode::Scoped,
-        }
-    }
-}
-
-#[derive(Debug, Clone, serde::Deserialize, specta::Type)]
-#[serde(rename_all = "camelCase")]
-pub(crate) struct DesktopDialogOpenRequest {
-    title: Option<String>,
-    filters: Option<Vec<DesktopDialogFilter>>,
-    default_path: Option<String>,
-    multiple: Option<bool>,
-    directory: Option<bool>,
-    recursive: Option<bool>,
-    can_create_directories: Option<bool>,
-    picker_mode: Option<DesktopDialogPickerMode>,
-    file_access_mode: Option<DesktopDialogFileAccessMode>,
-}
-
-#[derive(Debug, Clone, serde::Deserialize, specta::Type)]
-#[serde(rename_all = "camelCase")]
-pub(crate) struct DesktopDialogSaveRequest {
-    title: Option<String>,
-    filters: Option<Vec<DesktopDialogFilter>>,
-    default_path: Option<String>,
-    can_create_directories: Option<bool>,
-}
-
-#[derive(Debug, Clone, serde::Deserialize, specta::Type)]
-#[serde(rename_all = "camelCase")]
-pub(crate) struct DesktopOpenUrlRequest {
-    url: String,
-    with: Option<String>,
-}
-
-#[derive(Debug, Clone, serde::Deserialize, specta::Type)]
-#[serde(rename_all = "camelCase")]
-pub(crate) struct DesktopOpenPathRequest {
-    path: String,
-    with: Option<String>,
-}
-
-#[derive(Debug, Clone, serde::Deserialize, specta::Type)]
-#[serde(rename_all = "camelCase")]
-pub(crate) struct DesktopRevealItemRequest {
-    path: String,
-}
-
-fn trim_to_non_empty(input: &str, max_len: usize) -> Option<String> {
-    let trimmed = input.trim();
-    if trimmed.is_empty() {
-        return None;
-    }
-
-    Some(trimmed.chars().take(max_len).collect())
-}
-
-fn simplify_path(path: PathBuf) -> PathBuf {
-    path.components().collect()
-}
-
+#[cfg(test)]
 fn normalize_existing_path(path: PathBuf) -> PathBuf {
-    if path.exists() {
-        return std::fs::canonicalize(&path)
-            .map(simplify_path)
-            .unwrap_or_else(|_| simplify_path(path));
-    }
-
-    simplify_path(path)
-}
-
-fn sanitize_dialog_filters(
-    filters: Option<Vec<DesktopDialogFilter>>,
-) -> Result<Vec<DesktopDialogFilter>, String> {
-    let Some(filters) = filters else {
-        return Ok(Vec::new());
-    };
-
-    let mut sanitized = Vec::new();
-    for filter in filters {
-        let name = trim_to_non_empty(&filter.name, 128).ok_or_else(|| {
-            "DESKTOP_DIALOG_INVALID_FILTER_NAME: filter name cannot be empty".to_string()
-        })?;
-        let extensions = filter
-            .extensions
-            .into_iter()
-            .filter_map(|item| trim_to_non_empty(&item, 64))
-            .map(|item| item.trim_start_matches('.').to_string())
-            .filter(|item| !item.is_empty())
-            .collect::<Vec<_>>();
-        if extensions.is_empty() {
-            return Err(
-                "DESKTOP_DIALOG_INVALID_FILTER: filter extensions cannot be empty".to_string(),
-            );
-        }
-        sanitized.push(DesktopDialogFilter { name, extensions });
-    }
-
-    Ok(sanitized)
-}
-
-fn apply_dialog_default_path<R: tauri::Runtime>(
-    mut dialog: tauri_plugin_dialog::FileDialogBuilder<R>,
-    default_path: Option<String>,
-) -> Result<tauri_plugin_dialog::FileDialogBuilder<R>, String> {
-    let Some(default_path) = default_path else {
-        return Ok(dialog);
-    };
-
-    let default_path = trim_to_non_empty(&default_path, 4_096).ok_or_else(|| {
-        "DESKTOP_DIALOG_INVALID_DEFAULT_PATH: defaultPath cannot be empty".to_string()
-    })?;
-    let path = simplify_path(PathBuf::from(default_path));
-    if path.is_file() || !path.exists() {
-        if let (Some(parent), Some(file_name)) = (path.parent(), path.file_name()) {
-            if parent.components().count() > 0 {
-                dialog = dialog.set_directory(parent);
-            }
-            dialog = dialog.set_file_name(file_name.to_string_lossy());
-            return Ok(dialog);
-        }
-    }
-
-    Ok(dialog.set_directory(path))
-}
-
-fn build_open_dialog(
-    window: &WebviewWindow,
-    request: DesktopDialogOpenRequest,
-) -> Result<tauri_plugin_dialog::FileDialogBuilder<tauri::Wry>, String> {
-    let mut dialog = window.dialog().file();
-    #[cfg(any(windows, target_os = "macos"))]
-    {
-        dialog = dialog.set_parent(window);
-    }
-
-    if let Some(title) = request
-        .title
-        .and_then(|value| trim_to_non_empty(&value, 256))
-    {
-        dialog = dialog.set_title(title);
-    }
-
-    dialog = apply_dialog_default_path(dialog, request.default_path)?;
-
-    if let Some(can_create_directories) = request.can_create_directories {
-        dialog = dialog.set_can_create_directories(can_create_directories);
-    }
-    if let Some(picker_mode) = request.picker_mode {
-        dialog = dialog.set_picker_mode(picker_mode.into());
-    }
-    if let Some(file_access_mode) = request.file_access_mode {
-        dialog = dialog.set_file_access_mode(file_access_mode.into());
-    }
-
-    for filter in sanitize_dialog_filters(request.filters)? {
-        let extensions = filter
-            .extensions
-            .iter()
-            .map(|item| item.as_str())
-            .collect::<Vec<_>>();
-        dialog = dialog.add_filter(filter.name, &extensions);
-    }
-
-    let _ = request.recursive;
-    Ok(dialog)
-}
-
-fn build_save_dialog(
-    window: &WebviewWindow,
-    request: DesktopDialogSaveRequest,
-) -> Result<tauri_plugin_dialog::FileDialogBuilder<tauri::Wry>, String> {
-    let mut dialog = window.dialog().file();
-    #[cfg(any(windows, target_os = "macos"))]
-    {
-        dialog = dialog.set_parent(window);
-    }
-
-    if let Some(title) = request
-        .title
-        .and_then(|value| trim_to_non_empty(&value, 256))
-    {
-        dialog = dialog.set_title(title);
-    }
-
-    dialog = apply_dialog_default_path(dialog, request.default_path)?;
-
-    if let Some(can_create_directories) = request.can_create_directories {
-        dialog = dialog.set_can_create_directories(can_create_directories);
-    }
-
-    for filter in sanitize_dialog_filters(request.filters)? {
-        let extensions = filter
-            .extensions
-            .iter()
-            .map(|item| item.as_str())
-            .collect::<Vec<_>>();
-        dialog = dialog.add_filter(filter.name, &extensions);
-    }
-
-    Ok(dialog)
-}
-
-fn file_path_to_string(path: FilePath) -> String {
-    path.to_string()
-}
-
-fn sanitize_optional_program(input: Option<String>) -> Option<String> {
-    input.and_then(|value| trim_to_non_empty(&value, 256))
-}
-
-fn sanitize_url(input: String) -> Result<String, String> {
-    let url = trim_to_non_empty(&input, 2_048)
-        .ok_or_else(|| "DESKTOP_OPEN_URL_EMPTY: url cannot be empty".to_string())?;
-    let parsed = tauri::Url::parse(&url)
-        .map_err(|error| format!("DESKTOP_OPEN_URL_INVALID: invalid url: {error}"))?;
-    match parsed.scheme() {
-        "http" | "https" | "mailto" | "tel" => Ok(url),
-        scheme => Err(format!(
-            "DESKTOP_OPEN_URL_SCHEME_DENIED: unsupported url scheme: {scheme}"
-        )),
-    }
-}
-
-fn sanitize_open_path(input: String) -> Result<PathBuf, String> {
-    let path = trim_to_non_empty(&input, 4_096)
-        .ok_or_else(|| "DESKTOP_OPEN_PATH_EMPTY: path cannot be empty".to_string())?;
-    Ok(normalize_existing_path(PathBuf::from(path)))
-}
-
-fn path_is_within_root(path: &Path, root: &Path) -> bool {
-    path == root || path.starts_with(root)
-}
-
-fn push_desktop_open_root(roots: &mut Vec<PathBuf>, root: PathBuf) {
-    let root = normalize_existing_path(root);
-    if roots.iter().any(|existing| existing == &root) {
-        return;
-    }
-    roots.push(root);
+    aio_platform::OpenPathPolicy::new([path]).roots()[0].clone()
 }
 
 fn desktop_open_allowed_roots<R: tauri::Runtime>(
@@ -398,118 +72,112 @@ fn desktop_open_allowed_roots<R: tauri::Runtime>(
         crate::infra::codex_paths::codex_home_dir(app).map_err(|error| error.to_string())?;
     let configured_codex_home_dir = crate::infra::codex_paths::configured_codex_home_dir(app);
 
-    let mut roots = Vec::new();
-    push_desktop_open_root(&mut roots, app_data_dir);
-    push_desktop_open_root(&mut roots, home_dir.join(".claude"));
-    push_desktop_open_root(&mut roots, home_dir.join(".gemini"));
-    push_desktop_open_root(&mut roots, user_default_codex_home_dir);
-    push_desktop_open_root(&mut roots, follow_codex_home_dir);
-    push_desktop_open_root(&mut roots, effective_codex_home_dir);
+    let mut roots = vec![
+        app_data_dir,
+        home_dir.join(".claude"),
+        home_dir.join(".gemini"),
+        user_default_codex_home_dir,
+        follow_codex_home_dir,
+        effective_codex_home_dir,
+    ];
     if let Some(configured_codex_home_dir) = configured_codex_home_dir {
-        push_desktop_open_root(&mut roots, configured_codex_home_dir);
+        roots.push(configured_codex_home_dir);
     }
 
-    Ok(roots)
+    Ok(aio_platform::OpenPathPolicy::new(roots).roots().to_vec())
 }
 
+#[cfg(test)]
 fn ensure_desktop_open_path_allowed<R: tauri::Runtime>(
     app: &tauri::AppHandle<R>,
-    path: &Path,
+    path: &std::path::Path,
 ) -> Result<(), String> {
-    let normalized_path = normalize_existing_path(path.to_path_buf());
-    let allowed = desktop_open_allowed_roots(app)?;
-    if allowed
-        .iter()
-        .any(|root| path_is_within_root(&normalized_path, root))
-    {
-        return Ok(());
-    }
-
-    Err(format!(
-        "DESKTOP_OPEN_PATH_DENIED: path is outside allowed desktop roots: {}",
-        normalized_path.display()
-    ))
+    let candidate = aio_platform::OpenPathCandidate::try_from(DesktopOpenPathRequest {
+        path: path.display().to_string(),
+        with: None,
+    })
+    .map_err(|error| error.to_string())?;
+    aio_platform::OpenPathPolicy::new(desktop_open_allowed_roots(app)?)
+        .authorize(candidate)
+        .map(|_| ())
+        .map_err(|error| error.to_string())
 }
 
 #[tauri::command]
 #[specta::specta]
 pub(crate) fn desktop_clipboard_write_text(
-    app: tauri::AppHandle,
+    state: tauri::State<'_, crate::app::core_runtime::ManagedCoreRuntimeState>,
     text: String,
 ) -> Result<bool, String> {
-    let text = trim_to_non_empty(&text, 1_000_000)
-        .ok_or_else(|| "CLIPBOARD_EMPTY_TEXT: text cannot be empty".to_string())?;
+    desktop_clipboard_write_text_with(state.context().platform().as_ref(), text)
+}
 
-    app.clipboard()
-        .write_text(Cow::Owned(text))
-        .map_err(|error| format!("failed to write clipboard text: {error}"))?;
-
+fn desktop_clipboard_write_text_with(
+    platform: &dyn aio_platform::PlatformServices,
+    text: String,
+) -> Result<bool, String> {
+    let text =
+        aio_platform::ClipboardText::from_desktop_input(text).map_err(|error| error.to_string())?;
+    platform
+        .clipboard()
+        .write_text(text)
+        .map_err(|error| format!("failed to write clipboard text: {}", error.message()))?;
     Ok(true)
 }
 
 #[tauri::command]
 #[specta::specta]
 pub(crate) async fn desktop_dialog_open(
-    window: WebviewWindow,
+    state: tauri::State<'_, crate::app::core_runtime::ManagedCoreRuntimeState>,
     options: DesktopDialogOpenRequest,
 ) -> Result<Option<Vec<String>>, String> {
-    let multiple = options.multiple.unwrap_or(false);
-    let directory = options.directory.unwrap_or(false);
-    let dialog = build_open_dialog(&window, options)?;
-    let (tx, rx) = oneshot::channel();
+    let platform = state.context().platform().clone();
+    desktop_dialog_open_with(platform.as_ref(), options).await
+}
 
-    match (directory, multiple) {
-        (true, true) => {
-            dialog.pick_folders(move |selection| {
-                let _ = tx.send(selection.map(|paths| {
-                    paths
-                        .into_iter()
-                        .map(file_path_to_string)
-                        .collect::<Vec<_>>()
-                }));
-            });
-        }
-        (true, false) => {
-            dialog.pick_folder(move |selection| {
-                let _ = tx.send(selection.map(|path| vec![file_path_to_string(path)]));
-            });
-        }
-        (false, true) => {
-            dialog.pick_files(move |selection| {
-                let _ = tx.send(selection.map(|paths| {
-                    paths
-                        .into_iter()
-                        .map(file_path_to_string)
-                        .collect::<Vec<_>>()
-                }));
-            });
-        }
-        (false, false) => {
-            dialog.pick_file(move |selection| {
-                let _ = tx.send(selection.map(|path| vec![file_path_to_string(path)]));
-            });
-        }
-    }
-
-    rx.await
-        .map_err(|_| "DESKTOP_DIALOG_OPEN_CANCELLED: dialog response channel dropped".to_string())
+async fn desktop_dialog_open_with(
+    platform: &dyn aio_platform::PlatformServices,
+    options: DesktopDialogOpenRequest,
+) -> Result<Option<Vec<String>>, String> {
+    let request =
+        aio_platform::DialogOpenRequest::try_from(options).map_err(|error| error.to_string())?;
+    platform
+        .dialogs()
+        .open(request)
+        .await
+        .map(|selection| {
+            selection.map(|paths| {
+                paths
+                    .into_iter()
+                    .map(aio_platform::DialogPath::into_string)
+                    .collect()
+            })
+        })
+        .map_err(|error| error.to_string())
 }
 
 #[tauri::command]
 #[specta::specta]
 pub(crate) async fn desktop_dialog_save(
-    window: WebviewWindow,
+    state: tauri::State<'_, crate::app::core_runtime::ManagedCoreRuntimeState>,
     options: DesktopDialogSaveRequest,
 ) -> Result<Option<String>, String> {
-    let dialog = build_save_dialog(&window, options)?;
-    let (tx, rx) = oneshot::channel();
+    let platform = state.context().platform().clone();
+    desktop_dialog_save_with(platform.as_ref(), options).await
+}
 
-    dialog.save_file(move |selection| {
-        let _ = tx.send(selection.map(file_path_to_string));
-    });
-
-    rx.await
-        .map_err(|_| "DESKTOP_DIALOG_SAVE_CANCELLED: dialog response channel dropped".to_string())
+async fn desktop_dialog_save_with(
+    platform: &dyn aio_platform::PlatformServices,
+    options: DesktopDialogSaveRequest,
+) -> Result<Option<String>, String> {
+    let request =
+        aio_platform::DialogSaveRequest::try_from(options).map_err(|error| error.to_string())?;
+    platform
+        .dialogs()
+        .save(request)
+        .await
+        .map(|selection| selection.map(aio_platform::DialogPath::into_string))
+        .map_err(|error| error.to_string())
 }
 
 #[tauri::command]
@@ -528,178 +196,304 @@ pub(crate) fn desktop_window_set_theme(
 #[tauri::command]
 #[specta::specta]
 pub(crate) async fn desktop_opener_open_url(
-    app: tauri::AppHandle,
+    state: tauri::State<'_, crate::app::core_runtime::ManagedCoreRuntimeState>,
     input: DesktopOpenUrlRequest,
 ) -> Result<bool, String> {
-    let url = sanitize_url(input.url)?;
-    let with = sanitize_optional_program(input.with);
+    let platform = state.context().platform().clone();
+    desktop_opener_open_url_with(platform.as_ref(), input).await
+}
 
-    blocking::run("desktop_opener_open_url", move || {
-        let with = with.as_deref();
-        app.opener()
-            .open_url(url, with)
-            .map_err(|error| format!("failed to open desktop url: {error}"))?;
-        Ok::<bool, crate::shared::error::AppError>(true)
-    })
-    .await
-    .map_err(Into::into)
+async fn desktop_opener_open_url_with(
+    platform: &dyn aio_platform::PlatformServices,
+    input: DesktopOpenUrlRequest,
+) -> Result<bool, String> {
+    let request =
+        aio_platform::OpenUrlRequest::try_from(input).map_err(|error| error.to_string())?;
+    platform
+        .opener()
+        .open_url(request)
+        .await
+        .map_err(|error| format!("failed to open desktop url: {}", error.message()))?;
+    Ok(true)
 }
 
 #[tauri::command]
 #[specta::specta]
 pub(crate) async fn desktop_opener_open_path(
     app: tauri::AppHandle,
+    state: tauri::State<'_, crate::app::core_runtime::ManagedCoreRuntimeState>,
     input: DesktopOpenPathRequest,
 ) -> Result<bool, String> {
-    let path = sanitize_open_path(input.path)?;
-    ensure_desktop_open_path_allowed(&app, &path)?;
-    let with = sanitize_optional_program(input.with);
-    let path_string = path.display().to_string();
+    let roots = desktop_open_allowed_roots(&app)?;
+    let platform = state.context().platform().clone();
+    desktop_opener_open_path_with(platform.as_ref(), input, roots).await
+}
 
-    blocking::run("desktop_opener_open_path", move || {
-        let with = with.as_deref();
-        app.opener()
-            .open_path(path_string, with)
-            .map_err(|error| format!("failed to open desktop path: {error}"))?;
-        Ok::<bool, crate::shared::error::AppError>(true)
-    })
-    .await
-    .map_err(Into::into)
+async fn desktop_opener_open_path_with(
+    platform: &dyn aio_platform::PlatformServices,
+    input: DesktopOpenPathRequest,
+    roots: Vec<PathBuf>,
+) -> Result<bool, String> {
+    let candidate =
+        aio_platform::OpenPathCandidate::try_from(input).map_err(|error| error.to_string())?;
+    let request = aio_platform::OpenPathPolicy::new(roots)
+        .authorize(candidate)
+        .map_err(|error| error.to_string())?;
+    platform
+        .opener()
+        .open_path(request)
+        .await
+        .map_err(|error| format!("failed to open desktop path: {}", error.message()))?;
+    Ok(true)
 }
 
 #[tauri::command]
 #[specta::specta]
 pub(crate) async fn desktop_opener_reveal_item_in_dir(
     app: tauri::AppHandle,
+    state: tauri::State<'_, crate::app::core_runtime::ManagedCoreRuntimeState>,
     input: DesktopRevealItemRequest,
 ) -> Result<bool, String> {
-    let path = sanitize_open_path(input.path)?;
-    ensure_desktop_open_path_allowed(&app, &path)?;
-
-    blocking::run("desktop_opener_reveal_item_in_dir", move || {
-        app.opener()
-            .reveal_item_in_dir(path)
-            .map_err(|error| format!("failed to reveal desktop item: {error}"))?;
-        Ok::<bool, crate::shared::error::AppError>(true)
-    })
-    .await
-    .map_err(Into::into)
+    let roots = desktop_open_allowed_roots(&app)?;
+    let platform = state.context().platform().clone();
+    desktop_opener_reveal_item_with(platform.as_ref(), input, roots).await
 }
 
-#[tauri::command]
-#[specta::specta]
-pub(crate) fn desktop_notification_is_permission_granted(
-    app: tauri::AppHandle,
+async fn desktop_opener_reveal_item_with(
+    platform: &dyn aio_platform::PlatformServices,
+    input: DesktopRevealItemRequest,
+    roots: Vec<PathBuf>,
 ) -> Result<bool, String> {
-    let granted = matches!(
-        app.notification()
-            .permission_state()
-            .map_err(|error| format!("failed to read notification permission: {error}"))?,
-        tauri_plugin_notification::PermissionState::Granted
-    );
-
-    Ok(granted)
-}
-
-#[tauri::command]
-#[specta::specta]
-pub(crate) fn desktop_notification_request_permission(
-    app: tauri::AppHandle,
-) -> Result<DesktopNotificationPermissionState, String> {
-    let permission = app
-        .notification()
-        .request_permission()
-        .map_err(|error| format!("failed to request notification permission: {error}"))?;
-
-    Ok(permission.into())
-}
-
-#[tauri::command]
-#[specta::specta]
-pub(crate) fn desktop_notification_notify(
-    app: tauri::AppHandle,
-    options: DesktopNotificationPayload,
-) -> Result<bool, String> {
-    let title = trim_to_non_empty(&options.title, 256)
-        .ok_or_else(|| "NOTICE_INVALID_TITLE: title cannot be empty".to_string())?;
-    let body = trim_to_non_empty(&options.body, 4_096)
-        .ok_or_else(|| "NOTICE_INVALID_BODY: body cannot be empty".to_string())?;
-    let sound = options
-        .sound
-        .as_deref()
-        .and_then(|value| trim_to_non_empty(value, 128));
-
-    let mut builder = app.notification().builder().title(title).body(body);
-    if let Some(sound) = sound {
-        builder = builder.sound(sound);
-    }
-
-    builder
-        .show()
-        .map_err(|error| format!("failed to show desktop notification: {error}"))?;
-
+    let candidate =
+        aio_platform::RevealPathCandidate::try_from(input).map_err(|error| error.to_string())?;
+    let request = aio_platform::OpenPathPolicy::new(roots)
+        .authorize_reveal(candidate)
+        .map_err(|error| error.to_string())?;
+    platform
+        .opener()
+        .reveal_item(request)
+        .await
+        .map_err(|error| format!("failed to reveal desktop item: {}", error.message()))?;
     Ok(true)
 }
 
 #[tauri::command]
 #[specta::specta]
-pub(crate) fn desktop_notification_play_sound() -> Result<bool, String> {
-    crate::app::notification_sound::play_notification_sound()?;
+pub(crate) fn desktop_notification_is_permission_granted(
+    state: tauri::State<'_, crate::app::core_runtime::ManagedCoreRuntimeState>,
+) -> Result<bool, String> {
+    desktop_notification_is_permission_granted_with(state.context().platform().as_ref())
+}
+
+fn desktop_notification_is_permission_granted_with(
+    platform: &dyn aio_platform::PlatformServices,
+) -> Result<bool, String> {
+    platform
+        .notifications()
+        .permission_state()
+        .map(|state| matches!(state, DesktopNotificationPermissionState::Granted))
+        .map_err(|error| {
+            format!(
+                "failed to read notification permission: {}",
+                error.message()
+            )
+        })
+}
+
+#[tauri::command]
+#[specta::specta]
+pub(crate) fn desktop_notification_request_permission(
+    state: tauri::State<'_, crate::app::core_runtime::ManagedCoreRuntimeState>,
+) -> Result<DesktopNotificationPermissionState, String> {
+    desktop_notification_request_permission_with(state.context().platform().as_ref())
+}
+
+fn desktop_notification_request_permission_with(
+    platform: &dyn aio_platform::PlatformServices,
+) -> Result<DesktopNotificationPermissionState, String> {
+    platform
+        .notifications()
+        .request_permission()
+        .map_err(|error| {
+            format!(
+                "failed to request notification permission: {}",
+                error.message()
+            )
+        })
+}
+
+#[tauri::command]
+#[specta::specta]
+pub(crate) fn desktop_notification_notify(
+    state: tauri::State<'_, crate::app::core_runtime::ManagedCoreRuntimeState>,
+    options: DesktopNotificationPayload,
+) -> Result<bool, String> {
+    desktop_notification_notify_with(state.context().platform().as_ref(), options)
+}
+
+fn desktop_notification_notify_with(
+    platform: &dyn aio_platform::PlatformServices,
+    options: DesktopNotificationPayload,
+) -> Result<bool, String> {
+    let notification =
+        aio_platform::Notification::try_from(options).map_err(|error| error.to_string())?;
+    platform
+        .notifications()
+        .notify(notification)
+        .map_err(|error| format!("failed to show desktop notification: {}", error.message()))?;
+    Ok(true)
+}
+
+#[tauri::command]
+#[specta::specta]
+pub(crate) fn desktop_notification_play_sound(
+    state: tauri::State<'_, crate::app::core_runtime::ManagedCoreRuntimeState>,
+) -> Result<bool, String> {
+    desktop_notification_play_sound_with(state.context().platform().as_ref())
+}
+
+fn desktop_notification_play_sound_with(
+    platform: &dyn aio_platform::PlatformServices,
+) -> Result<bool, String> {
+    platform
+        .notifications()
+        .play_sound()
+        .map_err(|error| error.message().to_string())?;
     Ok(true)
 }
 
 #[tauri::command]
 #[specta::specta]
 pub(crate) async fn desktop_updater_check(
-    app: tauri::AppHandle,
+    state: tauri::State<'_, crate::app::core_runtime::ManagedCoreRuntimeState>,
     timeout: Option<u64>,
 ) -> Result<Option<DesktopUpdaterMetadata>, String> {
-    let _ = (app, timeout);
-    Ok(None)
+    let platform = state.context().platform().clone();
+    desktop_updater_check_with(platform.as_ref(), timeout).await
+}
+
+async fn desktop_updater_check_with(
+    platform: &dyn aio_platform::PlatformServices,
+    timeout: Option<u64>,
+) -> Result<Option<DesktopUpdaterMetadata>, String> {
+    let request = aio_platform::UpdateCheckRequest::new(
+        timeout.map(Duration::from_millis),
+        aio_platform::CancellationToken::new(),
+    );
+    platform
+        .updater()
+        .check(request)
+        .await
+        .map(|metadata| metadata.map(DesktopUpdaterMetadata::from))
+        .map_err(|error| error.to_string())
+}
+
+struct ChannelUpdateProgressSink {
+    channel: Channel<DesktopUpdaterDownloadEvent>,
+}
+
+impl aio_platform::UpdateProgressSink for ChannelUpdateProgressSink {
+    fn publish(
+        &self,
+        event: aio_platform::UpdateProgressEvent,
+    ) -> aio_platform::PlatformResult<()> {
+        let event = match event {
+            aio_platform::UpdateProgressEvent::Started { content_length } => {
+                DesktopUpdaterDownloadEvent::Started { content_length }
+            }
+            aio_platform::UpdateProgressEvent::Progress { chunk_length } => {
+                DesktopUpdaterDownloadEvent::Progress { chunk_length }
+            }
+            aio_platform::UpdateProgressEvent::Finished => DesktopUpdaterDownloadEvent::Finished,
+        };
+        self.channel.send(event).map_err(|error| {
+            aio_platform::PlatformError::new(
+                "UPDATE_PROGRESS_CHANNEL_FAILED",
+                aio_platform::PlatformOperation::UpdateProgress,
+                format!("failed to send updater progress: {error}"),
+            )
+        })
+    }
 }
 
 #[tauri::command]
 pub(crate) async fn desktop_updater_download_and_install(
-    app: tauri::AppHandle,
+    state: tauri::State<'_, crate::app::core_runtime::ManagedCoreRuntimeState>,
     rid: ResourceId,
     on_event: Channel<DesktopUpdaterDownloadEvent>,
     timeout: Option<u64>,
     confirm: Option<RiskyIpcConfirm>,
 ) -> Result<bool, String> {
-    let _ = (app, on_event, timeout);
-    reject_disabled_updater_install(rid, confirm)
+    let platform = state.context().platform().clone();
+    desktop_updater_download_and_install_with(
+        platform.as_ref(),
+        rid,
+        Arc::new(ChannelUpdateProgressSink { channel: on_event }),
+        timeout,
+        confirm,
+    )
+    .await
+}
+
+async fn desktop_updater_download_and_install_with(
+    platform: &dyn aio_platform::PlatformServices,
+    rid: ResourceId,
+    progress: Arc<dyn aio_platform::UpdateProgressSink>,
+    timeout: Option<u64>,
+    confirm: Option<RiskyIpcConfirm>,
+) -> Result<bool, String> {
+    RISKY_DESKTOP_UPDATER_INSTALL.require(confirm, format!("updater:{rid}"))?;
+    let request = aio_platform::UpdateInstallRequest::new(
+        aio_platform::UpdateId::new(rid),
+        timeout.map(Duration::from_millis),
+        aio_platform::CancellationToken::new(),
+    );
+    platform
+        .updater()
+        .download_and_install(request, progress)
+        .await
+        .map_err(|error| error.to_string())?;
+    Ok(true)
 }
 
 #[cfg(test)]
 mod tests {
     use super::{
-        desktop_open_allowed_roots, ensure_desktop_open_path_allowed, normalize_existing_path,
-        reject_disabled_updater_install, update_channel_disabled_error,
+        desktop_clipboard_write_text_with, desktop_dialog_open_with, desktop_dialog_save_with,
+        desktop_notification_is_permission_granted_with, desktop_notification_notify_with,
+        desktop_notification_play_sound_with, desktop_notification_request_permission_with,
+        desktop_open_allowed_roots, desktop_opener_open_path_with, desktop_opener_open_url_with,
+        desktop_opener_reveal_item_with, desktop_updater_check_with,
+        desktop_updater_download_and_install_with, ensure_desktop_open_path_allowed,
+        normalize_existing_path, DesktopDialogOpenRequest, DesktopDialogSaveRequest,
+        DesktopOpenPathRequest, DesktopOpenUrlRequest, DesktopRevealItemRequest,
+        DesktopUpdaterDownloadEvent,
     };
     use crate::infra::settings::{self, AppSettings, CodexHomeMode};
     use crate::shared::ipc_confirm::{IpcConfirm, RiskyIpcConfirm};
     use crate::test_support::{clear_settings_cache, test_env_lock};
+    use aio_platform::fakes::{FakePlatformServices, PlatformCall};
+    use aio_platform::{
+        DesktopNotificationPayload, DesktopNotificationPermissionState, DialogPath, PlatformError,
+        PlatformOperation, PlatformResult, UpdateProgressEvent, UpdateProgressSink,
+    };
     use std::ffi::OsString;
     use std::path::Path;
     use std::sync::atomic::{AtomicU64, Ordering};
 
     static TEST_ENV_SEQ: AtomicU64 = AtomicU64::new(1);
 
-    #[test]
-    fn updater_disabled_error_keeps_a_stable_code() {
-        assert_eq!(
-            update_channel_disabled_error(),
-            "UPDATE_CHANNEL_DISABLED: update channel is disabled"
-        );
+    #[derive(Default)]
+    struct NoopProgressSink;
+
+    impl UpdateProgressSink for NoopProgressSink {
+        fn publish(&self, _event: UpdateProgressEvent) -> PlatformResult<()> {
+            Ok(())
+        }
     }
 
-    #[test]
-    fn updater_install_requires_confirmation_before_reporting_disabled_channel() {
-        let rid = 42;
-        let missing = reject_disabled_updater_install(rid, None).unwrap_err();
-        assert!(missing.starts_with("SEC_CONFIRM_REQUIRED:"));
-
-        let valid = RiskyIpcConfirm {
+    fn valid_updater_confirm(rid: u32) -> RiskyIpcConfirm {
+        RiskyIpcConfirm {
             confirm: IpcConfirm {
                 action: "desktop_updater_download_and_install".to_string(),
                 resource: format!("updater:{rid}"),
@@ -707,10 +501,471 @@ mod tests {
                 issued_at_ms: crate::shared::time::now_unix_millis(),
                 ttl_ms: 60_000,
             },
-        };
+        }
+    }
+
+    #[tokio::test]
+    async fn updater_check_calls_service_and_maps_none() {
+        let platform = FakePlatformServices::new();
+        platform.updater_fake().script_check_result(Ok(None));
+
         assert_eq!(
-            reject_disabled_updater_install(rid, Some(valid)).unwrap_err(),
+            desktop_updater_check_with(&platform, Some(0)).await,
+            Ok(None)
+        );
+        assert!(matches!(
+            platform.journal().snapshot()[0].call,
+            PlatformCall::UpdateCheck {
+                timeout_ms: Some(0),
+                cancelled: false
+            }
+        ));
+    }
+
+    #[tokio::test]
+    async fn updater_install_missing_confirm_never_calls_service() {
+        let platform = FakePlatformServices::new();
+
+        let error = desktop_updater_download_and_install_with(
+            &platform,
+            42,
+            std::sync::Arc::new(NoopProgressSink),
+            None,
+            None,
+        )
+        .await
+        .unwrap_err();
+
+        assert!(error.starts_with("SEC_CONFIRM_REQUIRED:"));
+        assert!(platform.journal().snapshot().is_empty());
+    }
+
+    #[tokio::test]
+    async fn updater_install_valid_confirm_calls_service_once() {
+        let platform = FakePlatformServices::new();
+        platform
+            .updater_fake()
+            .script_install_result(Vec::new(), Ok(()));
+
+        assert_eq!(
+            desktop_updater_download_and_install_with(
+                &platform,
+                42,
+                std::sync::Arc::new(NoopProgressSink),
+                Some(0),
+                Some(valid_updater_confirm(42)),
+            )
+            .await,
+            Ok(true)
+        );
+        assert!(matches!(
+            platform.journal().snapshot()[0].call,
+            PlatformCall::UpdateDownloadAndInstall {
+                id,
+                timeout_ms: Some(0),
+                cancelled: false
+            } if id.get() == 42
+        ));
+    }
+
+    #[tokio::test]
+    async fn updater_install_returns_exact_disabled_error() {
+        let platform = FakePlatformServices::new();
+        platform.updater_fake().script_install_result(
+            Vec::new(),
+            Err(PlatformError::new(
+                "UPDATE_CHANNEL_DISABLED",
+                PlatformOperation::UpdateDownloadAndInstall,
+                "update channel is disabled",
+            )),
+        );
+
+        assert_eq!(
+            desktop_updater_download_and_install_with(
+                &platform,
+                7,
+                std::sync::Arc::new(NoopProgressSink),
+                None,
+                Some(valid_updater_confirm(7)),
+            )
+            .await
+            .unwrap_err(),
             "UPDATE_CHANNEL_DISABLED: update channel is disabled"
+        );
+    }
+
+    #[test]
+    fn updater_progress_channel_json_is_unchanged() {
+        assert_eq!(
+            serde_json::to_value(DesktopUpdaterDownloadEvent::Started {
+                content_length: Some(1_024),
+            })
+            .unwrap(),
+            serde_json::json!({
+                "event": "Started",
+                "data": { "contentLength": 1_024 }
+            })
+        );
+        assert_eq!(
+            serde_json::to_value(DesktopUpdaterDownloadEvent::Progress { chunk_length: 128 })
+                .unwrap(),
+            serde_json::json!({
+                "event": "Progress",
+                "data": { "chunkLength": 128 }
+            })
+        );
+        assert_eq!(
+            serde_json::to_value(DesktopUpdaterDownloadEvent::Finished).unwrap(),
+            serde_json::json!({ "event": "Finished" })
+        );
+    }
+
+    fn raw_open_dialog_request() -> DesktopDialogOpenRequest {
+        DesktopDialogOpenRequest {
+            title: None,
+            filters: None,
+            default_path: None,
+            multiple: None,
+            directory: None,
+            recursive: None,
+            can_create_directories: None,
+            picker_mode: None,
+            file_access_mode: None,
+        }
+    }
+
+    #[tokio::test]
+    async fn dialog_open_maps_scripted_paths() {
+        let platform = FakePlatformServices::new();
+        platform.dialog_fake().script_open_result(Ok(Some(vec![
+            DialogPath::new("first.txt"),
+            DialogPath::new("second.txt"),
+        ])));
+
+        assert_eq!(
+            desktop_dialog_open_with(&platform, raw_open_dialog_request())
+                .await
+                .unwrap(),
+            Some(vec!["first.txt".to_string(), "second.txt".to_string()])
+        );
+        let records = platform.journal().snapshot();
+        assert!(matches!(
+            &records[0].call,
+            PlatformCall::DialogOpen { request }
+                if !request.multiple() && !request.directory()
+        ));
+    }
+
+    #[tokio::test]
+    async fn dialog_open_preserves_user_cancel_as_none() {
+        let platform = FakePlatformServices::new();
+        platform.dialog_fake().script_open_result(Ok(None));
+
+        assert_eq!(
+            desktop_dialog_open_with(&platform, raw_open_dialog_request())
+                .await
+                .unwrap(),
+            None
+        );
+    }
+
+    #[tokio::test]
+    async fn dialog_open_preserves_channel_drop_error() {
+        let platform = FakePlatformServices::new();
+        platform
+            .dialog_fake()
+            .script_open_result(Err(PlatformError::new(
+                "DESKTOP_DIALOG_OPEN_CANCELLED",
+                PlatformOperation::DialogOpen,
+                "dialog response channel dropped",
+            )));
+
+        assert_eq!(
+            desktop_dialog_open_with(&platform, raw_open_dialog_request())
+                .await
+                .unwrap_err(),
+            "DESKTOP_DIALOG_OPEN_CANCELLED: dialog response channel dropped"
+        );
+    }
+
+    #[tokio::test]
+    async fn dialog_save_preserves_user_cancel_as_none() {
+        let platform = FakePlatformServices::new();
+        platform.dialog_fake().script_save_result(Ok(None));
+
+        assert_eq!(
+            desktop_dialog_save_with(
+                &platform,
+                DesktopDialogSaveRequest {
+                    title: None,
+                    filters: None,
+                    default_path: None,
+                    can_create_directories: None,
+                },
+            )
+            .await
+            .unwrap(),
+            None
+        );
+    }
+
+    #[tokio::test]
+    async fn opener_url_records_validated_url_and_program() {
+        let platform = FakePlatformServices::new();
+        platform.opener_fake().script_open_url_result(Ok(()));
+
+        assert_eq!(
+            desktop_opener_open_url_with(
+                &platform,
+                DesktopOpenUrlRequest {
+                    url: "  https://example.com/path  ".to_string(),
+                    with: Some("  browser  ".to_string()),
+                },
+            )
+            .await,
+            Ok(true)
+        );
+        let records = platform.journal().snapshot();
+        assert!(matches!(
+            &records[0].call,
+            PlatformCall::OpenerOpenUrl { request }
+                if request.url() == "https://example.com/path"
+                    && request.program() == Some("browser")
+        ));
+    }
+
+    #[tokio::test]
+    async fn opener_path_rejects_sibling_prefix_before_service_call() {
+        let platform = FakePlatformServices::new();
+        let root = std::env::current_dir().unwrap().join("target/opener-root");
+        let sibling = root.with_file_name("opener-root-other").join("file.txt");
+
+        let error = desktop_opener_open_path_with(
+            &platform,
+            DesktopOpenPathRequest {
+                path: sibling.to_string_lossy().into_owned(),
+                with: None,
+            },
+            vec![root],
+        )
+        .await
+        .unwrap_err();
+
+        assert!(error.starts_with("DESKTOP_OPEN_PATH_DENIED:"));
+        assert!(platform.journal().snapshot().is_empty());
+    }
+
+    #[tokio::test]
+    async fn opener_reveal_records_authorized_path() {
+        let platform = FakePlatformServices::new();
+        platform.opener_fake().script_reveal_item_result(Ok(()));
+        let root = std::env::current_dir()
+            .unwrap()
+            .join("target/opener-reveal-root");
+        let child = root.join("nested/file.txt");
+
+        assert_eq!(
+            desktop_opener_reveal_item_with(
+                &platform,
+                DesktopRevealItemRequest {
+                    path: child.to_string_lossy().into_owned(),
+                },
+                vec![root],
+            )
+            .await,
+            Ok(true)
+        );
+        let records = platform.journal().snapshot();
+        assert!(matches!(
+            &records[0].call,
+            PlatformCall::OpenerRevealItem { request } if request.path() == child
+        ));
+    }
+
+    #[test]
+    fn notification_permission_state_maps_all_four_variants() {
+        let platform = FakePlatformServices::new();
+        for state in [
+            DesktopNotificationPermissionState::Granted,
+            DesktopNotificationPermissionState::Denied,
+            DesktopNotificationPermissionState::Prompt,
+            DesktopNotificationPermissionState::PromptWithRationale,
+        ] {
+            platform
+                .notification_fake()
+                .script_permission_state_result(Ok(state));
+        }
+
+        assert_eq!(
+            desktop_notification_is_permission_granted_with(&platform),
+            Ok(true)
+        );
+        assert_eq!(
+            desktop_notification_is_permission_granted_with(&platform),
+            Ok(false)
+        );
+        assert_eq!(
+            desktop_notification_is_permission_granted_with(&platform),
+            Ok(false)
+        );
+        assert_eq!(
+            desktop_notification_is_permission_granted_with(&platform),
+            Ok(false)
+        );
+    }
+
+    #[test]
+    fn notification_request_permission_returns_scripted_state() {
+        let platform = FakePlatformServices::new();
+        platform
+            .notification_fake()
+            .script_request_permission_result(Ok(DesktopNotificationPermissionState::Prompt));
+
+        assert_eq!(
+            desktop_notification_request_permission_with(&platform),
+            Ok(DesktopNotificationPermissionState::Prompt)
+        );
+    }
+
+    #[test]
+    fn notification_notify_records_normalized_payload() {
+        let platform = FakePlatformServices::new();
+        platform.notification_fake().script_notify_result(Ok(()));
+
+        assert_eq!(
+            desktop_notification_notify_with(
+                &platform,
+                DesktopNotificationPayload {
+                    title: "  Title  ".to_string(),
+                    body: "  Body  ".to_string(),
+                    sound: Some("  ping  ".to_string()),
+                },
+            ),
+            Ok(true)
+        );
+        let records = platform.journal().snapshot();
+        assert!(matches!(
+            &records[0].call,
+            PlatformCall::NotificationNotify { notification }
+                if notification.title() == "Title"
+                    && notification.body() == "Body"
+                    && notification.sound() == Some("ping")
+        ));
+    }
+
+    #[test]
+    fn notification_play_sound_uses_service() {
+        let platform = FakePlatformServices::new();
+        platform
+            .notification_fake()
+            .script_play_sound_result(Ok(()));
+
+        assert_eq!(desktop_notification_play_sound_with(&platform), Ok(true));
+        assert!(matches!(
+            platform.journal().snapshot()[0].call,
+            PlatformCall::NotificationPlaySound
+        ));
+    }
+
+    #[test]
+    fn notification_backend_prefixes_remain_stable() {
+        let platform = FakePlatformServices::new();
+        platform
+            .notification_fake()
+            .script_permission_state_result(Err(PlatformError::new(
+                "NOTIFICATION_PERMISSION_READ_FAILED",
+                PlatformOperation::NotificationPermissionState,
+                "read detail",
+            )));
+        platform
+            .notification_fake()
+            .script_request_permission_result(Err(PlatformError::new(
+                "NOTIFICATION_PERMISSION_REQUEST_FAILED",
+                PlatformOperation::NotificationRequestPermission,
+                "request detail",
+            )));
+        platform
+            .notification_fake()
+            .script_notify_result(Err(PlatformError::new(
+                "NOTIFICATION_SHOW_FAILED",
+                PlatformOperation::NotificationNotify,
+                "show detail",
+            )));
+        platform
+            .notification_fake()
+            .script_play_sound_result(Err(PlatformError::new(
+                "NOTIFICATION_SOUND_FAILED",
+                PlatformOperation::NotificationPlaySound,
+                "NOTIFICATION_SOUND_THREAD_SPAWN_FAILED: sound detail",
+            )));
+
+        assert_eq!(
+            desktop_notification_is_permission_granted_with(&platform).unwrap_err(),
+            "failed to read notification permission: read detail"
+        );
+        assert_eq!(
+            desktop_notification_request_permission_with(&platform).unwrap_err(),
+            "failed to request notification permission: request detail"
+        );
+        assert_eq!(
+            desktop_notification_notify_with(
+                &platform,
+                DesktopNotificationPayload {
+                    title: "Title".to_string(),
+                    body: "Body".to_string(),
+                    sound: None,
+                },
+            )
+            .unwrap_err(),
+            "failed to show desktop notification: show detail"
+        );
+        assert_eq!(
+            desktop_notification_play_sound_with(&platform).unwrap_err(),
+            "NOTIFICATION_SOUND_THREAD_SPAWN_FAILED: sound detail"
+        );
+    }
+
+    #[test]
+    fn clipboard_command_records_normalized_text_and_returns_true() {
+        let platform = FakePlatformServices::new();
+        platform.clipboard_fake().script_result(Ok(()));
+
+        assert_eq!(
+            desktop_clipboard_write_text_with(&platform, "  copied text  ".to_string()),
+            Ok(true)
+        );
+        let records = platform.journal().snapshot();
+        assert!(matches!(
+            &records[0].call,
+            PlatformCall::ClipboardWriteText { text } if text.as_str() == "copied text"
+        ));
+    }
+
+    #[test]
+    fn clipboard_command_preserves_empty_text_error() {
+        let platform = FakePlatformServices::new();
+
+        assert_eq!(
+            desktop_clipboard_write_text_with(&platform, " \n ".to_string()).unwrap_err(),
+            "CLIPBOARD_EMPTY_TEXT: text cannot be empty"
+        );
+        assert!(platform.journal().snapshot().is_empty());
+    }
+
+    #[test]
+    fn clipboard_command_preserves_unprefixed_backend_error() {
+        let platform = FakePlatformServices::new();
+        platform
+            .clipboard_fake()
+            .script_result(Err(PlatformError::new(
+                "CLIPBOARD_BACKEND_FAILED",
+                PlatformOperation::ClipboardWriteText,
+                "backend detail",
+            )));
+
+        assert_eq!(
+            desktop_clipboard_write_text_with(&platform, "text".to_string()).unwrap_err(),
+            "failed to write clipboard text: backend detail"
         );
     }
 

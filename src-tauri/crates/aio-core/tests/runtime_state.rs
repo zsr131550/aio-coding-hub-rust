@@ -3,6 +3,8 @@ use aio_core::{
     AppContext, AppPathOverrides, AppPathRoots, AppPaths, AppRuntimeState, AsyncInitState,
     InstanceGuard, RuntimeOwner, StartupState, StateSlot,
 };
+use aio_platform::fakes::FakePlatformServices;
+use aio_platform::PlatformServices;
 use std::panic::{catch_unwind, AssertUnwindSafe};
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::Arc;
@@ -162,13 +164,17 @@ fn app_runtime_state_keeps_plugin_initialization_lazy() {
     );
     let instance = Arc::new(InstanceGuard::try_acquire(paths.as_ref()).expect("instance guard"));
     let runtime_owner = RuntimeOwner::new("runtime-state-test").expect("runtime owner");
+    let fake_platform = Arc::new(FakePlatformServices::new());
+    let platform: Arc<dyn PlatformServices> = fake_platform;
     let context = Arc::new(AppContext::new(
         paths,
+        platform.clone(),
         runtime_owner.task_runtime(),
         Arc::new(aio_core::NoopEventSink),
         Arc::new(StartupState::default()),
         instance,
     ));
+    assert!(Arc::ptr_eq(context.platform(), &platform));
     let state = AppRuntimeState::<usize, Vec<u8>, String, &'static str>::new(context, vec![]);
 
     runtime_owner.block_on(async {

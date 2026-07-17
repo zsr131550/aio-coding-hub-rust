@@ -4,7 +4,6 @@ use crate::shared::ipc_confirm::{RiskyIpcConfirm, RISKY_PROVIDER_API_KEY_CLIPBOA
 use crate::{base_url_probe, blocking, providers};
 use serde_json::json;
 use std::path::{Path, PathBuf};
-use tauri_plugin_clipboard_manager::ClipboardExt;
 
 const ENV_CLAUDE_DISABLE_NONESSENTIAL_TRAFFIC: &str = "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC";
 const ENV_DISABLE_ERROR_REPORTING: &str = "DISABLE_ERROR_REPORTING";
@@ -282,6 +281,7 @@ pub(crate) async fn provider_copy_api_key_to_clipboard(
     confirm: Option<RiskyIpcConfirm>,
 ) -> Result<bool, String> {
     RISKY_PROVIDER_API_KEY_CLIPBOARD.require(confirm, format!("provider:{provider_id}:api_key"))?;
+    let platform = db_state.context().platform().clone();
     let db = ensure_db_ready(app.clone(), db_state.inner()).await?;
     let api_key = blocking::run(
         "provider_copy_api_key_to_clipboard",
@@ -306,10 +306,23 @@ pub(crate) async fn provider_copy_api_key_to_clipboard(
     )
     .await?;
 
-    app.clipboard().write_text(api_key).map_err(|err| {
-        format!("SYSTEM_ERROR: failed to write provider api_key to clipboard: {err}")
-    })?;
+    copy_provider_api_key_with(platform.as_ref(), api_key)?;
     tracing::info!(provider_id, "provider api_key copied to clipboard");
+    Ok(true)
+}
+
+fn copy_provider_api_key_with(
+    platform: &dyn aio_platform::PlatformServices,
+    api_key: String,
+) -> Result<bool, String> {
+    let api_key = aio_platform::ClipboardText::from_prevalidated(api_key)
+        .map_err(|error| error.to_string())?;
+    platform.clipboard().write_text(api_key).map_err(|error| {
+        format!(
+            "SYSTEM_ERROR: failed to write provider api_key to clipboard: {}",
+            error.message()
+        )
+    })?;
     Ok(true)
 }
 
@@ -326,10 +339,35 @@ pub(crate) async fn base_url_ping_ms(base_url: String) -> Result<u64, String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use aio_platform::fakes::{FakePlatformServices, PlatformCall};
+    use aio_platform::{PlatformError, PlatformOperation};
     #[cfg(not(target_os = "windows"))]
     use std::process::{Command, Stdio};
     #[cfg(not(target_os = "windows"))]
     use tempfile::tempdir;
+
+    #[test]
+    fn provider_clipboard_preserves_secret_and_backend_error_mapping() {
+        let platform = FakePlatformServices::new();
+        platform
+            .clipboard_fake()
+            .script_result(Err(PlatformError::new(
+                "CLIPBOARD_BACKEND_FAILED",
+                PlatformOperation::ClipboardWriteText,
+                "backend detail",
+            )));
+
+        let error = copy_provider_api_key_with(&platform, "  secret  ".to_string()).unwrap_err();
+        assert_eq!(
+            error,
+            "SYSTEM_ERROR: failed to write provider api_key to clipboard: backend detail"
+        );
+        let records = platform.journal().snapshot();
+        assert!(matches!(
+            &records[0].call,
+            PlatformCall::ClipboardWriteText { text } if text.as_str() == "  secret  "
+        ));
+    }
 
     #[test]
     fn bash_single_quote_escapes_single_quote() {

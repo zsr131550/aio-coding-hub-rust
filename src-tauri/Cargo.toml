@@ -1,5 +1,5 @@
 [workspace]
-members = [".", "crates/aio-contract", "crates/aio-core"]
+members = [".", "crates/aio-contract", "crates/aio-core", "crates/aio-platform"]
 resolver = "2"
 
 [package]
@@ -29,6 +29,7 @@ tauri-build = { version = "2", features = [] }
 [dependencies]
 aio-contract = { path = "crates/aio-contract" }
 aio-core = { path = "crates/aio-core" }
+aio-platform = { path = "crates/aio-platform" }
 tauri = { version = "2", features = ["tray-icon", "image-png"] }
 tauri-plugin-opener = "2"
 tauri-plugin-clipboard-manager = "2"

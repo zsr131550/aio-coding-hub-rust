@@ -116,6 +116,12 @@ mod tests {
             ["Gateway", "State::default"].concat(),
             ["Startup", "State::default"].concat(),
             ["ExtensionHostRuntime", "State::default"].concat(),
+            ["Clipboard", "State"].concat(),
+            ["Dialog", "State"].concat(),
+            ["Opener", "State"].concat(),
+            ["Notification", "State"].concat(),
+            ["Autostart", "State"].concat(),
+            ["Updater", "State"].concat(),
         ];
         for legacy_state in legacy_states {
             assert!(

@@ -17,6 +17,7 @@ pub(crate) mod linux_webkit_compat;
 pub(crate) mod logging;
 pub(crate) mod notice;
 pub(crate) mod notification_sound;
+pub(crate) mod platform;
 pub(crate) mod plugin_registry;
 pub(crate) mod plugin_service;
 pub(crate) mod plugins;

@@ -137,12 +137,13 @@ fn restore_settings_after_failed_import<R: tauri::Runtime>(
 pub(super) fn rollback_after_failed_import<R: tauri::Runtime>(
     app: &tauri::AppHandle<R>,
     db: &db::Db,
+    autostart: &dyn aio_platform::AutostartService,
     previous_settings: &settings::AppSettings,
     runtime_backups: Vec<CliRuntimeBackup>,
     skill_fs_guard: Option<&mut SkillFsImportGuard>,
 ) {
     restore_settings_after_failed_import(app, previous_settings);
-    crate::app::autostart::restore_auto_start_best_effort(app, previous_settings.auto_start);
+    crate::app::autostart::restore_auto_start_best_effort(autostart, previous_settings.auto_start);
 
     if let Some(guard) = skill_fs_guard {
         guard.rollback();

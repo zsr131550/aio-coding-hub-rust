@@ -3,6 +3,7 @@ use std::sync::Arc;
 
 pub struct AppContext {
     paths: Arc<AppPaths>,
+    platform: Arc<dyn aio_platform::PlatformServices>,
     tasks: Arc<dyn TaskRuntime>,
     events: Arc<dyn EventSink>,
     startup: Arc<StartupState>,
@@ -12,6 +13,7 @@ pub struct AppContext {
 impl AppContext {
     pub fn new(
         paths: Arc<AppPaths>,
+        platform: Arc<dyn aio_platform::PlatformServices>,
         tasks: Arc<dyn TaskRuntime>,
         events: Arc<dyn EventSink>,
         startup: Arc<StartupState>,
@@ -19,6 +21,7 @@ impl AppContext {
     ) -> Self {
         Self {
             paths,
+            platform,
             tasks,
             events,
             startup,
@@ -28,6 +31,10 @@ impl AppContext {
 
     pub fn paths(&self) -> &Arc<AppPaths> {
         &self.paths
+    }
+
+    pub fn platform(&self) -> &Arc<dyn aio_platform::PlatformServices> {
+        &self.platform
     }
 
     pub fn tasks(&self) -> &Arc<dyn TaskRuntime> {

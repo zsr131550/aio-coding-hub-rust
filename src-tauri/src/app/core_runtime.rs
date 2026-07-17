@@ -19,8 +19,10 @@ pub(crate) fn install<R: tauri::Runtime>(
     paths: Arc<aio_core::AppPaths>,
     instance: Arc<aio_core::InstanceGuard>,
 ) -> Result<ManagedCoreRuntimeState, std::io::Error> {
+    let platform = super::platform::create_platform_services(app.clone());
     let context = Arc::new(aio_core::AppContext::new(
         paths,
+        platform,
         crate::task_runtime::current(),
         Arc::new(super::tauri_event_sink::TauriEventSink::new(app.clone())),
         Arc::new(aio_core::StartupState::default()),
