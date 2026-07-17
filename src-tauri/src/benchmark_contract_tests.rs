@@ -598,12 +598,12 @@ fn record() -> &'static str {
     "recorded"
 }
 
-fn benchmark_acl_request() -> tauri::webview::InvokeRequest {
+fn benchmark_acl_request(url: tauri::Url) -> tauri::webview::InvokeRequest {
     tauri::webview::InvokeRequest {
         cmd: "plugin:benchmark|record".into(),
         callback: tauri::ipc::CallbackFn(0),
         error: tauri::ipc::CallbackFn(1),
-        url: "http://tauri.localhost".parse().expect("local Tauri URL"),
+        url,
         body: tauri::ipc::InvokeBody::default(),
         headers: Default::default(),
         invoke_key: tauri::test::INVOKE_KEY.to_string(),
@@ -624,16 +624,18 @@ fn benchmark_plugin_acl_allows_only_the_main_window() {
     let main = tauri::WebviewWindowBuilder::new(&app, "main", Default::default())
         .build()
         .expect("build main webview");
-    let main_response = tauri::test::get_ipc_response(&main, benchmark_acl_request())
-        .expect("main capability allows benchmark command")
-        .deserialize::<String>()
-        .expect("deserialize benchmark response");
+    let local_url = main.url().expect("read main webview URL");
+    let main_response =
+        tauri::test::get_ipc_response(&main, benchmark_acl_request(local_url.clone()))
+            .expect("main capability allows benchmark command")
+            .deserialize::<String>()
+            .expect("deserialize benchmark response");
     assert_eq!(main_response, "recorded");
 
     let untrusted = tauri::WebviewWindowBuilder::new(&app, "untrusted", Default::default())
         .build()
         .expect("build untrusted webview");
-    let rejection = tauri::test::get_ipc_response(&untrusted, benchmark_acl_request())
+    let rejection = tauri::test::get_ipc_response(&untrusted, benchmark_acl_request(local_url))
         .expect_err("benchmark command must be rejected outside main capability");
     assert!(
         rejection

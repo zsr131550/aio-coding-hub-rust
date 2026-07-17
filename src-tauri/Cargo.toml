@@ -6,7 +6,7 @@ resolver = "2"
 name = "aio-coding-hub"
 version = "0.60.13"
 description = "AIO Coding Hub"
-authors = ["dyndynjyxa"]
+authors = ["zsr131550"]
 edition = "2021"
 default-run = "aio-coding-hub"
 

@@ -47,12 +47,8 @@ try {
     productName: "Fixture App",
     version: "1.2.3",
     identifier: "io.fixture.app",
-    plugins: {
-      updater: {
-        endpoints: ["https://fixture.invalid/latest.json"],
-        pubkey: "fixture-public-key",
-      },
-    },
+    bundle: {},
+    plugins: {},
   });
   writeJson(root, "src/app/app-routes.contract.json", {
     schemaVersion: 1,
@@ -184,6 +180,10 @@ try {
   assert(contract.ipc.riskyOperations.length === 6, "risky operation matrix was incomplete");
   assert(contract.events.length === 1, "event fixture mapping was not exported");
   assert(contract.release.officialTargets.length === 4, "release matrix was incomplete");
+  assert(contract.release.publicationMode === "source-only", "publication mode was not disabled");
+  assert(contract.release.updaterMode === "disabled", "updater mode was not disabled");
+  assert(contract.release.updaterEndpoint === null, "disabled updater exported an endpoint");
+  assert(contract.release.updaterPublicKeySha256 === null, "disabled updater exported trust data");
   assert(contract.artifactHashes["bindings.ts"], "bindings hash was missing");
   assert(contract.artifactHashes["fixtures/status.json"], "event fixture hash was missing");
   assert(
@@ -207,6 +207,43 @@ try {
   const second = runContract(args);
   assert(second.status === 0, `second generation failed:\n${second.stderr || second.stdout}`);
   assert(readFileSync(outputPath, "utf8") === firstBytes, "generation was not byte deterministic");
+
+  writeJson(root, "src-tauri/tauri.conf.json", {
+    productName: "Fixture App",
+    version: "1.2.3",
+    identifier: "io.fixture.app",
+    bundle: {},
+    plugins: { updater: { endpoints: ["https://fixture.invalid/latest.json"] } },
+  });
+  const updaterEndpointEnabled = runContract(args.slice(0, -1));
+  assert(updaterEndpointEnabled.status !== 0, "contract accepted a configured updater endpoint");
+  assert(
+    updaterEndpointEnabled.stderr.includes("updater endpoints must be absent"),
+    "configured updater endpoint failure did not explain the disabled boundary"
+  );
+  writeJson(root, "src-tauri/tauri.conf.json", {
+    productName: "Fixture App",
+    version: "1.2.3",
+    identifier: "io.fixture.app",
+    bundle: { createUpdaterArtifacts: "v1Compatible" },
+    plugins: {},
+  });
+  const updaterArtifactsEnabled = runContract(args.slice(0, -1));
+  assert(
+    updaterArtifactsEnabled.status !== 0,
+    "contract accepted string updater artifact generation"
+  );
+  assert(
+    updaterArtifactsEnabled.stderr.includes("updater artifact generation must be absent"),
+    "updater artifact failure did not explain the source-only boundary"
+  );
+  writeJson(root, "src-tauri/tauri.conf.json", {
+    productName: "Fixture App",
+    version: "1.2.3",
+    identifier: "io.fixture.app",
+    bundle: {},
+    plugins: {},
+  });
 
   writeFileSync(join(root, transcriptRelativePath), `${transcriptBytes} `, "utf8");
   const artifactDrift = runContract(args.slice(0, -1));

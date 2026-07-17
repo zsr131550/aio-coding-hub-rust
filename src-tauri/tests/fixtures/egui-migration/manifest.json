@@ -163,9 +163,9 @@
       "sha256": "9ec6b658f506bbda3f340c5ebdb38ef80271c33682077a08e39cf2aeaf60d8b2"
     },
     "settings/settings-current.json": {
-      "bytes": 2563,
+      "bytes": 2567,
       "kind": "file",
-      "sha256": "b6aae8bed69d185cf424de92d5367c142db4b13e5b10d5bf5da300d6cd0fde4a"
+      "sha256": "a987b29a4bc45361e37a06b8de130166233c68e4b113934fe11b2b588d7f0fb1"
     },
     "updater/invalid/cases.json": {
       "bytes": 387,

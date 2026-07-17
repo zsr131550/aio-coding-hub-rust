@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import type { UpdateMeta } from "../../hooks/useUpdateMeta";
-import { AIO_RELEASES_URL } from "../../constants/urls";
+import { AIO_RELEASES_URL, AIO_UPDATE_CHANNEL_ENABLED } from "../../constants/urls";
 import { runBackgroundTask } from "../../services/backgroundTasks";
 import type { ConfigImportResult } from "../../services/app/configMigrate";
 import { appDataDirGet, appDataReset, appExit, dbCompact } from "../../services/app/dataManagement";
@@ -126,6 +126,11 @@ export function useSettingsSidebarController(input: SettingsSidebarControllerInp
   const checkUpdate = useCallback(async () => {
     try {
       if (!about) {
+        return;
+      }
+
+      if (!AIO_UPDATE_CHANNEL_ENABLED && !devPreviewEnabled) {
+        toast("当前源码版本未启用更新通道");
         return;
       }
 

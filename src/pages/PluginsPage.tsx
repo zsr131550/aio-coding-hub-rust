@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { openDesktopSinglePath } from "../services/desktop/dialog";
 import { openDesktopUrl } from "../services/desktop/opener";
+import { AIO_REPO_URL } from "../constants/urls";
 import type {
   JsonValue,
   PluginDetail,
@@ -102,8 +103,7 @@ const TRUST_EVENT_TYPES = new Set([
   "plugin.official.installed",
 ]);
 
-const PLUGIN_DOCS_URL =
-  "https://github.com/dyndynjyxa/aio-coding-hub/blob/main/docs/plugins/README.md";
+const PLUGIN_DOCS_URL = `${AIO_REPO_URL}/blob/main/docs/plugins/README.md`;
 
 async function runPluginAction(action: string, task: () => Promise<unknown>) {
   try {

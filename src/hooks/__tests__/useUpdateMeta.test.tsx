@@ -12,8 +12,18 @@ vi.mock("sonner", () => ({
 }));
 vi.mock("../../services/consoleLog", () => ({ logToConsole: vi.fn() }));
 
+function enableUpdateChannelForTest() {
+  vi.doMock("../../constants/urls", async () => ({
+    ...(await vi.importActual<typeof import("../../constants/urls")>("../../constants/urls")),
+    AIO_UPDATE_CHANNEL_ENABLED: true,
+  }));
+}
+
 describe("hooks/useUpdateMeta", () => {
   beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(tauriInvoke).mockReset();
+    vi.doUnmock("../../constants/urls");
     localStorage.removeItem("devPreview.enabled");
   });
 
@@ -53,11 +63,33 @@ describe("hooks/useUpdateMeta", () => {
     localStorage.removeItem("devPreview.enabled");
   });
 
+  it("keeps silent checks offline and reports the disabled channel manually", async () => {
+    vi.resetModules();
+    setTauriRuntime();
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+    vi.mocked(tauriInvoke).mockResolvedValue({ rid: 1, version: "v1" } as any);
+
+    const { queryClient } = await import("../../query/queryClient");
+    queryClient.clear();
+    const { updateCheckNow } = await import("../useUpdateMeta");
+
+    await expect(updateCheckNow({ silent: true, openDialogIfUpdate: false })).resolves.toBeNull();
+    expect(toast).not.toHaveBeenCalled();
+    await expect(updateCheckNow({ silent: false, openDialogIfUpdate: true })).resolves.toBeNull();
+    expect(toast).toHaveBeenCalledWith("当前源码版本未启用更新通道");
+    expect(tauriInvoke).not.toHaveBeenCalled();
+    expect(fetchMock).not.toHaveBeenCalled();
+
+    vi.unstubAllGlobals();
+  });
+
   it("covers update check, dialog state, and download/install flows", async () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-02-01T00:00:00Z"));
 
     vi.resetModules();
+    enableUpdateChannelForTest();
     clearTauriRuntime();
 
     const { queryClient } = await import("../../query/queryClient");
@@ -144,6 +176,7 @@ describe("hooks/useUpdateMeta", () => {
   it("sets installError when download/install throws", async () => {
     vi.useFakeTimers();
     vi.resetModules();
+    enableUpdateChannelForTest();
     setTauriRuntime();
 
     const { queryClient } = await import("../../query/queryClient");
@@ -209,6 +242,7 @@ describe("hooks/useUpdateMeta", () => {
 
   it("logs and toasts when update check fails even if localStorage write also throws", async () => {
     vi.resetModules();
+    enableUpdateChannelForTest();
     setTauriRuntime();
 
     const setItemSpy = vi.spyOn(Storage.prototype, "setItem");
@@ -234,6 +268,7 @@ describe("hooks/useUpdateMeta", () => {
 
   it("returns null without candidate and reuses the in-flight install promise", async () => {
     vi.resetModules();
+    enableUpdateChannelForTest();
     setTauriRuntime();
 
     const { queryClient } = await import("../../query/queryClient");

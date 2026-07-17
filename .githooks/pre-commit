@@ -6,6 +6,26 @@ cd "$repo_root"
 
 rust_bridge_dir=""
 
+run_pnpm() {
+  if command -v pnpm >/dev/null 2>&1; then
+    pnpm "$@"
+    return
+  fi
+
+  if command -v corepack >/dev/null 2>&1; then
+    corepack pnpm "$@"
+    return
+  fi
+
+  if command -v pnpm.cmd >/dev/null 2>&1; then
+    pnpm.cmd "$@"
+    return
+  fi
+
+  echo "[pre-commit] pnpm not found in PATH."
+  return 127
+}
+
 cleanup() {
   if [ -n "$rust_bridge_dir" ] && [ -d "$rust_bridge_dir" ]; then
     rm -rf "$rust_bridge_dir"
@@ -107,17 +127,24 @@ while IFS= read -r file; do
       ;;
   esac
 
-  # These files are the inputs of CI's support-contract job
-  # (scripts/support-matrix.mjs check + homebrew-cask selftest).
+  # These files are the inputs of CI's source-build support contract.
   case "$file" in
-    scripts/support-matrix*|README.md|README_EN.md|.github/workflows/ci.yml|.github/workflows/release.yml|package.json)
+    scripts/support-matrix*|README.md|README_EN.md|.github/workflows/ci.yml|.github/workflows/dev-build.yml|package.json)
       has_support_matrix_changes=true
       ;;
   esac
 done < <(git diff --cached --name-only --diff-filter=ACMR)
 
+if git diff --cached --quiet; then
+  echo "[pre-commit] No staged changes, skipping checks."
+  exit 0
+fi
+
+echo "[pre-commit] Running repository independence checks..."
+node scripts/run-checks.mjs precommit-repository
+
 if [ "$has_src_changes" = false ] && [ "$has_tauri_changes" = false ] && [ "$has_support_matrix_changes" = false ]; then
-  echo "[pre-commit] No src/, src-tauri/ or support-matrix changes, skipping checks."
+  echo "[pre-commit] No src/, src-tauri/ or support-matrix changes, skipping package checks."
   exit 0
 fi
 
@@ -145,7 +172,7 @@ if [ "${#partially_staged[@]}" -gt 0 ]; then
 fi
 
 if [ "${#prettier_targets[@]}" -gt 0 ]; then
-  pnpm exec prettier --write -- "${prettier_targets[@]}"
+  run_pnpm exec prettier --write -- "${prettier_targets[@]}"
   # Some committed template files live under paths that are ignored for new files
   # (for example `src/templates/`). Refresh the index entries that are already
   # staged instead of re-adding them, otherwise `git add` can fail on ignored
@@ -172,8 +199,7 @@ fi
 
 if [ "$has_support_matrix_changes" = true ]; then
   echo "[pre-commit] Running support matrix checks..."
-  pnpm run check:support-matrix
-  pnpm run check:homebrew-cask
+  run_pnpm run check:support-matrix
 fi
 
 if [ "$has_tauri_changes" = true ]; then

@@ -98,5 +98,5 @@ pub(super) const SETTINGS_FILE_MAX_BYTES: usize = 1024 * 1024;
 
 pub(super) const LEGACY_IDENTIFIER: &str = "io.aio.gateway";
 pub(super) const DEFAULT_UPDATE_RELEASES_URL: &str =
-    "https://github.com/dyndynjyxa/aio-coding-hub/releases";
+    "https://github.com/zsr131550/aio-coding-hub-rust/releases";
 pub(super) const CACHE_TTL: Duration = Duration::from_secs(5);

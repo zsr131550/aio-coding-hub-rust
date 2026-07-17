@@ -14,6 +14,7 @@ import {
   type UpdaterDownloadEvent,
 } from "../services/app/updater";
 import type { AppAboutInfo } from "../services/app/appAbout";
+import { AIO_UPDATE_CHANNEL_ENABLED } from "../constants/urls";
 
 const STORAGE_KEY_LAST_CHECKED_AT_MS = "updater.lastCheckedAtMs";
 const DEV_PREVIEW_UPDATE_RID = 9_999_001;
@@ -107,9 +108,16 @@ export async function updateCheckNow(options: {
   ensureStarted();
   if (checkingPromise) return checkingPromise;
 
-  checkingPromise = (async () => {
+  const promise = (async () => {
     try {
-      const update = getDevPreviewEnabled()
+      const devPreviewEnabled = getDevPreviewEnabled();
+      if (!devPreviewEnabled && !AIO_UPDATE_CHANNEL_ENABLED) {
+        writeLastCheckedAtMs(Date.now());
+        if (!options.silent) toast("当前源码版本未启用更新通道");
+        return null;
+      }
+
+      const update = devPreviewEnabled
         ? buildDevPreviewUpdateCandidate()
         : await queryClient.fetchQuery({
             queryKey: updaterKeys.check(),
@@ -144,12 +152,15 @@ export async function updateCheckNow(options: {
       writeLastCheckedAtMs(Date.now());
       if (!options.silent) toast(`检查更新失败：${message}`);
       return null;
-    } finally {
-      checkingPromise = null;
     }
   })();
+  checkingPromise = promise;
 
-  return checkingPromise;
+  try {
+    return await promise;
+  } finally {
+    if (checkingPromise === promise) checkingPromise = null;
+  }
 }
 
 function onUpdaterDownloadEvent(evt: UpdaterDownloadEvent) {
@@ -174,6 +185,10 @@ export async function updateDownloadAndInstall(): Promise<boolean | null> {
   if (!updateCandidate) return null;
   if (isDevPreviewUpdateCandidate(updateCandidate)) {
     toast("Dev 预览更新仅用于展示，不能安装");
+    return false;
+  }
+  if (!AIO_UPDATE_CHANNEL_ENABLED) {
+    toast("当前源码版本未启用更新通道");
     return false;
   }
 

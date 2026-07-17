@@ -7,19 +7,31 @@
 use crate::shared::blocking;
 use std::borrow::Cow;
 use std::path::{Path, PathBuf};
-use std::time::Duration;
 
 use serde::Serialize;
 use tauri::ipc::Channel;
-use tauri::{Manager, ResourceId, WebviewWindow};
+use tauri::{ResourceId, WebviewWindow};
 use tauri_plugin_clipboard_manager::ClipboardExt;
 use tauri_plugin_dialog::{DialogExt, FileAccessMode, FilePath, PickerMode};
 use tauri_plugin_notification::NotificationExt;
 use tauri_plugin_opener::OpenerExt;
-use tauri_plugin_updater::{Update, UpdaterExt};
 use tokio::sync::oneshot;
 
 use crate::shared::ipc_confirm::{RiskyIpcConfirm, RISKY_DESKTOP_UPDATER_INSTALL};
+
+const UPDATE_CHANNEL_DISABLED_CODE: &str = "UPDATE_CHANNEL_DISABLED";
+
+fn update_channel_disabled_error() -> String {
+    format!("{UPDATE_CHANNEL_DISABLED_CODE}: update channel is disabled")
+}
+
+fn reject_disabled_updater_install(
+    rid: ResourceId,
+    confirm: Option<RiskyIpcConfirm>,
+) -> Result<bool, String> {
+    RISKY_DESKTOP_UPDATER_INSTALL.require(confirm, format!("updater:{rid}"))?;
+    Err(update_channel_disabled_error())
+}
 
 #[derive(Debug, Clone, Copy, serde::Deserialize, specta::Type)]
 #[serde(rename_all = "snake_case")]
@@ -78,6 +90,7 @@ pub(crate) struct DesktopUpdaterMetadata {
 
 #[derive(Debug, Clone, Serialize)]
 #[serde(tag = "event", content = "data")]
+#[allow(dead_code)] // Retained for the runtime-only Channel IPC compatibility surface.
 pub(crate) enum DesktopUpdaterDownloadEvent {
     #[serde(rename_all = "camelCase")]
     Started {
@@ -183,10 +196,6 @@ fn trim_to_non_empty(input: &str, max_len: usize) -> Option<String> {
     }
 
     Some(trimmed.chars().take(max_len).collect())
-}
-
-fn to_duration(timeout_ms: Option<u64>) -> Option<Duration> {
-    timeout_ms.map(Duration::from_millis)
 }
 
 fn simplify_path(path: PathBuf) -> PathBuf {
@@ -645,35 +654,7 @@ pub(crate) async fn desktop_updater_check(
     app: tauri::AppHandle,
     timeout: Option<u64>,
 ) -> Result<Option<DesktopUpdaterMetadata>, String> {
-    let mut builder = app.updater_builder();
-    if let Some(timeout) = to_duration(timeout) {
-        builder = builder.timeout(timeout);
-    }
-
-    let updater = builder
-        .build()
-        .map_err(|error| format!("failed to build updater: {error}"))?;
-    let update = updater
-        .check()
-        .await
-        .map_err(|error| format!("failed to check updater: {error}"))?;
-
-    if let Some(update) = update {
-        let current_version = update.current_version.clone();
-        let version = update.version.clone();
-        let body = update.body.clone();
-        let date = update.date.map(|value| value.to_string());
-        let rid = app.resources_table().add(update);
-
-        return Ok(Some(DesktopUpdaterMetadata {
-            rid,
-            current_version,
-            version,
-            date,
-            body,
-        }));
-    }
-
+    let _ = (app, timeout);
     Ok(None)
 }
 
@@ -685,47 +666,53 @@ pub(crate) async fn desktop_updater_download_and_install(
     timeout: Option<u64>,
     confirm: Option<RiskyIpcConfirm>,
 ) -> Result<bool, String> {
-    RISKY_DESKTOP_UPDATER_INSTALL.require(confirm, format!("updater:{rid}"))?;
-    let update = app
-        .resources_table()
-        .get::<Update>(rid)
-        .map_err(|error| format!("failed to resolve updater resource: {error}"))?;
-    let mut update = (*update).clone();
-    update.timeout = to_duration(timeout);
-
-    let mut first_chunk = true;
-    update
-        .download_and_install(
-            |chunk_length, content_length| {
-                if first_chunk {
-                    first_chunk = false;
-                    let _ = on_event.send(DesktopUpdaterDownloadEvent::Started { content_length });
-                }
-                let _ = on_event.send(DesktopUpdaterDownloadEvent::Progress { chunk_length });
-            },
-            || {
-                let _ = on_event.send(DesktopUpdaterDownloadEvent::Finished);
-            },
-        )
-        .await
-        .map_err(|error| format!("failed to download and install update: {error}"))?;
-
-    let _ = app.resources_table().close(rid);
-    Ok(true)
+    let _ = (app, on_event, timeout);
+    reject_disabled_updater_install(rid, confirm)
 }
 
 #[cfg(test)]
 mod tests {
     use super::{
         desktop_open_allowed_roots, ensure_desktop_open_path_allowed, normalize_existing_path,
+        reject_disabled_updater_install, update_channel_disabled_error,
     };
     use crate::infra::settings::{self, AppSettings, CodexHomeMode};
+    use crate::shared::ipc_confirm::{IpcConfirm, RiskyIpcConfirm};
     use crate::test_support::{clear_settings_cache, test_env_lock};
     use std::ffi::OsString;
     use std::path::Path;
     use std::sync::atomic::{AtomicU64, Ordering};
 
     static TEST_ENV_SEQ: AtomicU64 = AtomicU64::new(1);
+
+    #[test]
+    fn updater_disabled_error_keeps_a_stable_code() {
+        assert_eq!(
+            update_channel_disabled_error(),
+            "UPDATE_CHANNEL_DISABLED: update channel is disabled"
+        );
+    }
+
+    #[test]
+    fn updater_install_requires_confirmation_before_reporting_disabled_channel() {
+        let rid = 42;
+        let missing = reject_disabled_updater_install(rid, None).unwrap_err();
+        assert!(missing.starts_with("SEC_CONFIRM_REQUIRED:"));
+
+        let valid = RiskyIpcConfirm {
+            confirm: IpcConfirm {
+                action: "desktop_updater_download_and_install".to_string(),
+                resource: format!("updater:{rid}"),
+                nonce: "abcDEF1234567890".to_string(),
+                issued_at_ms: crate::shared::time::now_unix_millis(),
+                ttl_ms: 60_000,
+            },
+        };
+        assert_eq!(
+            reject_disabled_updater_install(rid, Some(valid)).unwrap_err(),
+            "UPDATE_CHANNEL_DISABLED: update channel is disabled"
+        );
+    }
 
     #[derive(Default)]
     struct EnvRestore {

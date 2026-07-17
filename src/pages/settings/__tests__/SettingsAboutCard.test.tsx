@@ -35,13 +35,13 @@ describe("pages/settings/SettingsAboutCard", () => {
     expect(screen.getByText("—")).toBeInTheDocument();
     expect(screen.getByText("运行模式")).toBeInTheDocument();
     expect(screen.getByText("desktop")).toBeInTheDocument();
-    expect(screen.getByText("检查更新")).toBeInTheDocument();
+    expect(screen.getByText("更新通道")).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole("button", { name: "检查" }));
+    fireEvent.click(screen.getByRole("button", { name: "未启用" }));
     expect(checkUpdate).toHaveBeenCalledTimes(1);
   });
 
-  it("renders portable action and checking state", () => {
+  it("does not expose a portable release action and preserves the pending state", () => {
     const checkUpdate = vi.fn().mockResolvedValue(undefined);
     const view = render(
       <SettingsAboutCard
@@ -58,8 +58,8 @@ describe("pages/settings/SettingsAboutCard", () => {
       />
     );
 
-    expect(screen.getByText("获取新版本")).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "打开" }));
+    expect(screen.getByText("更新通道")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "未启用" }));
     expect(checkUpdate).toHaveBeenCalledTimes(1);
 
     view.rerender(
@@ -77,6 +77,6 @@ describe("pages/settings/SettingsAboutCard", () => {
       />
     );
 
-    expect(screen.getByRole("button", { name: "检查中…" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "未启用" })).toBeDisabled();
   });
 });

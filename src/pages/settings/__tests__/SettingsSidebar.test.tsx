@@ -249,7 +249,7 @@ describe("pages/settings/SettingsSidebar", () => {
     configImportMutationRef.current = { isPending: false, mutateAsync: vi.fn() };
   });
 
-  it("handles update checks (no about, portable, normal)", async () => {
+  it("keeps manual update checks on the disabled source channel", async () => {
     vi.mocked(useModelPricesTotalCountQuery).mockReturnValue({ data: 3, isLoading: false } as any);
     vi.mocked(useModelPricesSyncBasellmMutation).mockReturnValue({
       isPending: false,
@@ -270,7 +270,6 @@ describe("pages/settings/SettingsSidebar", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "check-update" }));
 
-    vi.mocked(tauriOpenUrl).mockResolvedValueOnce(undefined as any);
     rerender(
       <QueryClientProvider client={createTestQueryClient()}>
         <MemoryRouter>
@@ -280,8 +279,8 @@ describe("pages/settings/SettingsSidebar", () => {
     );
 
     fireEvent.click(screen.getByRole("button", { name: "check-update" }));
-    expect(toast).toHaveBeenCalledWith("portable 模式请手动下载");
-    await waitFor(() => expect(tauriOpenUrl).toHaveBeenCalled());
+    expect(toast).toHaveBeenCalledWith("当前源码版本未启用更新通道");
+    expect(tauriOpenUrl).not.toHaveBeenCalled();
 
     rerender(
       <QueryClientProvider client={createTestQueryClient()}>
@@ -292,7 +291,8 @@ describe("pages/settings/SettingsSidebar", () => {
     );
 
     fireEvent.click(screen.getByRole("button", { name: "check-update" }));
-    expect(runBackgroundTask).toHaveBeenCalledWith("app-update-check", { trigger: "manual" });
+    expect(toast).toHaveBeenCalledWith("当前源码版本未启用更新通道");
+    expect(runBackgroundTask).not.toHaveBeenCalled();
   });
 
   it("runs local update preview even when about.run_mode is portable", async () => {
@@ -308,7 +308,7 @@ describe("pages/settings/SettingsSidebar", () => {
     await waitFor(() => {
       expect(runBackgroundTask).toHaveBeenCalledWith("app-update-check", { trigger: "manual" });
     });
-    expect(toast).not.toHaveBeenCalledWith("portable 模式请手动下载");
+    expect(toast).not.toHaveBeenCalledWith("当前源码版本未启用更新通道");
   });
 
   it("handles data management, model price sync, and subscription invalidation", async () => {

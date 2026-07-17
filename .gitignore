@@ -32,7 +32,6 @@ docs/*
 !docs/plugin-system-development-plan.md
 !docs/plugin-system-rfc.md
 !docs/plugin-manifest-v1.md
-!docs/release-homebrew.md
 !docs/plugins/
 !docs/plugins/**
 !docs/egui-migration/

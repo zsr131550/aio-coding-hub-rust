@@ -5,6 +5,7 @@ import { setTauriRuntime } from "../../../test/utils/tauriRuntime";
 describe("services/app/updater", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(tauriInvoke).mockReset();
   });
 
   afterEach(() => {
@@ -40,88 +41,23 @@ describe("services/app/updater", () => {
     });
   });
 
-  it("updaterCheck parses tauri result", async () => {
-    const { updaterCheck } = await import("../updater");
+  it("keeps the source-baseline update channel offline", async () => {
+    const { updaterCheck, updaterDownloadAndInstall } = await import("../updater");
 
     setTauriRuntime();
-
-    vi.mocked(tauriInvoke).mockResolvedValueOnce(false as any);
-    expect(await updaterCheck()).toBeNull();
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
 
     vi.mocked(tauriInvoke).mockResolvedValueOnce({ rid: 2, version: "v2" } as any);
-    expect(await updaterCheck()).toEqual({
-      rid: 2,
-      version: "v2",
-      currentVersion: undefined,
-      date: undefined,
-      body: undefined,
-    });
+
+    await expect(updaterCheck()).resolves.toBeNull();
+    await expect(updaterDownloadAndInstall({ rid: 2 })).rejects.toThrow("UPDATE_CHANNEL_DISABLED");
+    expect(tauriInvoke).not.toHaveBeenCalled();
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 
-  it("updaterCheck replaces GitHub release fallback notes with release body", async () => {
-    const { updaterCheck } = await import("../updater");
-
-    setTauriRuntime();
-
-    vi.mocked(tauriInvoke).mockResolvedValueOnce({
-      rid: 3,
-      version: "0.60.0",
-      currentVersion: "0.59.0",
-      date: "2026-06-14T15:58:48Z",
-      body: "See release: https://github.com/dyndynjyxa/aio-coding-hub/releases/tag/aio-coding-hub-v0.60.0",
-    } as any);
-
-    const fetchMock = vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => ({
-        body: "## 0.60.0\n\n- 具体更新内容",
-      }),
-    });
-    vi.stubGlobal("fetch", fetchMock);
-
-    await expect(updaterCheck()).resolves.toEqual({
-      rid: 3,
-      version: "0.60.0",
-      currentVersion: "0.59.0",
-      date: "2026-06-14T15:58:48Z",
-      body: "## 0.60.0\n\n- 具体更新内容",
-    });
-
-    expect(fetchMock).toHaveBeenCalledWith(
-      "https://api.github.com/repos/dyndynjyxa/aio-coding-hub/releases/tags/aio-coding-hub-v0.60.0",
-      expect.objectContaining({
-        headers: expect.objectContaining({ accept: "application/vnd.github+json" }),
-      })
-    );
-  });
-
-  it("updaterCheck keeps fallback notes when GitHub release body cannot be loaded", async () => {
-    const { updaterCheck } = await import("../updater");
-
-    setTauriRuntime();
-
-    const fallbackBody =
-      "See release: https://github.com/dyndynjyxa/aio-coding-hub/releases/tag/aio-coding-hub-v0.60.0";
-    vi.mocked(tauriInvoke).mockResolvedValueOnce({
-      rid: 4,
-      version: "0.60.0",
-      body: fallbackBody,
-    } as any);
-
-    const fetchMock = vi.fn().mockResolvedValue({ ok: false });
-    vi.stubGlobal("fetch", fetchMock);
-
-    await expect(updaterCheck()).resolves.toEqual({
-      rid: 4,
-      version: "0.60.0",
-      currentVersion: undefined,
-      date: undefined,
-      body: fallbackBody,
-    });
-  });
-
-  it("updaterDownloadAndInstall maps events and supports timeout option", async () => {
-    const { updaterDownloadAndInstall } = await import("../updater");
+  it("desktop updater compatibility maps events and supports timeout option", async () => {
+    const { desktopUpdaterDownloadAndInstall } = await import("../../desktop/updater");
 
     setTauriRuntime();
 
@@ -138,7 +74,7 @@ describe("services/app/updater", () => {
       return true as any;
     });
 
-    const ok = await updaterDownloadAndInstall({
+    const ok = await desktopUpdaterDownloadAndInstall({
       rid: 99,
       timeoutMs: 1234,
       onEvent: (e) => events.push(e),
@@ -169,15 +105,19 @@ describe("services/app/updater", () => {
     ]);
   });
 
-  it("updaterDownloadAndInstall rejects invalid rid and timeout before handwritten IPC", async () => {
-    const { updaterDownloadAndInstall } = await import("../updater");
-    const { desktopUpdaterCheck } = await import("../../desktop/updater");
+  it("desktop updater compatibility rejects invalid inputs before handwritten IPC", async () => {
+    const { desktopUpdaterCheck, desktopUpdaterDownloadAndInstall } =
+      await import("../../desktop/updater");
 
     setTauriRuntime();
 
-    await expect(updaterDownloadAndInstall({ rid: -1 })).rejects.toThrow("SEC_INVALID_INPUT");
-    await expect(updaterDownloadAndInstall({ rid: 1.5 })).rejects.toThrow("SEC_INVALID_INPUT");
-    await expect(updaterDownloadAndInstall({ rid: 1, timeoutMs: 0 })).rejects.toThrow(
+    await expect(desktopUpdaterDownloadAndInstall({ rid: -1 })).rejects.toThrow(
+      "SEC_INVALID_INPUT"
+    );
+    await expect(desktopUpdaterDownloadAndInstall({ rid: 1.5 })).rejects.toThrow(
+      "SEC_INVALID_INPUT"
+    );
+    await expect(desktopUpdaterDownloadAndInstall({ rid: 1, timeoutMs: 0 })).rejects.toThrow(
       "SEC_INVALID_INPUT"
     );
     await expect(desktopUpdaterCheck({ timeoutMs: Number.NaN })).rejects.toThrow(
@@ -187,8 +127,8 @@ describe("services/app/updater", () => {
     expect(tauriInvoke).not.toHaveBeenCalled();
   });
 
-  it("updaterDownloadAndInstall tolerates missing callback and default timeout branches", async () => {
-    const { updaterDownloadAndInstall } = await import("../updater");
+  it("desktop updater compatibility tolerates optional callback and timeout", async () => {
+    const { desktopUpdaterDownloadAndInstall } = await import("../../desktop/updater");
 
     setTauriRuntime();
 
@@ -202,7 +142,7 @@ describe("services/app/updater", () => {
       return true as any;
     });
 
-    const ok = await updaterDownloadAndInstall({
+    const ok = await desktopUpdaterDownloadAndInstall({
       rid: 7,
     });
 

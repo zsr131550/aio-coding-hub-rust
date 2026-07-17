@@ -101,6 +101,19 @@ function formatCounts(counts) {
     .join(", ");
 }
 
+function pnpmAuditInvocation() {
+  const auditArgs = ["audit", "--prod", "--audit-level=high", "--json"];
+  if (process.platform !== "win32") {
+    return { command: "pnpm", args: auditArgs };
+  }
+
+  // Windows exposes pnpm as a .cmd shim, which spawnSync cannot execute directly.
+  return {
+    command: process.env.ComSpec || "cmd.exe",
+    args: ["/d", "/s", "/c", `pnpm ${auditArgs.join(" ")}`],
+  };
+}
+
 function main() {
   /*
    * ============================================================================
@@ -119,7 +132,8 @@ function main() {
   logger.info("[pnpm-audit] 开始执行依赖审计...");
 
   // 1.1 运行 pnpm audit，并捕获 stdout / stderr 供后续解析
-  const result = spawnSync("pnpm", ["audit", "--prod", "--audit-level=high", "--json"], {
+  const invocation = pnpmAuditInvocation();
+  const result = spawnSync(invocation.command, invocation.args, {
     cwd: repoRoot,
     encoding: "utf8",
     env: process.env,

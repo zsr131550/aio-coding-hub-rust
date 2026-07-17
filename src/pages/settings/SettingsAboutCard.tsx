@@ -1,4 +1,5 @@
 import type { AppAboutInfo } from "../../services/app/appAbout";
+import { AIO_UPDATE_CHANNEL_ENABLED } from "../../constants/urls";
 import { Button } from "../../ui/Button";
 import { Card } from "../../ui/Card";
 
@@ -38,7 +39,11 @@ export function SettingsAboutCard({ about, checkingUpdate, checkUpdate }: Settin
           </div>
           <div className="flex items-center justify-between gap-4">
             <span className="text-muted-foreground">
-              {about.run_mode === "portable" ? "获取新版本" : "检查更新"}
+              {AIO_UPDATE_CHANNEL_ENABLED
+                ? about.run_mode === "portable"
+                  ? "获取新版本"
+                  : "检查更新"
+                : "更新通道"}
             </span>
             <Button
               onClick={() => void checkUpdate()}
@@ -46,7 +51,13 @@ export function SettingsAboutCard({ about, checkingUpdate, checkUpdate }: Settin
               size="sm"
               disabled={checkingUpdate}
             >
-              {checkingUpdate ? "检查中…" : about.run_mode === "portable" ? "打开" : "检查"}
+              {!AIO_UPDATE_CHANNEL_ENABLED
+                ? "未启用"
+                : checkingUpdate
+                  ? "检查中…"
+                  : about.run_mode === "portable"
+                    ? "打开"
+                    : "检查"}
             </Button>
           </div>
         </div>

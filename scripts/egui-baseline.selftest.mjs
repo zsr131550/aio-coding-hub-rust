@@ -651,6 +651,18 @@ await test("runner rejects a missing or stale compiled app version", () => {
   );
 });
 
+await test("benchmark parent paths use the input syntax on every host", () => {
+  const benchmarkRootFor = baselineRunner.benchmarkRootFor;
+
+  assert.equal(
+    benchmarkRootFor?.("C:\\Users\\Alice\\AppData\\Local\\Temp\\bench\\run-01"),
+    "C:\\Users\\Alice\\AppData\\Local\\Temp\\bench"
+  );
+  assert.equal(benchmarkRootFor?.("/tmp/bench/run-01"), "/tmp/bench");
+  assert.equal(benchmarkRootFor?.("relative/run-01"), null);
+  assert.equal(benchmarkRootFor?.("."), null);
+});
+
 await test("persisted runs redact runner-owned and real-home absolute paths", () => {
   const workspace = {
     runRoot: "C:\\Users\\Alice\\AppData\\Local\\Temp\\bench\\run-01",
@@ -677,6 +689,56 @@ await test("persisted runs redact runner-owned and real-home absolute paths", ()
   assert.match(redacted.stdout, /\$RUN_HOME\/report.jsonl/);
   assert.match(redacted.stderr, /\$REAL_HOME\/secrets/);
   assert.doesNotMatch(JSON.stringify(redacted), /Alice/);
+});
+
+await test("persisted runs redact POSIX-shaped paths independent of the host", () => {
+  const workspace = {
+    runRoot: "/tmp/bench/run-01",
+    home: "/tmp/bench/run-01/home",
+  };
+  const redacted = redactPersistedRunPaths(
+    {
+      isolation: {
+        home: workspace.home,
+        appData: `${workspace.home}/.aio-coding-hub`,
+      },
+      stdout: `opened ${workspace.home}/report.jsonl`,
+      stderr: "failed under /home/alice/secrets",
+      warnings: [{ code: "FIXTURE", message: "warning /tmp/bench/cache" }],
+      failures: [],
+      cleanup: { errors: [{ message: `cleanup ${workspace.home}` }] },
+    },
+    { workspace, realHome: "/home/alice" }
+  );
+
+  assert.deepEqual(redacted.isolation, {
+    home: "$RUN_HOME",
+    appData: "$RUN_HOME/.aio-coding-hub",
+  });
+  assert.match(redacted.stdout, /\$RUN_HOME\/report.jsonl/);
+  assert.match(redacted.stderr, /\$REAL_HOME\/secrets/);
+  assert.equal(redacted.warnings[0].message, "warning $BENCH_ROOT/cache");
+  assert.doesNotMatch(JSON.stringify(redacted), /alice/i);
+});
+
+await test("persisted POSIX path redaction preserves case-sensitive replacement roots", () => {
+  const workspace = {
+    runRoot: "/tmp/Bench/run-01",
+    home: "/tmp/Bench/run-01/home",
+  };
+  const redacted = redactPersistedRunPaths(
+    {
+      isolation: { home: workspace.home },
+      stdout: "",
+      stderr: "failed under /tmp/bench/secrets",
+      warnings: [],
+      failures: [],
+      cleanup: null,
+    },
+    { workspace, realHome: "/tmp/bench" }
+  );
+
+  assert.equal(redacted.stderr, "failed under $REAL_HOME/secrets");
 });
 
 await test("window milestone requires and exposes actual logical size and display scale", () => {

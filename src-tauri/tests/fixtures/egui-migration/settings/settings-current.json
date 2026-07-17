@@ -54,7 +54,7 @@
   "show_home_usage": true,
   "start_minimized": false,
   "tray_enabled": true,
-  "update_releases_url": "https://github.com/dyndynjyxa/aio-coding-hub/releases",
+  "update_releases_url": "https://github.com/zsr131550/aio-coding-hub-rust/releases",
   "upstream_first_byte_timeout_seconds": 30,
   "upstream_proxy_enabled": false,
   "upstream_proxy_password": "",

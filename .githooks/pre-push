@@ -4,10 +4,30 @@ set -euo pipefail
 repo_root="$(git rev-parse --show-toplevel)"
 cd "$repo_root"
 
+run_pnpm() {
+  if command -v pnpm >/dev/null 2>&1; then
+    pnpm "$@"
+    return
+  fi
+
+  if command -v corepack >/dev/null 2>&1; then
+    corepack pnpm "$@"
+    return
+  fi
+
+  if command -v pnpm.cmd >/dev/null 2>&1; then
+    pnpm.cmd "$@"
+    return
+  fi
+
+  echo "[pre-push] pnpm not found in PATH."
+  return 127
+}
+
 # Git passes ref update lines to pre-push via stdin. Our checks do not use
 # them, and letting child test processes inherit that stdin can make shell-based
 # tests accidentally execute ref names as commands.
 exec </dev/null
 
 echo "[pre-push] Running full pre-push checks (CI mirror: static checks + sharded coverage gate + tauri test + clippy)..."
-pnpm run check:prepush
+run_pnpm run check:prepush

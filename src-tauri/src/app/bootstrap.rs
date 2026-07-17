@@ -52,13 +52,6 @@ fn install_panic_hook() {
 fn init_desktop_integrations(app: &mut tauri::App<tauri::Wry>) {
     #[cfg(desktop)]
     {
-        if let Err(err) = app
-            .handle()
-            .plugin(tauri_plugin_updater::Builder::new().build())
-        {
-            tracing::error!("updater initialization failed: {}", err);
-        }
-
         if let Err(err) = resident::setup_tray(app.handle()) {
             tracing::error!("system tray initialization failed: {}", err);
         }

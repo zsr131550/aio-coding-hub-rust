@@ -5,8 +5,6 @@
 
 **Local AI CLI Unified Gateway** — Route Claude Code / Codex / Gemini CLI through a single entry point
 
-[![Release](https://img.shields.io/github/v/release/dyndynjyxa/aio-coding-hub?style=flat-square)](https://github.com/dyndynjyxa/aio-coding-hub/releases)
-[![Downloads](https://img.shields.io/github/downloads/dyndynjyxa/aio-coding-hub/total?style=flat-square)](https://github.com/dyndynjyxa/aio-coding-hub/releases)
 [![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Windows%20|%20macOS%20|%20Linux-lightgrey?style=flat-square)](#installation)
 [![Tauri](https://img.shields.io/badge/built%20with-Tauri%202-24C8DB?style=flat-square&logo=tauri&logoColor=white)](https://tauri.app/)
@@ -111,7 +109,7 @@ Plugin authors should start from the [Plugin Developer Guide](docs/plugins/READM
 
 ### ⚙️ More
 
-- Auto-update, autostart, single instance
+- Updater compatibility API, autostart, single instance
 - Data import / export / reset
 - WSL support
 
@@ -119,110 +117,21 @@ Plugin authors should start from the [Plugin Developer Guide](docs/plugins/READM
 
 ## Installation
 
-Go to [Releases](https://github.com/dyndynjyxa/aio-coding-hub/releases) and download for your platform:
-
-<!-- SUPPORT_MATRIX_RELEASE_DOWNLOAD:START -->
-| Platform | Official release packages |
-| --- | --- |
-| Windows x64 | `.msi` / `-portable.zip` |
-| macOS Intel | `.zip` |
-| macOS Apple Silicon | `.zip` |
-| Linux x64 | `.deb` / `.AppImage` / `-wayland.AppImage` |
-<!-- SUPPORT_MATRIX_RELEASE_DOWNLOAD:END -->
-
-The official support matrix only covers those four targets. `mac:universal` and `win:arm64` remain local build scripts and do not ship in Release assets or `latest.json`.
-
-### macOS
-
-**Option 1: Homebrew (recommended)**
-
-```bash
-brew tap dyndynjyxa/aio-coding-hub
-brew install --cask aio-coding-hub
-```
-
-To upgrade later:
-
-```bash
-brew update
-brew upgrade --cask aio-coding-hub
-```
-
-**Option 2: Manual download**
-
-Download the `.zip` matching your chip from [Releases](https://github.com/dyndynjyxa/aio-coding-hub/releases) (`arm` for Apple Silicon, `intel` for Intel), unzip, and drag `AIO Coding Hub.app` into your Applications folder.
-
-> [!IMPORTANT]
-> **Seeing "damaged and can't be opened" or "unverified developer" on first launch?**
->
-> The macOS packages are **not signed or notarized with an Apple Developer certificate**, so Gatekeeper blocks the first launch. Pick any of the following:
->
-> **① Remove the quarantine attribute (recommended, one command)**
->
-> ```bash
-> sudo xattr -cr "/Applications/AIO Coding Hub.app"
-> ```
->
-> **② Allow via System Settings**
->
-> After the first blocked launch, open **System Settings → Privacy & Security** and click **Open Anyway** at the bottom.
->
-> **③ Self-sign locally (optional, permanent)**
->
-> Replace the invalid signature with an ad-hoc one so macOS never prompts again:
->
-> ```bash
-> sudo codesign --force --deep --sign - "/Applications/AIO Coding Hub.app"
-> ```
->
-> You only need to do this once per install or manual re-install.
-
-### Windows
-
-Download from [Releases](https://github.com/dyndynjyxa/aio-coding-hub/releases):
-
-- `.msi` — standard installer with auto-update support
-- `-portable.zip` — portable version, unzip and run
-
-### Linux
-
-Download `.deb` (Debian / Ubuntu) or `.AppImage` (universal) from [Releases](https://github.com/dyndynjyxa/aio-coding-hub/releases).
-
-**Arch Linux (AUR, recommended)** — uses system libraries, best compatibility:
-
-```bash
-paru -S aio-coding-hub-bin
-# or
-yay -S aio-coding-hub-bin
-```
-
-<details>
-<summary>Wayland blank window / startup crash</summary>
-
-The app automatically detects Wayland sessions and sets `WEBKIT_DISABLE_COMPOSITING_MODE=1`
-to prevent EGL display initialisation crashes (see [issue #93](https://github.com/dyndynjyxa/aio-coding-hub/issues/93)).
-If you still see a blank white window, use the `*-wayland.AppImage` artifact from the Release page
-(bundled EGL/Mesa libraries stripped; system versions are used instead):
-
-```bash
-# Or manually repack an existing AppImage
-./scripts/repack-linux-appimage-wayland.sh aio-coding-hub-linux-amd64.AppImage
-```
-
-</details>
+This repository is currently in the source-only phase of the full Rust/egui rewrite. Official installers, Homebrew Casks, and auto-update channels will not be published until the rewrite and compatibility acceptance are complete.
 
 ### Build from Source
 
 <details>
 <summary>Prerequisites</summary>
 
-**General:** Node.js 18+, pnpm, Rust 1.90+
+**General:** Node.js 22.12+, pnpm, Rust 1.90+
 
 **Windows:** [Microsoft C++ Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/) (select "Desktop development with C++")
 
 **macOS:** `xcode-select --install`
 
 **Linux (Ubuntu/Debian):**
+
 ```bash
 sudo apt-get update
 sudo apt-get install -y libasound2-dev libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
@@ -231,31 +140,29 @@ sudo apt-get install -y libasound2-dev libwebkit2gtk-4.1-dev libappindicator3-de
 </details>
 
 ```bash
-git clone https://github.com/dyndynjyxa/aio-coding-hub.git
-cd aio-coding-hub
+git clone https://github.com/zsr131550/aio-coding-hub-rust.git
+cd aio-coding-hub-rust
 pnpm install
 
 # Development
 pnpm tauri:dev
 
-# Build (current platform)
+# Build the current platform
 pnpm tauri:build
-
-# Platform-specific
 ```
 
 <!-- SUPPORT_MATRIX_SOURCE_BUILD:START -->
 | Scope | Command | Notes |
 | --- | --- | --- |
-| Official | `pnpm tauri:build:win:x64` | Windows x64; Official; included in Release / updater matrix |
-| Official | `pnpm tauri:build:mac:x64` | macOS Intel; Official; included in Release / updater matrix |
-| Official | `pnpm tauri:build:mac:arm64` | macOS Apple Silicon; Official; included in Release / updater matrix |
-| Official | `pnpm tauri:build:linux:x64` | Linux x64; Official; included in Release / updater matrix |
-| Local only | `pnpm tauri:build:mac:universal` | macOS Universal; Local build only; excluded from the official release / updater matrix |
-| Local only | `pnpm tauri:build:win:arm64` | Windows ARM64; Local build only; excluded from the official release / updater matrix |
+| Source build | `pnpm tauri:build:win:x64` | Windows x64; Source build supported; no release binaries or updates are published during the rewrite |
+| Source build | `pnpm tauri:build:mac:x64` | macOS Intel; Source build supported; no release binaries or updates are published during the rewrite |
+| Source build | `pnpm tauri:build:mac:arm64` | macOS Apple Silicon; Source build supported; no release binaries or updates are published during the rewrite |
+| Source build | `pnpm tauri:build:linux:x64` | Linux x64; Source build supported; no release binaries or updates are published during the rewrite |
+| Experimental | `pnpm tauri:build:mac:universal` | macOS Universal; Experimental source build; no release binaries or updates are published during the rewrite |
+| Experimental | `pnpm tauri:build:win:arm64` | Windows ARM64; Experimental source build; no release binaries or updates are published during the rewrite |
 <!-- SUPPORT_MATRIX_SOURCE_BUILD:END -->
 
-Only the "Official" rows above feed GitHub Releases and auto-update. The "Local only" rows keep local build flexibility without claiming shipped support.
+These commands are for local source validation only; they do not create GitHub Releases, updater manifests, or signed installers.
 
 ---
 
@@ -290,9 +197,9 @@ All three CLIs send requests to the local gateway. The gateway picks a provider 
 
 ## FAQ
 
-**macOS says the app "is damaged" or comes from an "unverified developer"?**
+**Why are there no installers or automatic updates?**
 
-Expected — the packages are not Apple-signed or notarized. See the [macOS install notes](#macos); running `sudo xattr -cr "/Applications/AIO Coding Hub.app"` fixes it.
+The project is undergoing a full Rust/egui rewrite. Until compatibility acceptance is complete, only source builds are maintained; no Releases, signed installers, or updater manifests are created.
 
 **What port does the gateway use? How do I check it's running?**
 
@@ -304,11 +211,11 @@ No. The gateway only listens on the loopback interface, and all config and stats
 
 **Blank window or crash on Linux Wayland?**
 
-See the Wayland troubleshooting section under [Linux installation](#linux), or use the `*-wayland.AppImage` artifact.
+The current source baseline sets `WEBKIT_DISABLE_COMPOSITING_MODE=1` automatically. If the issue persists, check the system WebKitGTK/EGL dependencies; `scripts/repack-linux-appimage-wayland.sh` is only for locally built AppImages.
 
 **Which platforms get auto-updates?**
 
-The four official targets (Windows x64, macOS Intel / Apple Silicon, Linux x64) ship through Releases and the updater channel; `mac:universal` and `win:arm64` are local-build-only.
+No platform currently uses automatic updates. The updater API remains compatible but reports that the channel is disabled; an independent release channel will be designed after the full Rust rewrite.
 
 ---
 
@@ -373,15 +280,3 @@ Inspired by these excellent open-source projects:
 ## License
 
 [MIT License](LICENSE)
-
----
-
-## Star History
-
-<a href="https://www.star-history.com/?repos=dyndynjyxa%2Faio-coding-hub&type=timeline&legend=top-left">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=dyndynjyxa/aio-coding-hub&type=timeline&theme=dark&legend=top-left&sealed_token=jaHZDCqFyRK8pFxbpl9LPEq1w0XeHW5ZgEPgz0v-lA3dld9oQHaLo4PhBHoeCCHj0x2SQ4rFcl01feYvK7sW_pbwG6MhN3N1-v9AURRKgU-CuPtkj795d-0XP1dSGdzM1LNi2C5U3O4xiecboJnF3JihPmYap63V23nedzYGqGK_NSpNAN0xU97EoRrO" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=dyndynjyxa/aio-coding-hub&type=timeline&legend=top-left&sealed_token=jaHZDCqFyRK8pFxbpl9LPEq1w0XeHW5ZgEPgz0v-lA3dld9oQHaLo4PhBHoeCCHj0x2SQ4rFcl01feYvK7sW_pbwG6MhN3N1-v9AURRKgU-CuPtkj795d-0XP1dSGdzM1LNi2C5U3O4xiecboJnF3JihPmYap63V23nedzYGqGK_NSpNAN0xU97EoRrO" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=dyndynjyxa/aio-coding-hub&type=timeline&legend=top-left&sealed_token=jaHZDCqFyRK8pFxbpl9LPEq1w0XeHW5ZgEPgz0v-lA3dld9oQHaLo4PhBHoeCCHj0x2SQ4rFcl01feYvK7sW_pbwG6MhN3N1-v9AURRKgU-CuPtkj795d-0XP1dSGdzM1LNi2C5U3O4xiecboJnF3JihPmYap63V23nedzYGqGK_NSpNAN0xU97EoRrO" />
- </picture>
-</a>

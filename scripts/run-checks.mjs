@@ -18,13 +18,14 @@ const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
 const CHECKS = {
   "format-check": "pnpm format:check",
+  "repository-independence-self": "pnpm test:repository-independence-self",
+  "repository-independence": "pnpm check:repository-independence",
+  "repository-independence-staged": "pnpm check:repository-independence:staged",
   lint: "pnpm lint",
   typecheck: "pnpm typecheck",
   "no-instant-now-sub": "pnpm check:no-instant-now-sub",
-  "release-pr-changelog": "pnpm check:release-pr-changelog",
   "spec-links": "pnpm check:spec-links",
   "support-matrix": "pnpm check:support-matrix",
-  "homebrew-cask": "pnpm check:homebrew-cask",
   "gateway-error-codes": "pnpm check:gateway-error-codes",
   "plugin-system-docs": "pnpm check:plugin-system-docs",
   "plugin-api-contract": "pnpm check:plugin-api-contract",
@@ -46,13 +47,15 @@ const CHECKS = {
   "tauri-clippy": "pnpm tauri:clippy",
 };
 
+const SOURCE_REPOSITORY = ["repository-independence-self", "repository-independence"];
+const PRECOMMIT_REPOSITORY = ["repository-independence-self", "repository-independence-staged"];
 const PRECOMMIT_SRC = ["lint", "typecheck", "no-instant-now-sub"];
 const PRECOMMIT_TAURI = ["headless-core-boundary", "tauri-check"];
 const PREPUSH_STATIC = [
+  ...SOURCE_REPOSITORY,
   "lint",
   "typecheck",
   "support-matrix",
-  "homebrew-cask",
   "gateway-error-codes",
   "plugin-system-docs",
   "plugin-api-contract",
@@ -68,16 +71,16 @@ const PREPUSH_STATIC = [
 
 const STAGES = {
   // pre-commit hook picks the sub-stage based on which files are staged.
+  "precommit-repository": PRECOMMIT_REPOSITORY,
   "precommit-src": PRECOMMIT_SRC,
   "precommit-tauri": PRECOMMIT_TAURI,
-  precommit: [...PRECOMMIT_SRC, ...PRECOMMIT_TAURI],
+  precommit: [...PRECOMMIT_REPOSITORY, ...PRECOMMIT_SRC, ...PRECOMMIT_TAURI],
   "precommit-full": [
     "format-check",
+    ...PRECOMMIT_REPOSITORY,
     ...PRECOMMIT_SRC,
-    "release-pr-changelog",
     "spec-links",
     "support-matrix",
-    "homebrew-cask",
     "gateway-error-codes",
     "headless-core-boundary-self",
     "headless-core-boundary",

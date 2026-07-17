@@ -5,8 +5,6 @@
 
 **本地 AI CLI 统一网关** — 让 Claude Code / Codex / Gemini CLI 请求走同一个入口
 
-[![Release](https://img.shields.io/github/v/release/dyndynjyxa/aio-coding-hub?style=flat-square)](https://github.com/dyndynjyxa/aio-coding-hub/releases)
-[![Downloads](https://img.shields.io/github/downloads/dyndynjyxa/aio-coding-hub/total?style=flat-square)](https://github.com/dyndynjyxa/aio-coding-hub/releases)
 [![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Windows%20|%20macOS%20|%20Linux-lightgrey?style=flat-square)](#安装)
 [![Tauri](https://img.shields.io/badge/built%20with-Tauri%202-24C8DB?style=flat-square&logo=tauri&logoColor=white)](https://tauri.app/)
@@ -111,7 +109,7 @@
 
 ### ⚙️ 其他
 
-- 自动更新、开机自启、单实例
+- 更新通道兼容接口、开机自启、单实例
 - 数据导入 / 导出 / 清空
 - WSL 环境支持
 
@@ -119,108 +117,21 @@
 
 ## 安装
 
-前往 [Releases](https://github.com/dyndynjyxa/aio-coding-hub/releases) 下载对应平台安装包：
-
-<!-- SUPPORT_MATRIX_RELEASE_DOWNLOAD:START -->
-| 平台 | 官方发布安装包 |
-| --- | --- |
-| Windows x64 | `.msi` / `-portable.zip` |
-| macOS Intel | `.zip` |
-| macOS Apple Silicon | `.zip` |
-| Linux x64 | `.deb` / `.AppImage` / `-wayland.AppImage` |
-<!-- SUPPORT_MATRIX_RELEASE_DOWNLOAD:END -->
-
-官方支持矩阵只覆盖上表 4 个目标。`mac:universal` 和 `win:arm64` 只保留本地构建命令，不进入 Release 产物和 `latest.json`。
-
-### macOS
-
-**方式一：Homebrew（推荐）**
-
-```bash
-brew tap dyndynjyxa/aio-coding-hub
-brew install --cask aio-coding-hub
-```
-
-后续升级：
-
-```bash
-brew update
-brew upgrade --cask aio-coding-hub
-```
-
-**方式二：手动下载**
-
-从 [Releases](https://github.com/dyndynjyxa/aio-coding-hub/releases) 下载对应芯片的 `.zip`（Apple Silicon 选 `arm`，Intel 选 `intel`），解压后把 `AIO Coding Hub.app` 拖入「应用程序」文件夹。
-
-> [!IMPORTANT]
-> **首次打开提示"已损坏"或"无法验证开发者"？**
->
-> 当前 macOS 安装包**未经 Apple 开发者证书签名与公证**，Gatekeeper 会拦截首次启动。任选一种方式处理：
->
-> **① 移除隔离属性（推荐，一条命令）**
->
-> ```bash
-> sudo xattr -cr "/Applications/AIO Coding Hub.app"
-> ```
->
-> **② 系统设置放行**
->
-> 首次双击被拦截后，打开「系统设置 → 隐私与安全性」，在页面底部点击「仍要打开」。
->
-> **③ 本地自签名（可选，一劳永逸）**
->
-> 用 ad-hoc 签名替换掉无效签名，之后系统升级也不会再提示：
->
-> ```bash
-> sudo codesign --force --deep --sign - "/Applications/AIO Coding Hub.app"
-> ```
->
-> 以上处理只需在首次安装或手动覆盖安装后执行一次。
-
-### Windows
-
-从 [Releases](https://github.com/dyndynjyxa/aio-coding-hub/releases) 下载：
-
-- `.msi` — 标准安装包，支持自动更新
-- `-portable.zip` — 免安装便携版，解压即用
-
-### Linux
-
-从 [Releases](https://github.com/dyndynjyxa/aio-coding-hub/releases) 下载 `.deb`（Debian / Ubuntu）或 `.AppImage`（通用）。
-
-**Arch Linux（AUR，推荐）** — 使用系统库，兼容性最好：
-
-```bash
-paru -S aio-coding-hub-bin
-# 或
-yay -S aio-coding-hub-bin
-```
-
-<details>
-<summary>Wayland 白屏 / 启动崩溃排查</summary>
-
-应用在 Wayland 下启动时会自动检测并注入 `WEBKIT_DISABLE_COMPOSITING_MODE=1` 以避免 EGL 冲突崩溃（见 [issue #93](https://github.com/dyndynjyxa/aio-coding-hub/issues/93)）。
-若仍遇到白屏，可改用 Release 中附带的 `*-wayland.AppImage`（已剥离内置 EGL/Mesa 库，使用系统版本）：
-
-```bash
-# 或者手动对已有 AppImage 进行重打包
-./scripts/repack-linux-appimage-wayland.sh aio-coding-hub-linux-amd64.AppImage
-```
-
-</details>
+当前仓库处于全量 Rust/egui 重构的源码阶段。重构完成并通过兼容性验收前，不发布官方安装包、Homebrew Cask 或自动更新通道。
 
 ### 从源码构建
 
 <details>
 <summary>前置条件</summary>
 
-**通用要求：** Node.js 18+、pnpm、Rust 1.90+
+**通用要求：** Node.js 22.12+、pnpm、Rust 1.90+
 
-**Windows：** [Microsoft C++ Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/)（勾选"使用 C++ 的桌面开发"）
+**Windows：** [Microsoft C++ Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/)（勾选“使用 C++ 的桌面开发”）
 
 **macOS：** `xcode-select --install`
 
 **Linux (Ubuntu/Debian)：**
+
 ```bash
 sudo apt-get update
 sudo apt-get install -y libasound2-dev libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
@@ -229,31 +140,29 @@ sudo apt-get install -y libasound2-dev libwebkit2gtk-4.1-dev libappindicator3-de
 </details>
 
 ```bash
-git clone https://github.com/dyndynjyxa/aio-coding-hub.git
-cd aio-coding-hub
+git clone https://github.com/zsr131550/aio-coding-hub-rust.git
+cd aio-coding-hub-rust
 pnpm install
 
 # 开发模式
 pnpm tauri:dev
 
-# 构建（当前平台）
+# 构建当前平台
 pnpm tauri:build
-
-# 指定平台
 ```
 
 <!-- SUPPORT_MATRIX_SOURCE_BUILD:START -->
 | 分类 | 命令 | 说明 |
 | --- | --- | --- |
-| 官方支持 | `pnpm tauri:build:win:x64` | Windows x64；官方支持；进入 Release / updater 矩阵 |
-| 官方支持 | `pnpm tauri:build:mac:x64` | macOS Intel；官方支持；进入 Release / updater 矩阵 |
-| 官方支持 | `pnpm tauri:build:mac:arm64` | macOS Apple Silicon；官方支持；进入 Release / updater 矩阵 |
-| 官方支持 | `pnpm tauri:build:linux:x64` | Linux x64；官方支持；进入 Release / updater 矩阵 |
-| 本地构建 | `pnpm tauri:build:mac:universal` | macOS Universal；仅本地构建；不进入官方发布 / updater 矩阵 |
-| 本地构建 | `pnpm tauri:build:win:arm64` | Windows ARM64；仅本地构建；不进入官方发布 / updater 矩阵 |
+| 源码支持 | `pnpm tauri:build:win:x64` | Windows x64；源码构建支持；重构完成前不发布正式二进制或更新 |
+| 源码支持 | `pnpm tauri:build:mac:x64` | macOS Intel；源码构建支持；重构完成前不发布正式二进制或更新 |
+| 源码支持 | `pnpm tauri:build:mac:arm64` | macOS Apple Silicon；源码构建支持；重构完成前不发布正式二进制或更新 |
+| 源码支持 | `pnpm tauri:build:linux:x64` | Linux x64；源码构建支持；重构完成前不发布正式二进制或更新 |
+| 实验性 | `pnpm tauri:build:mac:universal` | macOS Universal；实验性源码构建；重构完成前不发布正式二进制或更新 |
+| 实验性 | `pnpm tauri:build:win:arm64` | Windows ARM64；实验性源码构建；重构完成前不发布正式二进制或更新 |
 <!-- SUPPORT_MATRIX_SOURCE_BUILD:END -->
 
-上表中的“官方支持”会进入 GitHub Release 和自动更新；“本地构建”只保留脚本，不承诺发布和更新。
+以上命令仅用于本地源码验证；它们不会创建 GitHub Release、更新清单或已签名安装包。
 
 ---
 
@@ -288,9 +197,9 @@ curl http://127.0.0.1:37123/health
 
 ## FAQ
 
-**macOS 提示"已损坏，无法打开"或"无法验证开发者"？**
+**为什么没有安装包或自动更新？**
 
-安装包未经 Apple 签名公证，属预期行为。参见 [macOS 安装说明](#macos)，执行 `sudo xattr -cr "/Applications/AIO Coding Hub.app"` 即可。
+项目正在进行全量 Rust/egui 重构。兼容性验收完成前只维护源码构建，不创建 Release、签名安装包或更新清单。
 
 **网关端口是多少？如何确认网关在运行？**
 
@@ -302,11 +211,11 @@ curl http://127.0.0.1:37123/health
 
 **Linux Wayland 下白屏或启动崩溃？**
 
-参见 [Linux 安装说明](#linux) 中的 Wayland 排查折叠块，或改用 `*-wayland.AppImage`。
+当前源码基线会自动设置 `WEBKIT_DISABLE_COMPOSITING_MODE=1`。如仍异常，请先检查系统 WebKitGTK/EGL 依赖；`scripts/repack-linux-appimage-wayland.sh` 仅用于本地构建的 AppImage。
 
 **哪些平台有自动更新？**
 
-官方支持矩阵内的 4 个目标（Windows x64、macOS Intel / Apple Silicon、Linux x64）进入 Release 与 updater 通道；`mac:universal`、`win:arm64` 仅提供本地构建脚本。
+当前没有平台接入自动更新。更新接口会保持兼容但明确返回“通道未启用”，待全量 Rust 重构完成后再独立设计发布通道。
 
 ---
 
@@ -371,13 +280,3 @@ pnpm tauri:test            # 后端测试
 ## 许可证
 
 [MIT License](LICENSE)
-
-## Star History
-
-<a href="https://www.star-history.com/?repos=dyndynjyxa%2Faio-coding-hub&type=timeline&legend=top-left">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=dyndynjyxa/aio-coding-hub&type=timeline&theme=dark&legend=top-left&sealed_token=jaHZDCqFyRK8pFxbpl9LPEq1w0XeHW5ZgEPgz0v-lA3dld9oQHaLo4PhBHoeCCHj0x2SQ4rFcl01feYvK7sW_pbwG6MhN3N1-v9AURRKgU-CuPtkj795d-0XP1dSGdzM1LNi2C5U3O4xiecboJnF3JihPmYap63V23nedzYGqGK_NSpNAN0xU97EoRrO" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=dyndynjyxa/aio-coding-hub&type=timeline&legend=top-left&sealed_token=jaHZDCqFyRK8pFxbpl9LPEq1w0XeHW5ZgEPgz0v-lA3dld9oQHaLo4PhBHoeCCHj0x2SQ4rFcl01feYvK7sW_pbwG6MhN3N1-v9AURRKgU-CuPtkj795d-0XP1dSGdzM1LNi2C5U3O4xiecboJnF3JihPmYap63V23nedzYGqGK_NSpNAN0xU97EoRrO" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=dyndynjyxa/aio-coding-hub&type=timeline&legend=top-left&sealed_token=jaHZDCqFyRK8pFxbpl9LPEq1w0XeHW5ZgEPgz0v-lA3dld9oQHaLo4PhBHoeCCHj0x2SQ4rFcl01feYvK7sW_pbwG6MhN3N1-v9AURRKgU-CuPtkj795d-0XP1dSGdzM1LNi2C5U3O4xiecboJnF3JihPmYap63V23nedzYGqGK_NSpNAN0xU97EoRrO" />
- </picture>
-</a>

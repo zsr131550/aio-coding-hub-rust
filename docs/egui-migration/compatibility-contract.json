@@ -8,13 +8,13 @@
   },
   "artifactHashes": {
     "docs/plugins/plugin-api-v1-contract.json": "794c1d40fdf2da1446443bdc048b070dd22d9a5cca7e2858a2e9335c53ade8f2",
-    "src-tauri/tauri.conf.json": "b0d7cf13c9dc5ffc9f36ce684490b1ee9d1c69d05af03fd4936917b498f6ae13",
+    "src-tauri/tauri.conf.json": "a4207ec40b6dfb5fe986c301a2ba32688288dc37eef75f6500d024f60819275d",
     "src-tauri/tests/fixtures/egui-migration/data/fresh/fixture.json": "b9e66afa562518df37220026d0471411e72ad4e97f483b96589d6472d25a8d32",
     "src-tauri/tests/fixtures/egui-migration/data/sqlite-current/aio-coding-hub.db": "d16ccfe66f2b2093bbfdf08437fa886c6fd718099c84cefbc618f75cc6d119e1",
     "src-tauri/tests/fixtures/egui-migration/data/sqlite-current/schema.json": "06d3cb112a93f620d05376ee57ca8a940b83a0ad3ad08938c085539ec348d9fc",
     "src-tauri/tests/fixtures/egui-migration/data/sqlite-v25/aio-coding-hub.db": "a97e70a3fa66c9ce7d0638eb45c4ab97408b5706d76478c0a7c871272c44caa2",
     "src-tauri/tests/fixtures/egui-migration/data/sqlite-v25/schema.json": "d36c74e550cdb73512305d9017ce87cce4b6f5b42140c842d06468a109473dec",
-    "src-tauri/tests/fixtures/egui-migration/manifest.json": "e47ef9368787f84858377fc414b81b3e8857be3f3b9113f53a5d9b465b6108c2",
+    "src-tauri/tests/fixtures/egui-migration/manifest.json": "128836bc1e3610bcaf466022a81bad0165026a88a5727243f82c7d21dd7de16d",
     "src-tauri/tests/fixtures/egui-migration/plugins/manifest-corpus/api-v2.json": "24eca9901788025dd4fb16023ccad535651b1e24524eb15599a207bfd366ba39",
     "src-tauri/tests/fixtures/egui-migration/plugins/manifest-corpus/cases.json": "9e1f7edf1ed80ce989c9da4b538377b3280a2f12d1ce74c64146c328d0b0e74b",
     "src-tauri/tests/fixtures/egui-migration/plugins/manifest-corpus/legacy-wasm-runtime.json": "187076f5575af0f45b3259be7f2b39f7b1ca7c0a1bdefa57e3b9201296161ba7",
@@ -31,7 +31,7 @@
     "src-tauri/tests/fixtures/egui-migration/README.md": "b7d6382764250d197ded713f54c0e1e7ceae6abab8e5dc1f93254d8cd51adf75",
     "src-tauri/tests/fixtures/egui-migration/request-logs/metadata.json": "5fbae1b16b3c48a95661d0018cb4c22c8814926c7f12e0846b553cdd1f51a985",
     "src-tauri/tests/fixtures/egui-migration/request-logs/request-logs-10000.jsonl": "9ec6b658f506bbda3f340c5ebdb38ef80271c33682077a08e39cf2aeaf60d8b2",
-    "src-tauri/tests/fixtures/egui-migration/settings/settings-current.json": "b6aae8bed69d185cf424de92d5367c142db4b13e5b10d5bf5da300d6cd0fde4a",
+    "src-tauri/tests/fixtures/egui-migration/settings/settings-current.json": "a987b29a4bc45361e37a06b8de130166233c68e4b113934fe11b2b588d7f0fb1",
     "src-tauri/tests/fixtures/egui-migration/updater/invalid/cases.json": "b24e8523067d77154560a6c80bd84e64b59e07b32ff686c16e158f94bbf74de8",
     "src-tauri/tests/fixtures/egui-migration/updater/invalid/invalid-signature.json": "ef149962b7cec09e2af4baee92d30b90f636c231ef64414459b1aa9c01ebac10",
     "src-tauri/tests/fixtures/egui-migration/updater/invalid/missing-platform.json": "88ab111fc4c34e6136fcaf3a8108399af9d95c7f814af25aa13f4218db693f3f",
@@ -547,9 +547,11 @@
         "updaterPlatform": "linux-x86_64"
       }
     ],
-    "updaterEndpoint": "https://github.com/dyndynjyxa/aio-coding-hub/releases/latest/download/latest.json",
-    "updaterPublicKeySha256": "b75f3e11f3a84cfa2f6ae586a64ad54f0677d2775eeb6ab4ec24b8f154d7f502",
-    "windowsInstallMode": "passive"
+    "publicationMode": "source-only",
+    "updaterEndpoint": null,
+    "updaterMode": "disabled",
+    "updaterPublicKeySha256": null,
+    "windowsInstallMode": null
   },
   "routes": [
     {

@@ -1,6 +1,2 @@
 blank_issues_enabled: false
-# 如需添加讨论区链接，取消下方注释并更新 URL
-# contact_links:
-#   - name: 讨论区
-#     url: https://github.com/your-org/aio-coding-hub/discussions
-#     about: 如有使用问题或想法交流，欢迎在讨论区发帖
+# 讨论区启用后再添加 contact_links，避免指向尚未配置的入口。

@@ -105,13 +105,13 @@ export function mergePreparedFixtureEvidence(current, workspace) {
   return current;
 }
 
-function replacePathPrefix(value, source, token) {
+function replacePathPrefix(value, source, token, caseInsensitive) {
   let redacted = value;
   const variants = new Set([source, source.replaceAll("\\", "/"), source.replaceAll("/", "\\")]);
   for (const variant of variants) {
     if (variant.length === 0) continue;
     const escaped = variant.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    redacted = redacted.replace(new RegExp(escaped, "gi"), token);
+    redacted = redacted.replace(new RegExp(escaped, caseInsensitive ? "gi" : "g"), token);
   }
   return redacted;
 }
@@ -119,7 +119,11 @@ function replacePathPrefix(value, source, token) {
 function redactDiagnosticValue(value, replacements) {
   if (typeof value === "string") {
     return replacements
-      .reduce((current, [source, token]) => replacePathPrefix(current, source, token), value)
+      .reduce(
+        (current, [source, token, caseInsensitive]) =>
+          replacePathPrefix(current, source, token, caseInsensitive),
+        value
+      )
       .replaceAll("\\", "/");
   }
   if (Array.isArray(value)) return value.map((item) => redactDiagnosticValue(item, replacements));
@@ -131,14 +135,51 @@ function redactDiagnosticValue(value, replacements) {
   return value;
 }
 
-export function redactPersistedRunPaths(run, { workspace, realHome = os.homedir() }) {
-  const replacements = [
+function pathSyntaxForAbsolute(value) {
+  if (typeof value !== "string" || value.length === 0) return null;
+  const windowsAbsolute = /^[A-Za-z]:[\\/]/.test(value) || value.startsWith("\\\\");
+  if (windowsAbsolute && path.win32.isAbsolute(value)) return path.win32;
+  if (path.posix.isAbsolute(value)) return path.posix;
+  return null;
+}
+
+export function benchmarkRootFor(runRoot) {
+  const syntax = pathSyntaxForAbsolute(runRoot);
+  if (syntax == null) return null;
+  const parent = syntax.dirname(runRoot);
+  if (parent.length === 0 || parent === "." || parent === runRoot || !syntax.isAbsolute(parent)) {
+    return null;
+  }
+  return parent;
+}
+
+function diagnosticPathReplacements(workspace, realHome) {
+  const candidates = [
     [workspace.home, "$RUN_HOME"],
     [workspace.runRoot, "$RUN_ROOT"],
-    [path.dirname(workspace.runRoot), "$BENCH_ROOT"],
+    [benchmarkRootFor(workspace.runRoot), "$BENCH_ROOT"],
     [repositoryRoot, "$REPO"],
     [realHome, "$REAL_HOME"],
-  ].sort(([left], [right]) => right.length - left.length);
+  ];
+  const seen = new Set();
+  const replacements = [];
+  for (const [source, token] of candidates) {
+    const syntax = pathSyntaxForAbsolute(source);
+    if (syntax == null) continue;
+    const normalized = syntax.normalize(source);
+    if (normalized.length === 0 || normalized === "." || !syntax.isAbsolute(normalized)) continue;
+    const caseInsensitive = syntax === path.win32;
+    const normalizedKey = normalized.replaceAll("\\", "/");
+    const key = `${caseInsensitive ? "win32" : "posix"}:${caseInsensitive ? normalizedKey.toLowerCase() : normalizedKey}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    replacements.push([normalized, token, caseInsensitive]);
+  }
+  return replacements.sort(([left], [right]) => right.length - left.length);
+}
+
+export function redactPersistedRunPaths(run, { workspace, realHome = os.homedir() }) {
+  const replacements = diagnosticPathReplacements(workspace, realHome);
   const redact = (value) => redactDiagnosticValue(value, replacements);
   return {
     ...run,

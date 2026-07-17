@@ -348,9 +348,18 @@ function generateContract({ root, rustContract, supportMatrix }) {
   }
 
   const updater = tauriConfig.plugins?.updater;
-  const endpoints = requireArray(updater?.endpoints, "Tauri updater endpoints");
-  if (endpoints.length !== 1) fail("Tauri updater must have exactly one stable endpoint");
-  const publicKey = requireString(updater?.pubkey, "Tauri updater public key");
+  if (updater != null && (typeof updater !== "object" || Array.isArray(updater))) {
+    fail("Tauri updater config must be an object when present");
+  }
+  if (updater != null && Object.hasOwn(updater, "endpoints")) {
+    fail("Tauri updater endpoints must be absent while the channel is disabled");
+  }
+  if (updater != null && Object.hasOwn(updater, "pubkey")) {
+    fail("Tauri updater public key must be absent while the channel is disabled");
+  }
+  if (Object.hasOwn(tauriConfig.bundle ?? {}, "createUpdaterArtifacts")) {
+    fail("Tauri updater artifact generation must be absent during the source-only rewrite");
+  }
 
   const artifactPaths = new Set([
     normalizeRelativePath(root, rustContract.ipc.bindingsPath, "bindings path"),
@@ -410,10 +419,12 @@ function generateContract({ root, rustContract, supportMatrix }) {
       extensionHost: rustContract.extensionHost,
     },
     release: {
+      publicationMode: "source-only",
       officialTargets,
-      updaterEndpoint: endpoints[0],
-      updaterPublicKeySha256: createHash("sha256").update(publicKey).digest("hex"),
-      windowsInstallMode: updater.windows?.installMode ?? null,
+      updaterMode: "disabled",
+      updaterEndpoint: null,
+      updaterPublicKeySha256: null,
+      windowsInstallMode: null,
     },
     artifactHashes,
   };

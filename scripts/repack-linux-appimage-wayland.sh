@@ -35,7 +35,8 @@
 #   - fuse / fuse2   Required by AppImage extraction (or use --appimage-extract
 #                    which works without FUSE).
 #
-# Ref: https://github.com/dyndynjyxa/aio-coding-hub/issues/93
+# This local source-build utility strips bundled EGL/Mesa libraries so the
+# AppImage uses the host Wayland graphics stack.
 
 set -euo pipefail
 

@@ -719,7 +719,7 @@ describe("pages/PluginsPage", () => {
 
     await waitFor(() => {
       expect(openDesktopUrl).toHaveBeenCalledWith(
-        "https://github.com/dyndynjyxa/aio-coding-hub/blob/main/docs/plugins/README.md"
+        "https://github.com/zsr131550/aio-coding-hub-rust/blob/main/docs/plugins/README.md"
       );
     });
   });

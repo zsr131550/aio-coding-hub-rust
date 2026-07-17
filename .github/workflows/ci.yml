@@ -1,17 +1,16 @@
 name: ci
 
 on:
+  workflow_dispatch:
   push:
-    branches: [dev, main]
+    branches: [dev, main, "codex/**"]
   pull_request:
     branches: [dev, main]
 
 permissions:
   contents: read
 
-# A new push to the same PR/branch supersedes the in-flight run. This also
-# cancels the doomed pre-sync run on release-please PRs once
-# sync-release-pr-cargo-lock pushes the updated Cargo.lock.
+# A new push to the same PR/branch supersedes the in-flight run.
 concurrency:
   group: ci-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
@@ -45,6 +44,12 @@ jobs:
         with:
           node-version: 22
 
+      - name: Repository independence checker self-test
+        run: node scripts/check-repository-independence.selftest.mjs
+
+      - name: Repository independence contract
+        run: node scripts/check-repository-independence.mjs
+
       - id: matrix
         name: Load desktop support matrix
         shell: bash
@@ -54,9 +59,6 @@ jobs:
 
       - name: Validate support matrix contract
         run: node scripts/support-matrix.mjs check
-
-      - name: Validate Homebrew Cask generator
-        run: node scripts/support-matrix.homebrew-cask.selftest.mjs
 
   desktop-support-contract:
     needs: support-contract
@@ -202,27 +204,9 @@ jobs:
         working-directory: src-tauri
         run: cargo fmt -- --check
 
-      - name: Sync Cargo.lock (for release-please version bumps)
+      - name: Verify committed Cargo.lock
         working-directory: src-tauri
-        run: cargo update --workspace
-
-      # release-please PRs have a dedicated workflow that commits Cargo.lock
-      # after version bumps. Skip the committed-file check here to avoid a
-      # race where CI runs before that sync workflow pushes its follow-up commit.
-      - name: Verify Cargo.lock is committed
-        if: ${{ github.event_name != 'pull_request' || !startsWith(github.head_ref, 'release-please--') }}
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          if git diff --quiet -- src-tauri/Cargo.lock; then
-            exit 0
-          fi
-
-          echo "src-tauri/Cargo.lock is out of date." >&2
-          echo "Run 'cd src-tauri && cargo update --workspace' and commit the result." >&2
-          git diff -- src-tauri/Cargo.lock
-          exit 1
+        run: cargo metadata --locked --format-version 1 --no-deps > /dev/null
 
       - name: Headless core boundary checker self-test
         run: node scripts/check-headless-core-boundary.selftest.mjs
