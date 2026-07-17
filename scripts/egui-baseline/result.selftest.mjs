@@ -165,6 +165,8 @@ function successfulRun(scenario, index) {
 }
 
 function baselineResult(scenario = "first-interactive") {
+  const fixturePlatform = "win32";
+  const fixtureArch = "x64";
   const rawRuns = Array.from({ length: 10 }, (_, index) => successfulRun(scenario, index));
   const aggregates = Object.fromEntries(
     Object.keys(rawRuns[0].metrics).map((name) => [
@@ -212,14 +214,14 @@ function baselineResult(scenario = "first-interactive") {
         path: "fixture.build-provenance.json",
         sha256: "6".repeat(64),
         profile: "release",
-        target: supportedHostTarget(),
+        target: supportedHostTarget(fixturePlatform, fixtureArch),
         producer: "scripts/tauri-build.mjs",
         configOverlaySha256: null,
       },
     },
     environment: {
-      platform: "win32",
-      arch: process.arch,
+      platform: fixturePlatform,
+      arch: fixtureArch,
       osRelease: "fixture-os-release",
       kernelType: "FixtureKernel",
       cpuModel: null,
@@ -231,7 +233,7 @@ function baselineResult(scenario = "first-interactive") {
       gpuRenderer: null,
       webViewRuntime: null,
       power: null,
-      processMetrics: processCollectorCapabilities("win32"),
+      processMetrics: processCollectorCapabilities(fixturePlatform),
     },
     protocol: {
       warmups: 2,
