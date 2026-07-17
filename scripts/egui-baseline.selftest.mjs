@@ -153,6 +153,8 @@ await test("process sampling discards an empty snapshot captured after process e
 });
 
 function minimalBaselineResult() {
+  const fixturePlatform = "win32";
+  const fixtureArch = "x64";
   const fixtureArtifacts = {
     "aio-coding-hub.db": { bytes: 1, sha256: "1".repeat(64) },
     "settings.json": { bytes: 1, sha256: "2".repeat(64) },
@@ -196,14 +198,14 @@ function minimalBaselineResult() {
         path: "fixture.build-provenance.json",
         sha256: "5".repeat(64),
         profile: "release",
-        target: supportedHostTarget(),
+        target: supportedHostTarget(fixturePlatform, fixtureArch),
         producer: "scripts/tauri-build.mjs",
         configOverlaySha256: null,
       },
     },
     environment: {
-      platform: "win32",
-      arch: process.arch,
+      platform: fixturePlatform,
+      arch: fixtureArch,
       osRelease: "fixture-os-release",
       kernelType: "FixtureKernel",
       cpuModel: null,
@@ -215,7 +217,7 @@ function minimalBaselineResult() {
       gpuRenderer: null,
       webViewRuntime: null,
       power: null,
-      processMetrics: processCollectorCapabilities("win32"),
+      processMetrics: processCollectorCapabilities(fixturePlatform),
     },
     protocol: {
       warmups: 2,
