@@ -6,6 +6,20 @@ import { fileURLToPath } from "node:url";
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const defaultRoot = resolve(scriptDir, "..");
 const MAX_SOURCE_BYTES = 2 * 1024 * 1024;
+const CAPABILITY_PLUGIN_IDENTIFIERS = Object.freeze([
+  "tauri_plugin_clipboard_manager",
+  "tauri_plugin_dialog",
+  "tauri_plugin_opener",
+  "tauri_plugin_notification",
+  "tauri_plugin_autostart",
+  "tauri_plugin_updater",
+]);
+const CAPABILITY_PLUGIN_EXACT_ALLOWLIST = new Set([
+  "src-tauri/src/app/plugin_registry.rs",
+  "src-tauri/src/app/bootstrap.rs",
+  "src-tauri/src/app/heartbeat_watchdog.rs",
+  "src-tauri/src/egui_fixture_contract.rs",
+]);
 
 const POLICIES = Object.freeze({
   "aio-contract": Object.freeze({
@@ -14,8 +28,13 @@ const POLICIES = Object.freeze({
     build: new Set(),
   }),
   "aio-core": Object.freeze({
-    normal: new Set(["aio-contract", "thiserror", "tokio"]),
+    normal: new Set(["aio-contract", "aio-platform", "thiserror", "tokio"]),
     dev: new Set(["serde_json", "tempfile", "tokio"]),
+    build: new Set(),
+  }),
+  "aio-platform": Object.freeze({
+    normal: new Set(["serde", "specta", "thiserror", "url"]),
+    dev: new Set(["serde_json"]),
     build: new Set(),
   }),
 });
@@ -79,9 +98,19 @@ function isForbiddenDependency(name) {
   return (
     normalized === "tauri" ||
     normalized.startsWith("tauri-") ||
-    ["egui", "eframe", "winit", "wry", "webview2-com", "webkit2gtk", "webkit2gtk-sys"].includes(
-      normalized
-    )
+    [
+      "egui",
+      "eframe",
+      "winit",
+      "wry",
+      "webview2-com",
+      "webkit2gtk",
+      "webkit2gtk-sys",
+      "rfd",
+      "arboard",
+      "tray-icon",
+      "notify-rust",
+    ].includes(normalized)
   );
 }
 
@@ -292,7 +321,7 @@ function lineNumberAt(source, index) {
 function auditRustSource(crateName, crateRoot, repoRoot, failures) {
   const sources = collectRustSources(crateRoot, failures);
   const prohibited =
-    /\b(?:tauri(?:_[A-Za-z0-9_]+)?|egui|eframe|winit|wry|webview2_com|webkit2gtk(?:_sys)?)\b/g;
+    /\b(?:tauri(?:_[A-Za-z0-9_]+)?|egui|eframe|winit|wry|webview2_com|webkit2gtk(?:_sys)?|rfd|arboard|tray_icon|notify_rust)\b/g;
 
   for (const sourcePath of sources) {
     const size = statSync(sourcePath).size;
@@ -310,6 +339,77 @@ function auditRustSource(crateName, crateRoot, repoRoot, failures) {
     }
   }
   return sources.length;
+}
+
+function collectProductionRustSources(sourceRoot, failures) {
+  const files = [];
+
+  function visit(path) {
+    const info = lstatSync(path);
+    if (info.isSymbolicLink()) {
+      failures.push(
+        `${relative(sourceRoot, path).replaceAll("\\", "/")}: symbolic links are not allowed in production Rust source`
+      );
+      return;
+    }
+    if (info.isFile()) {
+      if (path.endsWith(".rs")) {
+        files.push(path);
+      }
+      return;
+    }
+    if (!info.isDirectory()) {
+      return;
+    }
+    for (const entry of readdirSync(path)) {
+      visit(join(path, entry));
+    }
+  }
+
+  if (existsSync(sourceRoot)) {
+    visit(sourceRoot);
+  }
+  return files;
+}
+
+function isCapabilityPluginUseAllowed(displayPath) {
+  const normalized = displayPath.toLowerCase();
+  return (
+    normalized.startsWith("src-tauri/src/app/platform/") ||
+    CAPABILITY_PLUGIN_EXACT_ALLOWLIST.has(normalized)
+  );
+}
+
+function auditProductionCapabilityPluginUse(tauriRoot, repoRoot, failures) {
+  const sourceRoot = join(tauriRoot, "src");
+  for (const sourcePath of collectProductionRustSources(sourceRoot, failures)) {
+    const displayPath = relative(repoRoot, sourcePath).replaceAll("\\", "/");
+    if (isCapabilityPluginUseAllowed(displayPath)) {
+      continue;
+    }
+    const size = statSync(sourcePath).size;
+    if (size > MAX_SOURCE_BYTES) {
+      failures.push(`${displayPath}: Rust source exceeds ${MAX_SOURCE_BYTES} bytes`);
+      continue;
+    }
+
+    const code = stripRustNonCode(readFileSync(sourcePath, "utf8"));
+    const reported = new Set();
+    for (const identifier of CAPABILITY_PLUGIN_IDENTIFIERS) {
+      const pattern = new RegExp(`\\b${identifier}\\b`, "g");
+      for (const match of code.matchAll(pattern)) {
+        const line = lineNumberAt(code, match.index ?? 0);
+        const key = `${identifier}:${line}`;
+        if (reported.has(key)) {
+          continue;
+        }
+        reported.add(key);
+        failures.push(
+          `${displayPath}:${line}: capability plugin '${identifier}' may only be used by approved platform adapters or shell lifecycle files`
+        );
+      }
+    }
+  }
 }
 
 function auditBoundary(repoRoot) {
@@ -348,10 +448,23 @@ function auditBoundary(repoRoot) {
       ) {
         failures.push("aio-core: aio-contract must be a direct path dependency on ../aio-contract");
       }
+      const platformDependency = pkg.dependencies.find(
+        (dependency) =>
+          dependency.name === "aio-platform" && dependencyKind(dependency) === "normal"
+      );
+      if (
+        !platformDependency?.path ||
+        normalizedPath(platformDependency.path) !==
+          normalizedPath(join(tauriRoot, "crates", "aio-platform"))
+      ) {
+        failures.push("aio-core: aio-platform must be a direct path dependency on ../aio-platform");
+      }
     }
     auditForbiddenDependencyClosure(metadata, pkg, failures);
     sourceCount += auditRustSource(crateName, expectedRoot, repoRoot, failures);
   }
+
+  auditProductionCapabilityPluginUse(tauriRoot, repoRoot, failures);
 
   return { failures, sourceCount, packageCount: metadata.packages.length };
 }
@@ -369,7 +482,7 @@ function main() {
       process.exit(1);
     }
     console.log(
-      `[headless-core-boundary] checked aio-contract and aio-core: ${result.sourceCount} Rust files, ${result.packageCount} resolved packages`
+      `[headless-core-boundary] checked aio-contract, aio-core, and aio-platform: ${result.sourceCount} Rust files, ${result.packageCount} resolved packages`
     );
   } catch (error) {
     console.error(`[headless-core-boundary] ${error.message}`);
